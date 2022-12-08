@@ -1,4 +1,4 @@
-package grpc_server
+package servergrpc
 
 import (
 	"fmt"
@@ -7,25 +7,25 @@ import (
 	"time"
 )
 
-type GRPCServer struct {
+type ServerGRPC struct {
 	*grpc.Server
 	net.Listener
 }
 
-func NewServer(addr string) (*GRPCServer, error) {
+func NewServer(addr string) (*ServerGRPC, error) {
 
 	listen, err := net.Listen("tcp", addr)
 	if err != nil {
 		return nil, err
 	}
 
-	return &GRPCServer{
+	return &ServerGRPC{
 		Server:   grpc.NewServer(),
 		Listener: listen,
 	}, nil
 }
 
-func (s *GRPCServer) Start() {
+func (s *ServerGRPC) Start() {
 
 	go func() {
 		fmt.Printf("Server started at: %s\n", time.Now().Format("02-01-2006 15:04:05"))
@@ -36,7 +36,7 @@ func (s *GRPCServer) Start() {
 	}()
 }
 
-func (s *GRPCServer) Stop() {
+func (s *ServerGRPC) Stop() {
 
 	s.Server.Stop()
 	fmt.Printf("Server stopped at: %s\n", time.Now().Format("02-01-2006 15:04:05"))

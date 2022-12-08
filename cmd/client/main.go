@@ -1,8 +1,8 @@
 package main
 
 import (
+	"GophKeeper/internal/client/clientgrpc"
 	"GophKeeper/internal/server"
-	"GophKeeper/internal/server/servergrpc"
 	"fmt"
 	"log"
 	"os"
@@ -11,7 +11,7 @@ import (
 )
 
 var (
-	_ = (*servergrpc.ServerGRPC)(nil)
+	_ = (*clientgrpc.ClientGRPC)(nil)
 )
 
 var (
@@ -23,15 +23,23 @@ var (
 func main() {
 
 	cfg := newConfig()
-	serv := newServer(cfg)
+	cli := newClient(cfg)
 
-	serv.Start()
+	if err := cli.Connect(); err != nil {
+		log.Fatalf("server connection error: %v\n", err)
+	}
+
+	fmt.Println("Привет :)")
 
 	done := make(chan os.Signal)
 	signal.Notify(done, syscall.SIGTERM, syscall.SIGINT, syscall.SIGQUIT)
 	<-done
 
-	serv.Stop()
+	if err := cli.Disconnect(); err != nil {
+		log.Printf("connection error from the server: %v\n ", err)
+	}
+
+	fmt.Println("Goodbye...")
 }
 
 func init() {
@@ -51,13 +59,8 @@ func newConfig() *server.Config {
 	return cfg
 }
 
-// newServer Создание объекта сервера
-func newServer(cfg *server.Config) *servergrpc.ServerGRPC {
+// newClient Создание объекта клиента
+func newClient(cfg *server.Config) *clientgrpc.ClientGRPC {
 
-	serv, err := servergrpc.NewServer(cfg.AddrGRPC)
-	if err != nil {
-		log.Fatalf("failed run: %v\n", err.Error())
-	}
-
-	return serv
+	return clientgrpc.NewClient(cfg.AddrGRPC)
 }
