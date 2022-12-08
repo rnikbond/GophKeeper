@@ -2,20 +2,46 @@ package main
 
 import (
 	"GophKeeper/internal/server"
-	"fmt"
+	"GophKeeper/internal/server/grpc_server"
 	"log"
-	"time"
+	"os"
+	"os/signal"
+	"syscall"
+)
+
+var (
+	_ = (*grpc_server.GRPCServer)(nil)
 )
 
 func main() {
 
-	cfg := server.NewConfig()
-	if err := cfg.ParseArgs(); err != nil {
-		log.Fatalln(err.Error())
+	cfg := newConfig()
+	serv := newServer(cfg)
+	done := make(chan os.Signal)
+
+	serv.Start()
+
+	signal.Notify(done, syscall.SIGTERM, syscall.SIGINT, syscall.SIGQUIT)
+	<-done
+
+	serv.Stop()
+}
+
+func newServer(cfg *server.Config) *grpc_server.GRPCServer {
+
+	serv, err := grpc_server.NewServer(cfg.AddrGRPC)
+	if err != nil {
+		log.Fatalf("failed run: %v\n", err.Error())
 	}
 
-	fmt.Printf("Server started on %s at: %s\n", cfg.AddrGRPC, time.Now().Format("02-01-2006 15:04:05"))
-	time.Sleep(1 * time.Second)
-	fmt.Printf("Server stopped at: %s\n", time.Now().Format("02-01-2006 15:04:05"))
+	return serv
+}
 
+func newConfig() *server.Config {
+	cfg := server.NewConfig()
+	if err := cfg.ParseArgs(); err != nil {
+		log.Fatalf("failed run: %v\n", err.Error())
+	}
+
+	return cfg
 }
