@@ -3,6 +3,7 @@ package main
 import (
 	"GophKeeper/internal/server"
 	"GophKeeper/internal/server/servergrpc"
+	"GophKeeper/internal/storage"
 	"fmt"
 	"log"
 	"os"
@@ -23,7 +24,8 @@ var (
 func main() {
 
 	cfg := newConfig()
-	serv := newServer(cfg)
+	store := storage.NewMemoryStorage()
+	serv := newServer(cfg, store)
 
 	serv.Start()
 
@@ -52,9 +54,9 @@ func newConfig() *server.Config {
 }
 
 // newServer Создание объекта сервера
-func newServer(cfg *server.Config) *servergrpc.ServerGRPC {
+func newServer(cfg *server.Config, store storage.UserStorage) *servergrpc.ServerGRPC {
 
-	serv, err := servergrpc.NewServer(cfg.AddrGRPC)
+	serv, err := servergrpc.NewServer(cfg.AddrGRPC, store)
 	if err != nil {
 		log.Fatalf("failed run: %v\n", err.Error())
 	}

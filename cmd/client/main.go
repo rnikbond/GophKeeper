@@ -29,7 +29,16 @@ func main() {
 		log.Fatalf("server connection error: %v\n", err)
 	}
 
-	fmt.Println("Привет :)")
+	if err := cli.Login(); err != nil {
+
+		if err = cli.Register(); err != nil {
+			log.Fatalf("error say hello: %v\n", err)
+		}
+
+		fmt.Println("Success Register")
+	}
+
+	fmt.Println("Success Login")
 
 	done := make(chan os.Signal)
 	signal.Notify(done, syscall.SIGTERM, syscall.SIGINT, syscall.SIGQUIT)
