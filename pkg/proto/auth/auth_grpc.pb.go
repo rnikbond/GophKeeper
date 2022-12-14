@@ -24,7 +24,6 @@ const _ = grpc.SupportPackageIsVersion7
 type AuthServiceClient interface {
 	Register(ctx context.Context, in *AuthRequest, opts ...grpc.CallOption) (*AuthResponse, error)
 	Login(ctx context.Context, in *AuthRequest, opts ...grpc.CallOption) (*AuthResponse, error)
-	Logout(ctx context.Context, in *LogoutRequest, opts ...grpc.CallOption) (*Empty, error)
 	ChangePassword(ctx context.Context, in *ChangePasswordRequest, opts ...grpc.CallOption) (*Empty, error)
 }
 
@@ -54,15 +53,6 @@ func (c *authServiceClient) Login(ctx context.Context, in *AuthRequest, opts ...
 	return out, nil
 }
 
-func (c *authServiceClient) Logout(ctx context.Context, in *LogoutRequest, opts ...grpc.CallOption) (*Empty, error) {
-	out := new(Empty)
-	err := c.cc.Invoke(ctx, "/auth.AuthService/Logout", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 func (c *authServiceClient) ChangePassword(ctx context.Context, in *ChangePasswordRequest, opts ...grpc.CallOption) (*Empty, error) {
 	out := new(Empty)
 	err := c.cc.Invoke(ctx, "/auth.AuthService/ChangePassword", in, out, opts...)
@@ -78,7 +68,6 @@ func (c *authServiceClient) ChangePassword(ctx context.Context, in *ChangePasswo
 type AuthServiceServer interface {
 	Register(context.Context, *AuthRequest) (*AuthResponse, error)
 	Login(context.Context, *AuthRequest) (*AuthResponse, error)
-	Logout(context.Context, *LogoutRequest) (*Empty, error)
 	ChangePassword(context.Context, *ChangePasswordRequest) (*Empty, error)
 	mustEmbedUnimplementedAuthServiceServer()
 }
@@ -92,9 +81,6 @@ func (UnimplementedAuthServiceServer) Register(context.Context, *AuthRequest) (*
 }
 func (UnimplementedAuthServiceServer) Login(context.Context, *AuthRequest) (*AuthResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Login not implemented")
-}
-func (UnimplementedAuthServiceServer) Logout(context.Context, *LogoutRequest) (*Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Logout not implemented")
 }
 func (UnimplementedAuthServiceServer) ChangePassword(context.Context, *ChangePasswordRequest) (*Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ChangePassword not implemented")
@@ -148,24 +134,6 @@ func _AuthService_Login_Handler(srv interface{}, ctx context.Context, dec func(i
 	return interceptor(ctx, in, info, handler)
 }
 
-func _AuthService_Logout_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(LogoutRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(AuthServiceServer).Logout(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/auth.AuthService/Logout",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AuthServiceServer).Logout(ctx, req.(*LogoutRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 func _AuthService_ChangePassword_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ChangePasswordRequest)
 	if err := dec(in); err != nil {
@@ -198,10 +166,6 @@ var AuthService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Login",
 			Handler:    _AuthService_Login_Handler,
-		},
-		{
-			MethodName: "Logout",
-			Handler:    _AuthService_Logout_Handler,
 		},
 		{
 			MethodName: "ChangePassword",

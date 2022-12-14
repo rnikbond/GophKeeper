@@ -15,5 +15,7 @@ func (err ErrAuth) Error() string {
 }
 
 var (
-	ErrInvalidToken = NewErr("invalid token")
+	ErrInvalidToken    = NewErr("invalid token")
+	ErrInvalidAuthData = NewErr("invalid login or password")
+	ErrGenerateToken   = NewErr("error generate access token")
 )
