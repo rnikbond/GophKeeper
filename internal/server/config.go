@@ -9,7 +9,8 @@ import (
 )
 
 type Config struct {
-	AddrGRPC string `env:"ADDRESS_RPC" json:"address_rpc"`
+	AddrGRPC  string `env:"ADDRESS_RPC" json:"address_rpc"`
+	SecretKey string `env:"SECRET_KEY" json:"secret_key"`
 }
 
 // NewConfig Конфигурация сервера
@@ -23,7 +24,8 @@ func NewConfig() *Config {
 // ParseArgs Разброр аргументов командной строки
 func (cfg *Config) ParseArgs() error {
 
-	addr := flag.String("ag", "", "string - address grpc gate")
+	addr := flag.String("ag", "", "address grpc gate")
+	secret := flag.String("sk", "", "secret key for JWT")
 	flag.Parse()
 
 	if addr == nil || len(*addr) == 0 {
@@ -35,6 +37,11 @@ func (cfg *Config) ParseArgs() error {
 	}
 
 	cfg.AddrGRPC = *addr
+
+	if secret != nil {
+		cfg.SecretKey = *secret
+	}
+
 	return nil
 }
 
