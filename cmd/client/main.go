@@ -3,8 +3,9 @@ package main
 import (
 	"GophKeeper/internal/client/clientgrpc"
 	"GophKeeper/internal/server"
+	"GophKeeper/pkg/logzap"
 	"fmt"
-	"log"
+	"go.uber.org/zap"
 	"os"
 	"os/signal"
 	"syscall"
@@ -22,33 +23,39 @@ var (
 
 func main() {
 
+	logzap.ConfigZapLogger("client_errs.log")
+
+	logger := zap.L()
+
 	cfg := newConfig()
 	cli := newClient(cfg)
 
 	if err := cli.Connect(); err != nil {
-		log.Fatalf("server connection error: %v\n", err)
+		logger.Fatal(" connection error", zap.Error(err))
 	}
 
 	if err := cli.Login(); err != nil {
 
 		if err = cli.Register(); err != nil {
-			log.Fatalf("error say hello: %v\n", err)
+			logger.Error("register error", zap.Error(err))
 		}
 
-		fmt.Println("Success Register")
+		logger.Info("Success Register")
+	} else {
+		logger.Error("login error", zap.Error(err))
 	}
 
-	fmt.Println("Success Login")
+	logger.Info("Success Login")
 
 	done := make(chan os.Signal)
 	signal.Notify(done, syscall.SIGTERM, syscall.SIGINT, syscall.SIGQUIT)
 	<-done
 
 	if err := cli.Disconnect(); err != nil {
-		log.Printf("connection error from the server: %v\n ", err)
+		logger.Error("could not disconnect", zap.Error(err))
 	}
 
-	fmt.Println("Goodbye...")
+	logger.Info("Goodbye...")
 }
 
 func init() {
@@ -62,7 +69,8 @@ func init() {
 func newConfig() *server.Config {
 	cfg := server.NewConfig()
 	if err := cfg.ParseArgs(); err != nil {
-		log.Fatalf("failed run: %v\n", err.Error())
+		logger := zap.L()
+		logger.Fatal("failed run gRPC server: %v\n", zap.Error(err))
 	}
 
 	return cfg
