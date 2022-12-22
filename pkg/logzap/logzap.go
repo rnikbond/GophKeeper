@@ -1,19 +1,13 @@
 package logzap
 
 import (
-	"log"
 	"os"
 
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
 
-func ConfigZapLogger(errsFileName string) {
-
-	errsFile, err := os.OpenFile(errsFileName, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
-	if err != nil {
-		log.Fatal(err)
-	}
+func ConfigZapLogger() {
 
 	cfgInfo := zap.NewProductionEncoderConfig()
 	cfgInfo.EncodeLevel = zapcore.CapitalLevelEncoder
@@ -32,7 +26,6 @@ func ConfigZapLogger(errsFileName string) {
 
 	infoLvl := zap.LevelEnablerFunc(func(level zapcore.Level) bool { return level == zapcore.InfoLevel })
 	warnLvl := zap.LevelEnablerFunc(func(level zapcore.Level) bool { return level >= zapcore.WarnLevel })
-	errLvl := zap.LevelEnablerFunc(func(level zapcore.Level) bool { return level >= zapcore.ErrorLevel })
 	fatalLvl := zap.LevelEnablerFunc(func(level zapcore.Level) bool { return level > zapcore.ErrorLevel })
 
 	infoEncoder := zapcore.NewConsoleEncoder(cfgInfo)
@@ -41,7 +34,6 @@ func ConfigZapLogger(errsFileName string) {
 	core := zapcore.NewTee(
 		zapcore.NewCore(infoEncoder, zapcore.AddSync(os.Stdout), infoLvl),
 		zapcore.NewCore(errsEncoder, zapcore.AddSync(os.Stderr), warnLvl),
-		zapcore.NewCore(errsEncoder, zapcore.AddSync(errsFile), errLvl),
 	)
 
 	logger := zap.New(core)

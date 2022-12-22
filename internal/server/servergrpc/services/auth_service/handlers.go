@@ -2,75 +2,74 @@ package auth_service
 
 import (
 	"context"
-	"log"
 
-	"GophKeeper/internal/storage"
-	pb "GophKeeper/pkg/proto/auth"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+
+	"GophKeeper/internal/server/model"
+	"GophKeeper/internal/storage"
+	pb "GophKeeper/pkg/proto/auth"
 )
 
-// Register Регистрация нового пользователя
+// Register - Регистрация нового пользователя.
 func (serv *AuthService) Register(ctx context.Context, in *pb.AuthRequest) (*pb.AuthResponse, error) {
 
-	u := storage.User{
+	cred := storage.Credential{
 		Email:    in.Email,
 		Password: in.Password,
 	}
 
-	if err := serv.store.Create(u); err != nil {
-		log.Printf("failed create user: %v", err)
-		return nil, err
-	}
-
-	tokenStr, err := GenerateJWT(u.Email, serv.secretKey)
+	token, err := serv.auth.Register(cred)
 	if err != nil {
-		log.Printf("%v: %v", ErrGenerateToken, err)
-		return nil, status.Error(codes.Internal, ErrGenerateToken.Error())
+
+		switch err {
+		case model.ErrAlreadyExists:
+			return nil, status.Error(codes.AlreadyExists, err.Error())
+
+		case model.ErrInvalidPassword:
+			return nil, status.Error(codes.Unauthenticated, err.Error())
+		}
+
+		return nil, status.Error(codes.Internal, "Internal server error")
 	}
 
 	return &pb.AuthResponse{
-		Token: tokenStr,
+		Token: token,
 	}, nil
 }
 
-// Login Авторизация пользоватедя
+// Login - Авторизация пользователя.
 func (serv *AuthService) Login(ctx context.Context, in *pb.AuthRequest) (*pb.AuthResponse, error) {
 
-	user, err := serv.store.Find(in.Email)
+	cred := storage.Credential{
+		Email:    in.Email,
+		Password: in.Password,
+	}
+
+	token, err := serv.auth.Login(cred)
 	if err != nil {
-		return nil, err
-	}
 
-	if in.Password != user.Password {
-		return nil, ErrInvalidAuthData
-	}
+		switch err {
+		case model.ErrNotFound:
+			return nil, status.Error(codes.NotFound, err.Error())
 
-	tokenStr, errJWT := GenerateJWT(user.Email, serv.secretKey)
-	if errJWT != nil {
-		log.Printf("%v: %v", ErrGenerateToken, errJWT)
-		return nil, status.Error(codes.Internal, ErrGenerateToken.Error())
+		case model.ErrInvalidPassword:
+			return nil, status.Error(codes.Unauthenticated, err.Error())
+		}
+
+		return nil, status.Error(codes.Internal, "Internal server error")
 	}
 
 	return &pb.AuthResponse{
-		Token: tokenStr,
+		Token: token,
 	}, nil
 }
 
-// ChangePassword Смена пароля пользователя
+// ChangePassword - Смена пароля пользователя.
 func (serv *AuthService) ChangePassword(ctx context.Context, in *pb.ChangePasswordRequest) (*pb.Empty, error) {
 
-	tokenStr, errJWT := VerifyJWT(in.Token, serv.secretKey)
-	if errJWT != nil {
-		log.Printf("failed change password: %v : %v", ErrInvalidToken, errJWT)
-		return nil, ErrInvalidToken
-	}
-
-	token := tokenStr.Claims.(*Token)
-
-	if err := serv.store.Update(token.Email, in.Password); err != nil {
-		log.Printf("failed change password: %v", err)
-		return nil, err
+	if err := serv.auth.ChangePassword(in.Email, in.Password); err != nil {
+		return nil, status.Error(codes.Internal, "Internal server error")
 	}
 
 	return &pb.Empty{}, nil

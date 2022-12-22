@@ -1,13 +1,13 @@
 package storage
 
 type UserStorage interface {
-	Create(user User) error
-	Find(email string) (User, error)
+	Create(cred Credential) error
+	Find(email string) (Credential, error)
 	Delete(email string) error
 	Update(email, password string) error
 }
 
-type User struct {
+type Credential struct {
 	Email    string
 	Password string
 }

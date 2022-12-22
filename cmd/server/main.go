@@ -1,14 +1,18 @@
 package main
 
 import (
-	"GophKeeper/internal/server"
-	"GophKeeper/internal/server/servergrpc"
-	"GophKeeper/internal/storage"
+	"GophKeeper/internal/server/model"
 	"fmt"
-	"log"
 	"os"
 	"os/signal"
 	"syscall"
+
+	"go.uber.org/zap"
+
+	"GophKeeper/internal/server"
+	"GophKeeper/internal/server/servergrpc"
+	"GophKeeper/internal/storage"
+	"GophKeeper/pkg/logzap"
 )
 
 var (
@@ -23,9 +27,12 @@ var (
 
 func main() {
 
+	logzap.ConfigZapLogger()
+
 	cfg := newConfig()
 	store := storage.NewMemoryStorage()
-	serv := newServer(cfg, store)
+	auth := newAuthModel(store)
+	serv := newServer(cfg, auth)
 
 	serv.Start()
 
@@ -47,18 +54,24 @@ func init() {
 func newConfig() *server.Config {
 	cfg := server.NewConfig()
 	if err := cfg.ParseArgs(); err != nil {
-		log.Fatalf("failed run: %v\n", err.Error())
+		logger := zap.L()
+		logger.Error("failed parse args", zap.Error(err))
 	}
 
 	return cfg
 }
 
-// newServer Создание объекта сервера
-func newServer(cfg *server.Config, store storage.UserStorage) *servergrpc.ServerGRPC {
+func newAuthModel(store storage.UserStorage) *model.AuthModel {
+	return model.NewAuthModel(store)
+}
 
-	serv, err := servergrpc.NewServer(cfg.AddrGRPC, store)
+// newServer Создание объекта сервера
+func newServer(cfg *server.Config, auth *model.AuthModel) *servergrpc.ServerGRPC {
+
+	serv, err := servergrpc.NewServer(cfg.AddrGRPC, auth)
 	if err != nil {
-		log.Fatalf("failed run: %v\n", err.Error())
+		logger := zap.L()
+		logger.Error("failed server run", zap.Error(err))
 	}
 
 	return serv

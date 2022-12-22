@@ -1,14 +1,16 @@
 package main
 
 import (
-	"GophKeeper/internal/client/clientgrpc"
-	"GophKeeper/internal/server"
-	"GophKeeper/pkg/logzap"
 	"fmt"
-	"go.uber.org/zap"
 	"os"
 	"os/signal"
 	"syscall"
+
+	"go.uber.org/zap"
+
+	"GophKeeper/internal/client/clientgrpc"
+	"GophKeeper/internal/server"
+	"GophKeeper/pkg/logzap"
 )
 
 var (
@@ -23,7 +25,7 @@ var (
 
 func main() {
 
-	logzap.ConfigZapLogger("client_errs.log")
+	logzap.ConfigZapLogger()
 
 	logger := zap.L()
 
@@ -31,7 +33,7 @@ func main() {
 	cli := newClient(cfg)
 
 	if err := cli.Connect(); err != nil {
-		logger.Fatal(" connection error", zap.Error(err))
+		logger.Fatal("connection error", zap.Error(err))
 	}
 
 	if err := cli.Login(); err != nil {

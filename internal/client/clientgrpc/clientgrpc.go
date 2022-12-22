@@ -3,6 +3,7 @@ package clientgrpc
 import (
 	"context"
 	"fmt"
+
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 
@@ -21,8 +22,8 @@ func NewClient(addr string) *ClientGRPC {
 	}
 }
 
-func (c ClientGRPC) Register() error {
-	resp, err := c.rpcClient.Register(context.Background(), &pb.AuthRequest{
+func (c ClientGRPC) Login() error {
+	resp, err := c.rpcClient.Login(context.Background(), &pb.AuthRequest{
 		Email:    "rnikbond@yandex.ru",
 		Password: "qwerty123",
 	})
@@ -34,8 +35,8 @@ func (c ClientGRPC) Register() error {
 	return err
 }
 
-func (c ClientGRPC) Login() error {
-	resp, err := c.rpcClient.Login(context.Background(), &pb.AuthRequest{
+func (c ClientGRPC) Register() error {
+	resp, err := c.rpcClient.Register(context.Background(), &pb.AuthRequest{
 		Email:    "rnikbond@yandex.ru",
 		Password: "qwerty123",
 	})

@@ -1,22 +1,25 @@
 package servergrpc
 
 import (
-	"GophKeeper/internal/server/servergrpc/services/auth_service"
-	"GophKeeper/internal/storage"
-	pb "GophKeeper/pkg/proto/auth"
 	"fmt"
-	"google.golang.org/grpc"
 	"net"
 	"time"
+
+	"google.golang.org/grpc"
+
+	"GophKeeper/internal/server/model"
+	"GophKeeper/internal/server/servergrpc/services/auth_service"
+	pb "GophKeeper/pkg/proto/auth"
 )
 
 type ServerGRPC struct {
 	*grpc.Server
 	net.Listener
-	pb.AuthServiceServer
+
+	auth *auth_service.AuthService
 }
 
-func NewServer(addr string, store storage.UserStorage) (*ServerGRPC, error) {
+func NewServer(addr string, auth *model.AuthModel) (*ServerGRPC, error) {
 
 	listen, err := net.Listen("tcp", addr)
 	if err != nil {
@@ -26,9 +29,10 @@ func NewServer(addr string, store storage.UserStorage) (*ServerGRPC, error) {
 	s := &ServerGRPC{
 		Server:   grpc.NewServer(),
 		Listener: listen,
+		auth:     auth_service.NewAuthService(auth),
 	}
 
-	registerServices(s.Server, store)
+	pb.RegisterAuthServiceServer(s.Server, s.auth)
 
 	return s, nil
 }
@@ -48,11 +52,4 @@ func (serv *ServerGRPC) Stop() {
 
 	serv.Server.Stop()
 	fmt.Printf("Server stopped at: %s\n", time.Now().Format("02-01-2006 15:04:05"))
-}
-
-func registerServices(server *grpc.Server, store storage.UserStorage) {
-
-	authServ := auth_service.NewAuthService(store)
-
-	pb.RegisterAuthServiceServer(server, authServ)
 }
