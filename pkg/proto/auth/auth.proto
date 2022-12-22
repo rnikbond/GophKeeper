@@ -18,8 +18,6 @@ message AuthRequest {
 }
 
 message ChangePasswordRequest {
-  string token = 1;
-  string email = 2;
   string password = 3;
 }
 

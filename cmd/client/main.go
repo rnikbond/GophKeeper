@@ -49,6 +49,12 @@ func main() {
 
 	logger.Info("Success Login")
 
+	if err := cli.ChangePassword(); err != nil {
+		logger.Error("error change password", zap.Error(err))
+	} else {
+		logger.Info("success change password")
+	}
+
 	done := make(chan os.Signal)
 	signal.Notify(done, syscall.SIGTERM, syscall.SIGINT, syscall.SIGQUIT)
 	<-done

@@ -1,9 +1,9 @@
 package clientgrpc
 
 import (
+	"GophKeeper/pkg/token"
 	"context"
 	"fmt"
-
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 
@@ -12,6 +12,7 @@ import (
 
 type ClientGRPC struct {
 	addr      string
+	token     string
 	conn      *grpc.ClientConn
 	rpcClient pb.AuthServiceClient
 }
@@ -22,28 +23,41 @@ func NewClient(addr string) *ClientGRPC {
 	}
 }
 
-func (c ClientGRPC) Login() error {
+func (c *ClientGRPC) Login() error {
 	resp, err := c.rpcClient.Login(context.Background(), &pb.AuthRequest{
 		Email:    "rnikbond@yandex.ru",
 		Password: "qwerty123",
 	})
 
 	if resp != nil {
+		c.token = resp.Token
 		fmt.Printf("token: %s\n", resp.Token)
 	}
 
 	return err
 }
 
-func (c ClientGRPC) Register() error {
+func (c *ClientGRPC) Register() error {
 	resp, err := c.rpcClient.Register(context.Background(), &pb.AuthRequest{
 		Email:    "rnikbond@yandex.ru",
 		Password: "qwerty123",
 	})
 
 	if resp != nil {
+		c.token = resp.Token
 		fmt.Printf("token: %s\n", resp.Token)
 	}
+
+	return err
+}
+
+func (c ClientGRPC) ChangePassword() error {
+
+	ctx := token.WriteToken(c.token + "321")
+
+	_, err := c.rpcClient.ChangePassword(ctx, &pb.ChangePasswordRequest{
+		Password: "qwerty123",
+	})
 
 	return err
 }

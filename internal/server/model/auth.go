@@ -77,10 +77,17 @@ func (auth AuthModel) Register(in storage.Credential) (string, error) {
 }
 
 // ChangePassword - Смена пароля пользователя.
-func (auth AuthModel) ChangePassword(email, password string) error {
+func (auth AuthModel) ChangePassword(tok, password string) error {
+
+	jwtTok, err := token.VerifyJWT(tok, auth.secretKey)
+	if err != nil {
+		return ErrInvalidToken
+	}
+
+	email := jwtTok.Claims.(*token.Token).Email
 
 	if _, err := auth.store.Find(email); err != nil {
-		auth.logger.Error("failed find user", zap.Error(err))
+		auth.logger.Error("failed find user", zap.Error(err), zap.String("email", email))
 		return ErrInternal
 	}
 
