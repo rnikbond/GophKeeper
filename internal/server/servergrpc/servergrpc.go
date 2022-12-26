@@ -1,55 +1,71 @@
 package servergrpc
 
 import (
-	"fmt"
 	"net"
 	"time"
 
+	"go.uber.org/zap"
 	"google.golang.org/grpc"
 
-	"GophKeeper/internal/server/model"
-	"GophKeeper/internal/server/servergrpc/services/auth_service"
+	"GophKeeper/internal/server/servergrpc/rpc_services"
 	pb "GophKeeper/pkg/proto/auth"
 )
 
+// ServerOption - определяет операцию сервиса авторизации.
+type ServerOption func(serv *ServerGRPC)
+
+// ServerGRPC структура gPRC сервера.
 type ServerGRPC struct {
 	*grpc.Server
 	net.Listener
 
-	auth *auth_service.AuthService
+	auth   *rpc_services.AuthServiceRPC
+	logger *zap.Logger
+
+	secretKey string
 }
 
-func NewServer(addr string, auth *model.AuthModel) (*ServerGRPC, error) {
-
+// NewServer - Создание экземпляра gRPC сервера, но не запускает его.
+// • addr - Адрес, на котором в при вызове Start() будет запущен сервер.
+func NewServer(addr string, interceptor grpc.ServerOption, opts ...ServerOption) (*ServerGRPC, error) {
 	listen, err := net.Listen("tcp", addr)
 	if err != nil {
 		return nil, err
 	}
 
 	s := &ServerGRPC{
-		Server:   grpc.NewServer(),
+		//Server:   grpc.NewServer(interceptors.NewValidateInterceptor(secretKey)),
+		Server:   grpc.NewServer(interceptor),
 		Listener: listen,
-		auth:     auth_service.NewAuthService(auth),
+		logger:   zap.L(),
 	}
 
-	pb.RegisterAuthServiceServer(s.Server, s.auth)
+	for _, opt := range opts {
+		opt(s)
+	}
 
 	return s, nil
 }
 
+// WithAuthServiceRPC - Регистрирует сервис gPRC авторизации
+func WithAuthServiceRPC(auth *rpc_services.AuthServiceRPC) ServerOption {
+	return func(serv *ServerGRPC) {
+		pb.RegisterAuthServiceServer(serv.Server, auth)
+	}
+}
+
+// Start - Запуск сервера.
 func (serv *ServerGRPC) Start() {
-
 	go func() {
-		fmt.Printf("Server started at: %s\n", time.Now().Format("02-01-2006 15:04:05"))
-
+		serv.logger.Info("Server started", zap.String("At", time.Now().Format("02-01-2006 15:04:05")))
 		if err := serv.Server.Serve(serv.Listener); err != nil {
-			fmt.Printf("failed start gRPC server: %v\n", err)
+			serv.logger.Error("failed run gRPC server", zap.Error(err))
 		}
 	}()
 }
 
+// Stop - Остановка сервера.
 func (serv *ServerGRPC) Stop() {
-
 	serv.Server.Stop()
-	fmt.Printf("Server stopped at: %s\n", time.Now().Format("02-01-2006 15:04:05"))
+	serv.logger.Info("Server stopped", zap.String("At", time.Now().Format("02-01-2006 15:04:05")))
 }

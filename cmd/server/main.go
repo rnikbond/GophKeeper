@@ -1,7 +1,6 @@
 package main
 
 import (
-	"GophKeeper/internal/server/model"
 	"fmt"
 	"os"
 	"os/signal"
@@ -10,7 +9,10 @@ import (
 	"go.uber.org/zap"
 
 	"GophKeeper/internal/server"
+	"GophKeeper/internal/server/app_services"
 	"GophKeeper/internal/server/servergrpc"
+	"GophKeeper/internal/server/servergrpc/interceptors"
+	"GophKeeper/internal/server/servergrpc/rpc_services"
 	"GophKeeper/internal/storage"
 	"GophKeeper/pkg/logzap"
 )
@@ -31,16 +33,18 @@ func main() {
 
 	cfg := newConfig()
 	store := storage.NewMemoryStorage()
-	auth := newAuthModel(store)
-	serv := newServer(cfg, auth)
 
-	serv.Start()
+	authApp := newAuthAppService(store, cfg)
+	authRPC := newAuthRPCService(authApp)
+	grpcServer := newServer(cfg, authRPC)
+
+	grpcServer.Start()
 
 	done := make(chan os.Signal)
 	signal.Notify(done, syscall.SIGTERM, syscall.SIGINT, syscall.SIGQUIT)
 	<-done
 
-	serv.Stop()
+	grpcServer.Stop()
 }
 
 func init() {
@@ -61,14 +65,20 @@ func newConfig() *server.Config {
 	return cfg
 }
 
-func newAuthModel(store storage.UserStorage) *model.AuthModel {
-	return model.NewAuthModel(store)
+func newAuthAppService(store storage.UserStorage, cfg *server.Config) *app_services.AuthAppService {
+	return app_services.NewAuthService(store, app_services.WithSecretKey(cfg.SecretKey))
+}
+
+func newAuthRPCService(authApp *app_services.AuthAppService) *rpc_services.AuthServiceRPC {
+	return rpc_services.NewAuthServiceRPC(authApp)
 }
 
 // newServer Создание объекта сервера
-func newServer(cfg *server.Config, auth *model.AuthModel) *servergrpc.ServerGRPC {
+func newServer(cfg *server.Config, auth *rpc_services.AuthServiceRPC) *servergrpc.ServerGRPC {
 
-	serv, err := servergrpc.NewServer(cfg.AddrGRPC, auth)
+	validate := interceptors.NewValidateInterceptor(cfg.SecretKey)
+
+	serv, err := servergrpc.NewServer(cfg.AddrGRPC, validate, servergrpc.WithAuthServiceRPC(auth))
 	if err != nil {
 		logger := zap.L()
 		logger.Error("failed server run", zap.Error(err))

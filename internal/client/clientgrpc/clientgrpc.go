@@ -53,7 +53,7 @@ func (c *ClientGRPC) Register() error {
 
 func (c ClientGRPC) ChangePassword() error {
 
-	ctx := token.WriteToken(c.token + "321")
+	ctx := token.WriteToken(c.token)
 
 	_, err := c.rpcClient.ChangePassword(ctx, &pb.ChangePasswordRequest{
 		Password: "qwerty123",

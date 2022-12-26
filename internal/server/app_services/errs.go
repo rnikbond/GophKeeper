@@ -1,16 +1,16 @@
-package model
+package app_services
 
-type ErrModel struct {
+type ErrAppServices struct {
 	Value string
 }
 
-func NewErr(val string) ErrModel {
-	return ErrModel{
+func NewErr(val string) ErrAppServices {
+	return ErrAppServices{
 		Value: val,
 	}
 }
 
-func (es ErrModel) Error() string {
+func (es ErrAppServices) Error() string {
 	return es.Value
 }
 

@@ -40,20 +40,6 @@ func VerifyJWT(bearerToken, secretKey string) (*jwt.Token, error) {
 	return token, err
 }
 
-func ReadToken(ctx context.Context) (string, error) {
-	md, ok := metadata.FromIncomingContext(ctx)
-	if !ok {
-		return ``, ErrTokenNotFound
-	}
-
-	values := md.Get("token")
-	if len(values) != 1 {
-		return ``, ErrTokenNotFound
-	}
-
-	return values[0], nil
-}
-
 func WriteToken(t string) context.Context {
 	md := metadata.New(map[string]string{"token": t})
 	return metadata.NewOutgoingContext(context.Background(), md)

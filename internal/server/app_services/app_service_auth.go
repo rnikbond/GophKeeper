@@ -1,4 +1,4 @@
-package model
+package app_services
 
 import (
 	"GophKeeper/internal/storage"
@@ -7,21 +7,48 @@ import (
 	"strings"
 )
 
-type AuthModel struct {
+// AuthAppOption - определяет операцию сервиса авторизации.
+type AuthAppOption func(serv *AuthAppService)
+
+// AuthAppService отвеает за сервис авторизации и регистрации пользователя.
+type AuthAppService struct {
 	store     storage.UserStorage
-	secretKey string
 	logger    *zap.Logger
+	secretKey string
 }
 
-func NewAuthModel(store storage.UserStorage) *AuthModel {
-	return &AuthModel{
+// Credential - Учетные данные пользователя.
+type Credential struct {
+	// Email - Почтовый адрес.
+	Email string
+	// Password - Пароль.
+	Password string
+}
+
+// NewAuthService - Создание экземпляра сервиса авторизации.
+func NewAuthService(store storage.UserStorage, opts ...AuthAppOption) *AuthAppService {
+	auth := &AuthAppService{
 		store:  store,
 		logger: zap.L(),
+	}
+
+	for _, opt := range opts {
+		opt(auth)
+	}
+
+	return auth
+}
+
+// WithSecretKey - Инициализирует секретный ключ для генерации JWT.
+func WithSecretKey(key string) AuthAppOption {
+	return func(auth *AuthAppService) {
+		auth.secretKey = key
 	}
 }
 
 // Login - Авторизация пользователя.
-func (auth AuthModel) Login(in storage.Credential) (string, error) {
+// При успешной авторизации возвращается JWT.
+func (auth AuthAppService) Login(in Credential) (string, error) {
 
 	userStore, err := auth.store.Find(in.Email)
 	if err != nil {
@@ -47,9 +74,10 @@ func (auth AuthModel) Login(in storage.Credential) (string, error) {
 }
 
 // Register - Регистрация пользователя.
-func (auth AuthModel) Register(in storage.Credential) (string, error) {
+// При успешной регистрации возвращается JWT.
+func (auth AuthAppService) Register(in Credential) (string, error) {
 
-	cred := storage.Credential{
+	cred := Credential{
 		Email:    in.Email,
 		Password: in.Password,
 	}
@@ -58,7 +86,12 @@ func (auth AuthModel) Register(in storage.Credential) (string, error) {
 		return ``, errCred
 	}
 
-	if err := auth.store.Create(cred); err != nil {
+	storeCred := storage.Credential{
+		Email:    cred.Email,
+		Password: cred.Password,
+	}
+
+	if err := auth.store.Create(storeCred); err != nil {
 		if err == storage.ErrAlreadyExists {
 			return ``, ErrAlreadyExists
 		}
@@ -77,14 +110,7 @@ func (auth AuthModel) Register(in storage.Credential) (string, error) {
 }
 
 // ChangePassword - Смена пароля пользователя.
-func (auth AuthModel) ChangePassword(tok, password string) error {
-
-	jwtTok, err := token.VerifyJWT(tok, auth.secretKey)
-	if err != nil {
-		return ErrInvalidToken
-	}
-
-	email := jwtTok.Claims.(*token.Token).Email
+func (auth AuthAppService) ChangePassword(email, password string) error {
 
 	if _, err := auth.store.Find(email); err != nil {
 		auth.logger.Error("failed find user", zap.Error(err), zap.String("email", email))
@@ -100,7 +126,7 @@ func (auth AuthModel) ChangePassword(tok, password string) error {
 }
 
 // checkCredential - Проверка корректности пароля и email.
-func checkCredential(cred storage.Credential) error {
+func checkCredential(cred Credential) error {
 	if len(cred.Password) < 6 {
 		return ErrShortPassword
 	}
