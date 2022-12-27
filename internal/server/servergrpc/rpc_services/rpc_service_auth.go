@@ -89,9 +89,10 @@ func (serv *AuthServiceRPC) Login(ctx context.Context, in *pb.AuthRequest) (*pb.
 func (serv *AuthServiceRPC) ChangePassword(ctx context.Context, in *pb.ChangePasswordRequest) (*pb.Empty, error) {
 
 	email, ok := md_ctx.ValueFromContext(ctx, "email")
+
 	if !ok {
 		serv.logger.Error("failed found email in ctx metadata")
-		// Ошибка Internal, т.к. Interceptor должен был положить email в ctx
+		// Internal, т.к. Interceptor должен был положить email в ctx
 		return nil, status.Error(codes.Internal, InternalErrorText)
 	}
 

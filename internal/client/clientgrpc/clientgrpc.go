@@ -1,11 +1,11 @@
 package clientgrpc
 
 import (
-	"GophKeeper/pkg/token"
 	"context"
 	"fmt"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/grpc/metadata"
 
 	pb "GophKeeper/pkg/proto/auth"
 )
@@ -53,7 +53,8 @@ func (c *ClientGRPC) Register() error {
 
 func (c ClientGRPC) ChangePassword() error {
 
-	ctx := token.WriteToken(c.token)
+	md := metadata.New(map[string]string{"token": c.token})
+	ctx := metadata.NewOutgoingContext(context.Background(), md)
 
 	_, err := c.rpcClient.ChangePassword(ctx, &pb.ChangePasswordRequest{
 		Password: "qwerty123",

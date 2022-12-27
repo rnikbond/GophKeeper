@@ -1,25 +1,29 @@
 package interceptors
 
 import (
-	"GophKeeper/pkg/md_ctx"
+	"GophKeeper/pkg/token"
 	"context"
 	middleware "github.com/grpc-ecosystem/go-grpc-middleware"
+	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
-
-	"GophKeeper/pkg/token"
 )
 
 // ValidateInterceptor - Перехватчик для gRPC, который отвечает за проверку подлинности JWT.
 type ValidateInterceptor struct {
 	// secretKey - Секретный ключ дял проверки подлинности JWT.
 	secretKey string
+	logger    *zap.Logger
 }
 
 // NewValidateInterceptor - Создание экземпляра перехватчика для валидации JWT.
 func NewValidateInterceptor(key string) grpc.ServerOption {
-	v := &ValidateInterceptor{secretKey: key}
+	v := &ValidateInterceptor{
+		secretKey: key,
+		logger:    zap.L(),
+	}
 	return grpc.UnaryInterceptor(middleware.ChainUnaryServer(v.ValidateTokenInterceptor))
 }
 
@@ -42,18 +46,24 @@ func (inter ValidateInterceptor) ValidateTokenInterceptor(
 		return handler(ctx, req)
 	}
 
-	tokenStr, ok := md_ctx.ValueFromContext(ctx, "token")
+	md, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
+		return nil, status.Error(codes.PermissionDenied, "Failed read metadata")
+	}
+
+	values := md.Get("token")
+	if len(values) != 1 {
 		return nil, status.Error(codes.PermissionDenied, "Failed read token")
 	}
 
-	jwtToken, err := token.VerifyJWT(tokenStr, inter.secretKey)
+	jwtToken, err := token.VerifyJWT(values[0], inter.secretKey)
 	if err != nil {
 		return nil, status.Error(codes.PermissionDenied, "Invalid token")
 	}
 
 	email := jwtToken.Claims.(*token.Token).Email
-	ctx = md_ctx.ValueToContext(ctx, "email", email)
+	md.Append("email", email)
+	ctx = metadata.NewIncomingContext(ctx, md)
 
 	return handler(ctx, req)
 }
