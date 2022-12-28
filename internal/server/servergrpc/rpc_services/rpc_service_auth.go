@@ -17,12 +17,12 @@ var (
 type AuthServiceRPC struct {
 	pb.AuthServiceServer
 
-	auth   *app_services.AuthAppService
+	auth   app_services.AuthApp
 	logger *zap.Logger
 }
 
 // NewAuthServiceRPC - Создание эклемпляра gRPC сервиса авторизации и регистрации
-func NewAuthServiceRPC(auth *app_services.AuthAppService) *AuthServiceRPC {
+func NewAuthServiceRPC(auth app_services.AuthApp) *AuthServiceRPC {
 	serv := &AuthServiceRPC{
 		auth:   auth,
 		logger: zap.L(),
@@ -97,6 +97,11 @@ func (serv *AuthServiceRPC) ChangePassword(ctx context.Context, in *pb.ChangePas
 	}
 
 	if err := serv.auth.ChangePassword(email, in.Password); err != nil {
+
+		if err == app_services.ErrShortPassword {
+			return nil, status.Error(codes.InvalidArgument, err.Error())
+		}
+
 		serv.logger.Error("failed change password", zap.Error(err))
 		return nil, status.Error(codes.Internal, InternalErrorText)
 	}

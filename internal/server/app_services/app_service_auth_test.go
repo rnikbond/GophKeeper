@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"GophKeeper/internal/storage"
-	mock "GophKeeper/mocks/interbal/storage"
+	mock "GophKeeper/mocks/storage"
 )
 
 func TestAuthAppService_Login(t *testing.T) {

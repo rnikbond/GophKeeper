@@ -20,7 +20,7 @@ var (
 	ErrAlreadyExists   = NewErr("user already exists")
 	ErrInvalidEmail    = NewErr("invalid email")
 	ErrInvalidPassword = NewErr("invalid password")
-	ErrInvalidToken    = NewErr("invalid token")
 	ErrShortPassword   = NewErr("password must contain 6 or more characters")
+	ErrUnauthenticated = NewErr("unauthenticated")
 	ErrInternal        = NewErr("internal error")
 )

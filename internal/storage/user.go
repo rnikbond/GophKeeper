@@ -1,4 +1,4 @@
-//go:generate mockgen -source user.go -destination ../../mocks/interbal/storage/user_mock.go -package storage
+//go:generate mockgen -source user.go -destination ../../mocks/storage/user_mock.go -package storage
 package storage
 
 // Credential - Учетные данные пользователя.

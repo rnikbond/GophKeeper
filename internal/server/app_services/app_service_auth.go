@@ -1,3 +1,4 @@
+//go:generate mockgen -source app_service_auth.go -destination ../../../mocks/server/app_services/app_service_auth_mock.go -package app_services
 package app_services
 
 import (
@@ -6,6 +7,15 @@ import (
 	"go.uber.org/zap"
 	"strings"
 )
+
+// TODO :: Вынести в config
+var minPasswordLength = 6
+
+type AuthApp interface {
+	Login(in Credential) (string, error)
+	Register(in Credential) (string, error)
+	ChangePassword(email, password string) error
+}
 
 // AuthAppOption - определяет операцию сервиса авторизации.
 type AuthAppOption func(serv *AuthAppService)
@@ -112,7 +122,15 @@ func (auth AuthAppService) Register(in Credential) (string, error) {
 // ChangePassword - Смена пароля пользователя.
 func (auth AuthAppService) ChangePassword(email, password string) error {
 
+	if len(password) < minPasswordLength {
+		return ErrShortPassword
+	}
+
 	if _, err := auth.store.Find(email); err != nil {
+		if err == storage.ErrNotFound {
+			return ErrUnauthenticated
+		}
+
 		auth.logger.Error("failed find user", zap.Error(err), zap.String("email", email))
 		return ErrInternal
 	}
@@ -127,7 +145,7 @@ func (auth AuthAppService) ChangePassword(email, password string) error {
 
 // checkCredential - Проверка корректности пароля и email.
 func checkCredential(cred Credential) error {
-	if len(cred.Password) < 6 {
+	if len(cred.Password) < minPasswordLength {
 		return ErrShortPassword
 	}
 
