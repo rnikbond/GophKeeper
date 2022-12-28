@@ -35,7 +35,7 @@ func TestValidateTokenInterceptor(t *testing.T) {
 		wantCode  codes.Code
 	}{
 		{
-			name: "Check endpoint Register",
+			name: "Check unprocessed endpoint Register",
 			info: &grpc.UnaryServerInfo{
 				FullMethod: "/auth.AuthService/Register",
 			},
@@ -43,7 +43,7 @@ func TestValidateTokenInterceptor(t *testing.T) {
 			wantEmail: false,
 		},
 		{
-			name: "Check endpoint Login",
+			name: "Check unprocessed endpoint Login",
 			info: &grpc.UnaryServerInfo{
 				FullMethod: "/auth.AuthService/Login",
 			},
@@ -51,7 +51,7 @@ func TestValidateTokenInterceptor(t *testing.T) {
 			wantEmail: false,
 		},
 		{
-			name: "Check create Email",
+			name: "Validate valid token",
 			info: &grpc.UnaryServerInfo{
 				FullMethod: "/auth.AuthService/Any",
 			},
@@ -59,7 +59,7 @@ func TestValidateTokenInterceptor(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "Check error empty token",
+			name: "Validate empty token",
 			info: &grpc.UnaryServerInfo{
 				FullMethod: "/auth.AuthService/Any",
 			},
@@ -67,7 +67,7 @@ func TestValidateTokenInterceptor(t *testing.T) {
 			wantCode: codes.PermissionDenied,
 		},
 		{
-			name: "Check error invalid token",
+			name: "Validate invalid token",
 			info: &grpc.UnaryServerInfo{
 				FullMethod: "/auth.AuthService/Any",
 			},
