@@ -1,4 +1,4 @@
-package storage
+package auth_store
 
 type ErrStorage struct {
 	Value string

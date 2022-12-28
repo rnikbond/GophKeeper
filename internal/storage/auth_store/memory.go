@@ -1,4 +1,4 @@
-package storage
+package auth_store
 
 import (
 	"sync"

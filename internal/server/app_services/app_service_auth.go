@@ -2,7 +2,7 @@
 package app_services
 
 import (
-	"GophKeeper/internal/storage"
+	"GophKeeper/internal/storage/auth_store"
 	"GophKeeper/pkg/token"
 	"go.uber.org/zap"
 	"strings"
@@ -22,7 +22,7 @@ type AuthAppOption func(serv *AuthAppService)
 
 // AuthAppService отвеает за сервис авторизации и регистрации пользователя.
 type AuthAppService struct {
-	store     storage.UserStorage
+	store     auth_store.AuthStorage
 	logger    *zap.Logger
 	secretKey string
 }
@@ -36,7 +36,7 @@ type Credential struct {
 }
 
 // NewAuthService - Создание экземпляра сервиса авторизации.
-func NewAuthService(store storage.UserStorage, opts ...AuthAppOption) *AuthAppService {
+func NewAuthService(store auth_store.AuthStorage, opts ...AuthAppOption) *AuthAppService {
 	auth := &AuthAppService{
 		store:  store,
 		logger: zap.L(),
@@ -62,7 +62,7 @@ func (auth AuthAppService) Login(in Credential) (string, error) {
 
 	userStore, err := auth.store.Find(in.Email)
 	if err != nil {
-		if err == storage.ErrNotFound {
+		if err == auth_store.ErrNotFound {
 			return ``, ErrNotFound
 		}
 
@@ -96,13 +96,13 @@ func (auth AuthAppService) Register(in Credential) (string, error) {
 		return ``, errCred
 	}
 
-	storeCred := storage.Credential{
+	storeCred := auth_store.Credential{
 		Email:    cred.Email,
 		Password: cred.Password,
 	}
 
 	if err := auth.store.Create(storeCred); err != nil {
-		if err == storage.ErrAlreadyExists {
+		if err == auth_store.ErrAlreadyExists {
 			return ``, ErrAlreadyExists
 		}
 
@@ -127,7 +127,7 @@ func (auth AuthAppService) ChangePassword(email, password string) error {
 	}
 
 	if _, err := auth.store.Find(email); err != nil {
-		if err == storage.ErrNotFound {
+		if err == auth_store.ErrNotFound {
 			return ErrUnauthenticated
 		}
 

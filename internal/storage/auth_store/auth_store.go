@@ -1,5 +1,5 @@
-//go:generate mockgen -source user.go -destination ../../mocks/storage/user_mock.go -package storage
-package storage
+//go:generate mockgen -source auth_store.go -destination ../../../mocks/storage/auth_store_mock.go -package storage
+package auth_store
 
 // Credential - Учетные данные пользователя.
 type Credential struct {
@@ -9,7 +9,7 @@ type Credential struct {
 	Password string
 }
 
-type UserStorage interface {
+type AuthStorage interface {
 	Create(cred Credential) error
 	Find(email string) (Credential, error)
 	Delete(email string) error

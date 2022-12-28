@@ -1,6 +1,7 @@
 package main
 
 import (
+	"GophKeeper/internal/storage/auth_store"
 	"fmt"
 	"os"
 	"os/signal"
@@ -13,7 +14,6 @@ import (
 	"GophKeeper/internal/server/servergrpc"
 	"GophKeeper/internal/server/servergrpc/interceptors"
 	"GophKeeper/internal/server/servergrpc/rpc_services"
-	"GophKeeper/internal/storage"
 	"GophKeeper/pkg/logzap"
 )
 
@@ -32,7 +32,7 @@ func main() {
 	logzap.ConfigZapLogger()
 
 	cfg := newConfig()
-	store := storage.NewMemoryStorage()
+	store := auth_store.NewMemoryStorage()
 
 	authApp := newAuthAppService(store, cfg)
 	authRPC := newAuthRPCService(authApp)
@@ -65,7 +65,7 @@ func newConfig() *server.Config {
 	return cfg
 }
 
-func newAuthAppService(store storage.UserStorage, cfg *server.Config) *app_services.AuthAppService {
+func newAuthAppService(store auth_store.AuthStorage, cfg *server.Config) *app_services.AuthAppService {
 	return app_services.NewAuthService(store, app_services.WithSecretKey(cfg.SecretKey))
 }
 

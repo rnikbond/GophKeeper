@@ -6,7 +6,7 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 
-	"GophKeeper/internal/storage"
+	"GophKeeper/internal/storage/auth_store"
 	mock "GophKeeper/mocks/storage"
 )
 
@@ -15,18 +15,18 @@ func TestAuthAppService_Login(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	store := mock.NewMockUserStorage(ctrl)
+	store := mock.NewMockAuthStorage(ctrl)
 
 	tests := []struct {
 		name      string
-		credStore storage.Credential
+		credStore auth_store.Credential
 		credServ  Credential
 		waitErr   error
 		storeErr  error
 	}{
 		{
 			name: "Success",
-			credStore: storage.Credential{
+			credStore: auth_store.Credential{
 				Email:    "test@emailcom",
 				Password: "testPassword",
 			},
@@ -39,17 +39,17 @@ func TestAuthAppService_Login(t *testing.T) {
 		},
 		{
 			name:      "Unregistered",
-			credStore: storage.Credential{},
+			credStore: auth_store.Credential{},
 			credServ: Credential{
 				Email:    "test@emailcom",
 				Password: "testPassword",
 			},
 			waitErr:  ErrNotFound,
-			storeErr: storage.ErrNotFound,
+			storeErr: auth_store.ErrNotFound,
 		},
 		{
 			name: "Invalid password",
-			credStore: storage.Credential{
+			credStore: auth_store.Credential{
 				Email:    "test@emailcom",
 				Password: "passwordTest",
 			},
@@ -80,11 +80,11 @@ func TestAuthAppService_Register(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	store := mock.NewMockUserStorage(ctrl)
+	store := mock.NewMockAuthStorage(ctrl)
 
 	tests := []struct {
 		name      string
-		credStore storage.Credential
+		credStore auth_store.Credential
 		credServ  Credential
 		waitErr   error
 		storeErr  error
@@ -92,7 +92,7 @@ func TestAuthAppService_Register(t *testing.T) {
 	}{
 		{
 			name: "Success",
-			credStore: storage.Credential{
+			credStore: auth_store.Credential{
 				Email:    "test@email.com",
 				Password: "testPassword",
 			},
@@ -126,7 +126,7 @@ func TestAuthAppService_Register(t *testing.T) {
 		},
 		{
 			name: "User already exist",
-			credStore: storage.Credential{
+			credStore: auth_store.Credential{
 				Email:    "test@email.com",
 				Password: "passwordTest",
 			},
@@ -135,7 +135,7 @@ func TestAuthAppService_Register(t *testing.T) {
 				Password: "passwordTest",
 			},
 			waitErr:   ErrAlreadyExists,
-			storeErr:  storage.ErrAlreadyExists,
+			storeErr:  auth_store.ErrAlreadyExists,
 			callStore: true,
 		},
 	}
@@ -160,25 +160,58 @@ func TestAuthAppService_ChangePassword(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	store := mock.NewMockUserStorage(ctrl)
+	store := mock.NewMockAuthStorage(ctrl)
 
 	tests := []struct {
-		name     string
-		email    string
-		password string
+		name            string
+		email           string
+		password        string
+		waitErr         error
+		callStoreFind   bool
+		callStoreUpdate bool
+		errStore        error
 	}{
-		{},
+		{
+			name:            "Success",
+			email:           "test@email.com",
+			password:        "qwerty123",
+			callStoreFind:   true,
+			callStoreUpdate: true,
+		},
+		{
+			name:            "Invalid password",
+			email:           "test@email.com",
+			password:        "",
+			waitErr:         ErrShortPassword,
+			callStoreFind:   false,
+			callStoreUpdate: false,
+		},
+		{
+			name:            "Unauthenticated",
+			email:           "test@email.com",
+			password:        "qwerty123",
+			waitErr:         ErrUnauthenticated,
+			callStoreFind:   true,
+			callStoreUpdate: false,
+			errStore:        auth_store.ErrNotFound,
+		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 
-			store.EXPECT().Find(tt.email).Return(storage.Credential{}, nil)
-			store.EXPECT().Update(tt.email, tt.password).Return(nil)
+			if tt.callStoreFind {
+				store.EXPECT().Find(tt.email).Return(auth_store.Credential{}, tt.errStore)
+			}
+
+			if tt.callStoreUpdate {
+				store.EXPECT().Update(tt.email, tt.password).Return(tt.errStore)
+			}
 
 			auth := NewAuthService(store)
 			err := auth.ChangePassword(tt.email, tt.password)
-			assert.NoError(t, err)
+
+			assert.Equal(t, tt.waitErr, err)
 		})
 	}
 }
