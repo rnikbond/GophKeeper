@@ -1,6 +1,7 @@
 package rpc_services
 
 import (
+	"GophKeeper/internal/model/auth"
 	"GophKeeper/internal/server/app_services"
 	"GophKeeper/pkg/md_ctx"
 	pb "GophKeeper/pkg/proto/auth"
@@ -34,7 +35,7 @@ func NewAuthServiceRPC(auth app_services.AuthApp) *AuthServiceRPC {
 // Register - Регистрация нового пользователя.
 func (serv *AuthServiceRPC) Register(ctx context.Context, in *pb.AuthRequest) (*pb.AuthResponse, error) {
 
-	cred := app_services.Credential{
+	cred := auth.Credential{
 		Email:    in.Email,
 		Password: in.Password,
 	}
@@ -61,7 +62,7 @@ func (serv *AuthServiceRPC) Register(ctx context.Context, in *pb.AuthRequest) (*
 // Login - Авторизация пользователя.
 func (serv *AuthServiceRPC) Login(ctx context.Context, in *pb.AuthRequest) (*pb.AuthResponse, error) {
 
-	cred := app_services.Credential{
+	cred := auth.Credential{
 		Email:    in.Email,
 		Password: in.Password,
 	}

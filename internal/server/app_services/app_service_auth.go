@@ -1,7 +1,8 @@
-//go:generate mockgen -source app_service_auth.go -destination ../../../mocks/server/app_services/app_service_auth_mock.go -package app_services
+//go:generate mockgen -source app_service_auth.go -destination mocks/app_service_auth_mock.go -package app_services
 package app_services
 
 import (
+	authModel "GophKeeper/internal/model/auth"
 	"GophKeeper/internal/storage/auth_store"
 	"GophKeeper/pkg/token"
 	"go.uber.org/zap"
@@ -12,8 +13,8 @@ import (
 var minPasswordLength = 6
 
 type AuthApp interface {
-	Login(in Credential) (string, error)
-	Register(in Credential) (string, error)
+	Login(in authModel.Credential) (string, error)
+	Register(in authModel.Credential) (string, error)
 	ChangePassword(email, password string) error
 }
 
@@ -22,21 +23,13 @@ type AuthAppOption func(serv *AuthAppService)
 
 // AuthAppService отвеает за сервис авторизации и регистрации пользователя.
 type AuthAppService struct {
-	store     auth_store.AuthStorage
+	store     auth_store.AuthStorager
 	logger    *zap.Logger
 	secretKey string
 }
 
-// Credential - Учетные данные пользователя.
-type Credential struct {
-	// Email - Почтовый адрес.
-	Email string
-	// Password - Пароль.
-	Password string
-}
-
 // NewAuthService - Создание экземпляра сервиса авторизации.
-func NewAuthService(store auth_store.AuthStorage, opts ...AuthAppOption) *AuthAppService {
+func NewAuthService(store auth_store.AuthStorager, opts ...AuthAppOption) *AuthAppService {
 	auth := &AuthAppService{
 		store:  store,
 		logger: zap.L(),
@@ -58,7 +51,7 @@ func WithSecretKey(key string) AuthAppOption {
 
 // Login - Авторизация пользователя.
 // При успешной авторизации возвращается JWT.
-func (auth AuthAppService) Login(in Credential) (string, error) {
+func (auth AuthAppService) Login(in authModel.Credential) (string, error) {
 
 	userStore, err := auth.store.Find(in.Email)
 	if err != nil {
@@ -85,9 +78,9 @@ func (auth AuthAppService) Login(in Credential) (string, error) {
 
 // Register - Регистрация пользователя.
 // При успешной регистрации возвращается JWT.
-func (auth AuthAppService) Register(in Credential) (string, error) {
+func (auth AuthAppService) Register(in authModel.Credential) (string, error) {
 
-	cred := Credential{
+	cred := authModel.Credential{
 		Email:    in.Email,
 		Password: in.Password,
 	}
@@ -96,7 +89,7 @@ func (auth AuthAppService) Register(in Credential) (string, error) {
 		return ``, errCred
 	}
 
-	storeCred := auth_store.Credential{
+	storeCred := authModel.Credential{
 		Email:    cred.Email,
 		Password: cred.Password,
 	}
@@ -144,7 +137,7 @@ func (auth AuthAppService) ChangePassword(email, password string) error {
 }
 
 // checkCredential - Проверка корректности пароля и email.
-func checkCredential(cred Credential) error {
+func checkCredential(cred authModel.Credential) error {
 	if len(cred.Password) < minPasswordLength {
 		return ErrShortPassword
 	}

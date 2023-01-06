@@ -1,6 +1,8 @@
 package rpc_services
 
 import (
+	"GophKeeper/internal/model/auth"
+	mock "GophKeeper/internal/server/app_services/mocks"
 	"GophKeeper/pkg/token"
 	"context"
 	"github.com/stretchr/testify/require"
@@ -13,7 +15,6 @@ import (
 	"google.golang.org/grpc/status"
 
 	"GophKeeper/internal/server/app_services"
-	mock "GophKeeper/mocks/server/app_services"
 	pb "GophKeeper/pkg/proto/auth"
 )
 
@@ -72,7 +73,7 @@ func TestAuthServiceRPC_Login(t *testing.T) {
 				require.NoError(t, errJWT)
 			}
 
-			cred := app_services.Credential{
+			cred := auth.Credential{
 				Email:    tt.in.Email,
 				Password: tt.in.Password,
 			}
@@ -147,7 +148,7 @@ func TestAuthServiceRPC_Register(t *testing.T) {
 				require.NoError(t, errJWT)
 			}
 
-			cred := app_services.Credential{
+			cred := auth.Credential{
 				Email:    tt.in.Email,
 				Password: tt.in.Password,
 			}

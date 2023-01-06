@@ -1,13 +1,14 @@
 package app_services
 
 import (
+	"GophKeeper/internal/model/auth"
+	storeMock "GophKeeper/internal/storage/auth_store/mocks"
 	"testing"
 
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 
 	"GophKeeper/internal/storage/auth_store"
-	mock "GophKeeper/mocks/storage"
 )
 
 func TestAuthAppService_Login(t *testing.T) {
@@ -15,22 +16,22 @@ func TestAuthAppService_Login(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	store := mock.NewMockAuthStorage(ctrl)
+	store := storeMock.NewMockAuthStorager(ctrl)
 
 	tests := []struct {
 		name      string
-		credStore auth_store.Credential
-		credServ  Credential
+		credStore auth.Credential
+		credServ  auth.Credential
 		waitErr   error
 		storeErr  error
 	}{
 		{
 			name: "Success",
-			credStore: auth_store.Credential{
+			credStore: auth.Credential{
 				Email:    "test@emailcom",
 				Password: "testPassword",
 			},
-			credServ: Credential{
+			credServ: auth.Credential{
 				Email:    "test@emailcom",
 				Password: "testPassword",
 			},
@@ -39,8 +40,8 @@ func TestAuthAppService_Login(t *testing.T) {
 		},
 		{
 			name:      "Unregistered",
-			credStore: auth_store.Credential{},
-			credServ: Credential{
+			credStore: auth.Credential{},
+			credServ: auth.Credential{
 				Email:    "test@emailcom",
 				Password: "testPassword",
 			},
@@ -49,11 +50,11 @@ func TestAuthAppService_Login(t *testing.T) {
 		},
 		{
 			name: "Invalid password",
-			credStore: auth_store.Credential{
+			credStore: auth.Credential{
 				Email:    "test@emailcom",
 				Password: "passwordTest",
 			},
-			credServ: Credential{
+			credServ: auth.Credential{
 				Email:    "test@emailcom",
 				Password: "testPassword",
 			},
@@ -67,8 +68,8 @@ func TestAuthAppService_Login(t *testing.T) {
 
 			store.EXPECT().Find(tt.credServ.Email).Return(tt.credStore, tt.storeErr)
 
-			auth := NewAuthService(store)
-			_, err := auth.Login(tt.credServ)
+			authServ := NewAuthService(store)
+			_, err := authServ.Login(tt.credServ)
 
 			assert.Equal(t, err, tt.waitErr)
 		})
@@ -80,23 +81,18 @@ func TestAuthAppService_Register(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	store := mock.NewMockAuthStorage(ctrl)
+	store := storeMock.NewMockAuthStorager(ctrl)
 
 	tests := []struct {
 		name      string
-		credStore auth_store.Credential
-		credServ  Credential
+		cred      auth.Credential
 		waitErr   error
 		storeErr  error
 		callStore bool
 	}{
 		{
 			name: "Success",
-			credStore: auth_store.Credential{
-				Email:    "test@email.com",
-				Password: "testPassword",
-			},
-			credServ: Credential{
+			cred: auth.Credential{
 				Email:    "test@email.com",
 				Password: "testPassword",
 			},
@@ -106,7 +102,7 @@ func TestAuthAppService_Register(t *testing.T) {
 		},
 		{
 			name: "Invalid email",
-			credServ: Credential{
+			cred: auth.Credential{
 				Email:    "test_email.com",
 				Password: "testPassword",
 			},
@@ -116,7 +112,7 @@ func TestAuthAppService_Register(t *testing.T) {
 		},
 		{
 			name: "Short password",
-			credServ: Credential{
+			cred: auth.Credential{
 				Email:    "test@email.com",
 				Password: "pwd",
 			},
@@ -126,11 +122,7 @@ func TestAuthAppService_Register(t *testing.T) {
 		},
 		{
 			name: "User already exist",
-			credStore: auth_store.Credential{
-				Email:    "test@email.com",
-				Password: "passwordTest",
-			},
-			credServ: Credential{
+			cred: auth.Credential{
 				Email:    "test@email.com",
 				Password: "passwordTest",
 			},
@@ -144,11 +136,11 @@ func TestAuthAppService_Register(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 
 			if tt.callStore {
-				store.EXPECT().Create(tt.credStore).Return(tt.storeErr)
+				store.EXPECT().Create(tt.cred).Return(tt.storeErr)
 			}
 
-			auth := NewAuthService(store)
-			_, err := auth.Register(tt.credServ)
+			authServ := NewAuthService(store)
+			_, err := authServ.Register(tt.cred)
 
 			assert.Equal(t, err, tt.waitErr)
 		})
@@ -160,7 +152,7 @@ func TestAuthAppService_ChangePassword(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	store := mock.NewMockAuthStorage(ctrl)
+	store := storeMock.NewMockAuthStorager(ctrl)
 
 	tests := []struct {
 		name            string
@@ -201,15 +193,15 @@ func TestAuthAppService_ChangePassword(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 
 			if tt.callStoreFind {
-				store.EXPECT().Find(tt.email).Return(auth_store.Credential{}, tt.errStore)
+				store.EXPECT().Find(tt.email).Return(auth.Credential{}, tt.errStore)
 			}
 
 			if tt.callStoreUpdate {
 				store.EXPECT().Update(tt.email, tt.password).Return(tt.errStore)
 			}
 
-			auth := NewAuthService(store)
-			err := auth.ChangePassword(tt.email, tt.password)
+			authServ := NewAuthService(store)
+			err := authServ.ChangePassword(tt.email, tt.password)
 
 			assert.Equal(t, tt.waitErr, err)
 		})

@@ -5,7 +5,7 @@
 package app_services
 
 import (
-	app_services "GophKeeper/internal/server/app_services"
+	auth "GophKeeper/internal/model/auth"
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
@@ -49,7 +49,7 @@ func (mr *MockAuthAppMockRecorder) ChangePassword(email, password interface{}) *
 }
 
 // Login mocks base method.
-func (m *MockAuthApp) Login(in app_services.Credential) (string, error) {
+func (m *MockAuthApp) Login(in auth.Credential) (string, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Login", in)
 	ret0, _ := ret[0].(string)
@@ -64,7 +64,7 @@ func (mr *MockAuthAppMockRecorder) Login(in interface{}) *gomock.Call {
 }
 
 // Register mocks base method.
-func (m *MockAuthApp) Register(in app_services.Credential) (string, error) {
+func (m *MockAuthApp) Register(in auth.Credential) (string, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Register", in)
 	ret0, _ := ret[0].(string)

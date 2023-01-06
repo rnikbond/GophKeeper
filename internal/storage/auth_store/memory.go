@@ -1,22 +1,23 @@
 package auth_store
 
 import (
+	"GophKeeper/internal/model/auth"
 	"sync"
 )
 
 type MemoryStorage struct {
 	mutex sync.RWMutex
-	users map[string]Credential
+	users map[string]auth.Credential
 }
 
 func NewMemoryStorage() *MemoryStorage {
 	return &MemoryStorage{
-		users: make(map[string]Credential),
+		users: make(map[string]auth.Credential),
 	}
 }
 
 // Create Создание нового пользователя
-func (store *MemoryStorage) Create(cred Credential) error {
+func (store *MemoryStorage) Create(cred auth.Credential) error {
 
 	store.mutex.Lock()
 	defer store.mutex.Unlock()
@@ -30,14 +31,14 @@ func (store *MemoryStorage) Create(cred Credential) error {
 }
 
 // Find Поиск пользователя по Email
-func (store *MemoryStorage) Find(email string) (Credential, error) {
+func (store *MemoryStorage) Find(email string) (auth.Credential, error) {
 
 	store.mutex.RLock()
 	defer store.mutex.RUnlock()
 
 	user, ok := store.users[email]
 	if !ok {
-		return Credential{}, ErrNotFound
+		return auth.Credential{}, ErrNotFound
 	}
 
 	return user, nil

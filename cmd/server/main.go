@@ -65,7 +65,7 @@ func newConfig() *server.Config {
 	return cfg
 }
 
-func newAuthAppService(store auth_store.AuthStorage, cfg *server.Config) *app_services.AuthAppService {
+func newAuthAppService(store auth_store.AuthStorager, cfg *server.Config) *app_services.AuthAppService {
 	return app_services.NewAuthService(store, app_services.WithSecretKey(cfg.SecretKey))
 }
 
