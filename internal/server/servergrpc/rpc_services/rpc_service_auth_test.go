@@ -1,21 +1,23 @@
 package rpc_services
 
 import (
-	"GophKeeper/internal/model/auth"
-	mock "GophKeeper/internal/server/app_services/mocks"
-	"GophKeeper/pkg/token"
 	"context"
-	"github.com/stretchr/testify/require"
-	"google.golang.org/grpc/metadata"
+
 	"testing"
 
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 
+	"GophKeeper/internal/model/auth"
 	"GophKeeper/internal/server/app_services"
+	mock "GophKeeper/internal/server/app_services/mocks"
 	pb "GophKeeper/pkg/proto/auth"
+	"GophKeeper/pkg/token"
 )
 
 func TestAuthServiceRPC_Login(t *testing.T) {

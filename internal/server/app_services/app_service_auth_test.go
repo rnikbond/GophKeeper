@@ -1,14 +1,14 @@
 package app_services
 
 import (
-	"GophKeeper/internal/model/auth"
-	storeMock "GophKeeper/internal/storage/auth_store/mocks"
 	"testing"
 
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 
+	"GophKeeper/internal/model/auth"
 	"GophKeeper/internal/storage/auth_store"
+	storeMock "GophKeeper/internal/storage/auth_store/mocks"
 )
 
 func TestAuthAppService_Login(t *testing.T) {

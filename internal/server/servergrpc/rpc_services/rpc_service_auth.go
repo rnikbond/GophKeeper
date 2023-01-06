@@ -1,14 +1,16 @@
 package rpc_services
 
 import (
+	"context"
+
+	"go.uber.org/zap"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+
 	"GophKeeper/internal/model/auth"
 	"GophKeeper/internal/server/app_services"
 	"GophKeeper/pkg/md_ctx"
 	pb "GophKeeper/pkg/proto/auth"
-	"context"
-	"go.uber.org/zap"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
 var (

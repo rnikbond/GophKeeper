@@ -1,8 +1,9 @@
 package auth_store
 
 import (
-	"GophKeeper/internal/model/auth"
 	"sync"
+
+	"GophKeeper/internal/model/auth"
 )
 
 type MemoryStorage struct {

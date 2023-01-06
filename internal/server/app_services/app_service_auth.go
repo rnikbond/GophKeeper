@@ -2,11 +2,13 @@
 package app_services
 
 import (
+	"strings"
+
+	"go.uber.org/zap"
+
 	authModel "GophKeeper/internal/model/auth"
 	"GophKeeper/internal/storage/auth_store"
 	"GophKeeper/pkg/token"
-	"go.uber.org/zap"
-	"strings"
 )
 
 // TODO :: Вынести в config

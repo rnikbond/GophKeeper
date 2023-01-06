@@ -1,14 +1,17 @@
 package interceptors
 
 import (
-	"GophKeeper/pkg/token"
 	"context"
+
 	middleware "github.com/grpc-ecosystem/go-grpc-middleware"
+
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
+
+	"GophKeeper/pkg/token"
 )
 
 // ValidateInterceptor - Перехватчик для gRPC, который отвечает за проверку подлинности JWT.

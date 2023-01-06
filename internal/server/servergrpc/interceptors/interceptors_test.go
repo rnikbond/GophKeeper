@@ -1,15 +1,19 @@
 package interceptors
 
 import (
-	"GophKeeper/pkg/md_ctx"
-	"GophKeeper/pkg/token"
 	"context"
+
+	"testing"
+
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
-	"testing"
+
+	"GophKeeper/pkg/md_ctx"
+	"GophKeeper/pkg/token"
 )
 
 // ValidateTokenInterceptor - Тест перехватчика для проверки корректности JWT.
