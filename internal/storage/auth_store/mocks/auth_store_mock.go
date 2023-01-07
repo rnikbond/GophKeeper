@@ -11,31 +11,31 @@ import (
 	gomock "github.com/golang/mock/gomock"
 )
 
-// MockAuthStorager is a mock of AuthStorager interface.
-type MockAuthStorager struct {
+// MockAuthStorage is a mock of AuthStorage interface.
+type MockAuthStorage struct {
 	ctrl     *gomock.Controller
-	recorder *MockAuthStoragerMockRecorder
+	recorder *MockAuthStorageMockRecorder
 }
 
-// MockAuthStoragerMockRecorder is the mock recorder for MockAuthStorager.
-type MockAuthStoragerMockRecorder struct {
-	mock *MockAuthStorager
+// MockAuthStorageMockRecorder is the mock recorder for MockAuthStorage.
+type MockAuthStorageMockRecorder struct {
+	mock *MockAuthStorage
 }
 
-// NewMockAuthStorager creates a new mock instance.
-func NewMockAuthStorager(ctrl *gomock.Controller) *MockAuthStorager {
-	mock := &MockAuthStorager{ctrl: ctrl}
-	mock.recorder = &MockAuthStoragerMockRecorder{mock}
+// NewMockAuthStorage creates a new mock instance.
+func NewMockAuthStorage(ctrl *gomock.Controller) *MockAuthStorage {
+	mock := &MockAuthStorage{ctrl: ctrl}
+	mock.recorder = &MockAuthStorageMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockAuthStorager) EXPECT() *MockAuthStoragerMockRecorder {
+func (m *MockAuthStorage) EXPECT() *MockAuthStorageMockRecorder {
 	return m.recorder
 }
 
 // Create mocks base method.
-func (m *MockAuthStorager) Create(cred auth.Credential) error {
+func (m *MockAuthStorage) Create(cred auth.Credential) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Create", cred)
 	ret0, _ := ret[0].(error)
@@ -43,13 +43,13 @@ func (m *MockAuthStorager) Create(cred auth.Credential) error {
 }
 
 // Create indicates an expected call of Create.
-func (mr *MockAuthStoragerMockRecorder) Create(cred interface{}) *gomock.Call {
+func (mr *MockAuthStorageMockRecorder) Create(cred interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockAuthStorager)(nil).Create), cred)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockAuthStorage)(nil).Create), cred)
 }
 
 // Delete mocks base method.
-func (m *MockAuthStorager) Delete(email string) error {
+func (m *MockAuthStorage) Delete(email string) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Delete", email)
 	ret0, _ := ret[0].(error)
@@ -57,13 +57,13 @@ func (m *MockAuthStorager) Delete(email string) error {
 }
 
 // Delete indicates an expected call of Delete.
-func (mr *MockAuthStoragerMockRecorder) Delete(email interface{}) *gomock.Call {
+func (mr *MockAuthStorageMockRecorder) Delete(email interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockAuthStorager)(nil).Delete), email)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockAuthStorage)(nil).Delete), email)
 }
 
 // Find mocks base method.
-func (m *MockAuthStorager) Find(email string) (auth.Credential, error) {
+func (m *MockAuthStorage) Find(email string) (auth.Credential, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Find", email)
 	ret0, _ := ret[0].(auth.Credential)
@@ -72,13 +72,13 @@ func (m *MockAuthStorager) Find(email string) (auth.Credential, error) {
 }
 
 // Find indicates an expected call of Find.
-func (mr *MockAuthStoragerMockRecorder) Find(email interface{}) *gomock.Call {
+func (mr *MockAuthStorageMockRecorder) Find(email interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Find", reflect.TypeOf((*MockAuthStorager)(nil).Find), email)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Find", reflect.TypeOf((*MockAuthStorage)(nil).Find), email)
 }
 
 // Update mocks base method.
-func (m *MockAuthStorager) Update(email, password string) error {
+func (m *MockAuthStorage) Update(email, password string) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Update", email, password)
 	ret0, _ := ret[0].(error)
@@ -86,7 +86,7 @@ func (m *MockAuthStorager) Update(email, password string) error {
 }
 
 // Update indicates an expected call of Update.
-func (mr *MockAuthStoragerMockRecorder) Update(email, password interface{}) *gomock.Call {
+func (mr *MockAuthStorageMockRecorder) Update(email, password interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockAuthStorager)(nil).Update), email, password)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockAuthStorage)(nil).Update), email, password)
 }

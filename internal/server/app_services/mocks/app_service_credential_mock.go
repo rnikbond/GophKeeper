@@ -5,6 +5,7 @@
 package app_services
 
 import (
+	cred "GophKeeper/internal/model/cred"
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
@@ -33,59 +34,59 @@ func (m *MockCredentialApp) EXPECT() *MockCredentialAppMockRecorder {
 	return m.recorder
 }
 
-// Create mocks base method.
-func (m *MockCredentialApp) Create(email, password string) error {
+// Change mocks base method.
+func (m *MockCredentialApp) Change(in cred.CredentialFull) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Create", email, password)
+	ret := m.ctrl.Call(m, "Change", in)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Change indicates an expected call of Change.
+func (mr *MockCredentialAppMockRecorder) Change(in interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Change", reflect.TypeOf((*MockCredentialApp)(nil).Change), in)
+}
+
+// Create mocks base method.
+func (m *MockCredentialApp) Create(in cred.CredentialFull) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Create", in)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // Create indicates an expected call of Create.
-func (mr *MockCredentialAppMockRecorder) Create(email, password interface{}) *gomock.Call {
+func (mr *MockCredentialAppMockRecorder) Create(in interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockCredentialApp)(nil).Create), email, password)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockCredentialApp)(nil).Create), in)
 }
 
 // Delete mocks base method.
-func (m *MockCredentialApp) Delete(email string) error {
+func (m *MockCredentialApp) Delete(in cred.CredentialGet) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Delete", email)
+	ret := m.ctrl.Call(m, "Delete", in)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // Delete indicates an expected call of Delete.
-func (mr *MockCredentialAppMockRecorder) Delete(email interface{}) *gomock.Call {
+func (mr *MockCredentialAppMockRecorder) Delete(in interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockCredentialApp)(nil).Delete), email)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockCredentialApp)(nil).Delete), in)
 }
 
-// Read mocks base method.
-func (m *MockCredentialApp) Read(email string) (string, error) {
+// Get mocks base method.
+func (m *MockCredentialApp) Get(in cred.CredentialGet) (cred.CredentialFull, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Read", email)
-	ret0, _ := ret[0].(string)
+	ret := m.ctrl.Call(m, "Get", in)
+	ret0, _ := ret[0].(cred.CredentialFull)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// Read indicates an expected call of Read.
-func (mr *MockCredentialAppMockRecorder) Read(email interface{}) *gomock.Call {
+// Get indicates an expected call of Get.
+func (mr *MockCredentialAppMockRecorder) Get(in interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Read", reflect.TypeOf((*MockCredentialApp)(nil).Read), email)
-}
-
-// Update mocks base method.
-func (m *MockCredentialApp) Update(email, password string) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Update", email, password)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// Update indicates an expected call of Update.
-func (mr *MockCredentialAppMockRecorder) Update(email, password interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockCredentialApp)(nil).Update), email, password)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockCredentialApp)(nil).Get), in)
 }
