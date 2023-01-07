@@ -16,7 +16,7 @@ func TestAuthAppService_Login(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	store := storeMock.NewMockAuthStorager(ctrl)
+	store := storeMock.NewMockAuthStorage(ctrl)
 
 	tests := []struct {
 		name      string
@@ -81,7 +81,7 @@ func TestAuthAppService_Register(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	store := storeMock.NewMockAuthStorager(ctrl)
+	store := storeMock.NewMockAuthStorage(ctrl)
 
 	tests := []struct {
 		name      string
@@ -152,7 +152,7 @@ func TestAuthAppService_ChangePassword(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	store := storeMock.NewMockAuthStorager(ctrl)
+	store := storeMock.NewMockAuthStorage(ctrl)
 
 	tests := []struct {
 		name            string

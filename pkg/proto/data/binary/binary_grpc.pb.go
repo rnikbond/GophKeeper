@@ -4,7 +4,7 @@
 // - protoc             v3.17.3
 // source: pkg/proto/data/binary/binary.proto
 
-package credential
+package binary
 
 import (
 	context "context"
@@ -18,194 +18,194 @@ import (
 // Requires gRPC-Go v1.32.0 or later.
 const _ = grpc.SupportPackageIsVersion7
 
-// CredentialServiceClient is the client API for CredentialService service.
+// BinaryServiceClient is the client API for BinaryService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type CredentialServiceClient interface {
+type BinaryServiceClient interface {
 	Create(ctx context.Context, in *CreateRequest, opts ...grpc.CallOption) (*Empty, error)
 	Change(ctx context.Context, in *ChangeRequest, opts ...grpc.CallOption) (*Empty, error)
 	Delete(ctx context.Context, in *DeleteRequest, opts ...grpc.CallOption) (*Empty, error)
 	Get(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*GetResponse, error)
 }
 
-type credentialServiceClient struct {
+type binaryServiceClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewCredentialServiceClient(cc grpc.ClientConnInterface) CredentialServiceClient {
-	return &credentialServiceClient{cc}
+func NewBinaryServiceClient(cc grpc.ClientConnInterface) BinaryServiceClient {
+	return &binaryServiceClient{cc}
 }
 
-func (c *credentialServiceClient) Create(ctx context.Context, in *CreateRequest, opts ...grpc.CallOption) (*Empty, error) {
+func (c *binaryServiceClient) Create(ctx context.Context, in *CreateRequest, opts ...grpc.CallOption) (*Empty, error) {
 	out := new(Empty)
-	err := c.cc.Invoke(ctx, "/credential.CredentialService/Create", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/binary.BinaryService/Create", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *credentialServiceClient) Change(ctx context.Context, in *ChangeRequest, opts ...grpc.CallOption) (*Empty, error) {
+func (c *binaryServiceClient) Change(ctx context.Context, in *ChangeRequest, opts ...grpc.CallOption) (*Empty, error) {
 	out := new(Empty)
-	err := c.cc.Invoke(ctx, "/credential.CredentialService/Change", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/binary.BinaryService/Change", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *credentialServiceClient) Delete(ctx context.Context, in *DeleteRequest, opts ...grpc.CallOption) (*Empty, error) {
+func (c *binaryServiceClient) Delete(ctx context.Context, in *DeleteRequest, opts ...grpc.CallOption) (*Empty, error) {
 	out := new(Empty)
-	err := c.cc.Invoke(ctx, "/credential.CredentialService/Delete", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/binary.BinaryService/Delete", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *credentialServiceClient) Get(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*GetResponse, error) {
+func (c *binaryServiceClient) Get(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*GetResponse, error) {
 	out := new(GetResponse)
-	err := c.cc.Invoke(ctx, "/credential.CredentialService/Get", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/binary.BinaryService/Get", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// CredentialServiceServer is the server API for CredentialService service.
-// All implementations must embed UnimplementedCredentialServiceServer
+// BinaryServiceServer is the server API for BinaryService service.
+// All implementations must embed UnimplementedBinaryServiceServer
 // for forward compatibility
-type CredentialServiceServer interface {
+type BinaryServiceServer interface {
 	Create(context.Context, *CreateRequest) (*Empty, error)
 	Change(context.Context, *ChangeRequest) (*Empty, error)
 	Delete(context.Context, *DeleteRequest) (*Empty, error)
 	Get(context.Context, *GetRequest) (*GetResponse, error)
-	mustEmbedUnimplementedCredentialServiceServer()
+	mustEmbedUnimplementedBinaryServiceServer()
 }
 
-// UnimplementedCredentialServiceServer must be embedded to have forward compatible implementations.
-type UnimplementedCredentialServiceServer struct {
+// UnimplementedBinaryServiceServer must be embedded to have forward compatible implementations.
+type UnimplementedBinaryServiceServer struct {
 }
 
-func (UnimplementedCredentialServiceServer) Create(context.Context, *CreateRequest) (*Empty, error) {
+func (UnimplementedBinaryServiceServer) Create(context.Context, *CreateRequest) (*Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Create not implemented")
 }
-func (UnimplementedCredentialServiceServer) Change(context.Context, *ChangeRequest) (*Empty, error) {
+func (UnimplementedBinaryServiceServer) Change(context.Context, *ChangeRequest) (*Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Change not implemented")
 }
-func (UnimplementedCredentialServiceServer) Delete(context.Context, *DeleteRequest) (*Empty, error) {
+func (UnimplementedBinaryServiceServer) Delete(context.Context, *DeleteRequest) (*Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Delete not implemented")
 }
-func (UnimplementedCredentialServiceServer) Get(context.Context, *GetRequest) (*GetResponse, error) {
+func (UnimplementedBinaryServiceServer) Get(context.Context, *GetRequest) (*GetResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Get not implemented")
 }
-func (UnimplementedCredentialServiceServer) mustEmbedUnimplementedCredentialServiceServer() {}
+func (UnimplementedBinaryServiceServer) mustEmbedUnimplementedBinaryServiceServer() {}
 
-// UnsafeCredentialServiceServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to CredentialServiceServer will
+// UnsafeBinaryServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to BinaryServiceServer will
 // result in compilation errors.
-type UnsafeCredentialServiceServer interface {
-	mustEmbedUnimplementedCredentialServiceServer()
+type UnsafeBinaryServiceServer interface {
+	mustEmbedUnimplementedBinaryServiceServer()
 }
 
-func RegisterCredentialServiceServer(s grpc.ServiceRegistrar, srv CredentialServiceServer) {
-	s.RegisterService(&CredentialService_ServiceDesc, srv)
+func RegisterBinaryServiceServer(s grpc.ServiceRegistrar, srv BinaryServiceServer) {
+	s.RegisterService(&BinaryService_ServiceDesc, srv)
 }
 
-func _CredentialService_Create_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _BinaryService_Create_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(CreateRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(CredentialServiceServer).Create(ctx, in)
+		return srv.(BinaryServiceServer).Create(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/credential.CredentialService/Create",
+		FullMethod: "/binary.BinaryService/Create",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(CredentialServiceServer).Create(ctx, req.(*CreateRequest))
+		return srv.(BinaryServiceServer).Create(ctx, req.(*CreateRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _CredentialService_Change_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _BinaryService_Change_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ChangeRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(CredentialServiceServer).Change(ctx, in)
+		return srv.(BinaryServiceServer).Change(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/credential.CredentialService/Change",
+		FullMethod: "/binary.BinaryService/Change",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(CredentialServiceServer).Change(ctx, req.(*ChangeRequest))
+		return srv.(BinaryServiceServer).Change(ctx, req.(*ChangeRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _CredentialService_Delete_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _BinaryService_Delete_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(DeleteRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(CredentialServiceServer).Delete(ctx, in)
+		return srv.(BinaryServiceServer).Delete(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/credential.CredentialService/Delete",
+		FullMethod: "/binary.BinaryService/Delete",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(CredentialServiceServer).Delete(ctx, req.(*DeleteRequest))
+		return srv.(BinaryServiceServer).Delete(ctx, req.(*DeleteRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _CredentialService_Get_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _BinaryService_Get_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(CredentialServiceServer).Get(ctx, in)
+		return srv.(BinaryServiceServer).Get(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/credential.CredentialService/Get",
+		FullMethod: "/binary.BinaryService/Get",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(CredentialServiceServer).Get(ctx, req.(*GetRequest))
+		return srv.(BinaryServiceServer).Get(ctx, req.(*GetRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-// CredentialService_ServiceDesc is the grpc.ServiceDesc for CredentialService service.
+// BinaryService_ServiceDesc is the grpc.ServiceDesc for BinaryService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
-var CredentialService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "credential.CredentialService",
-	HandlerType: (*CredentialServiceServer)(nil),
+var BinaryService_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "binary.BinaryService",
+	HandlerType: (*BinaryServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
 			MethodName: "Create",
-			Handler:    _CredentialService_Create_Handler,
+			Handler:    _BinaryService_Create_Handler,
 		},
 		{
 			MethodName: "Change",
-			Handler:    _CredentialService_Change_Handler,
+			Handler:    _BinaryService_Change_Handler,
 		},
 		{
 			MethodName: "Delete",
-			Handler:    _CredentialService_Delete_Handler,
+			Handler:    _BinaryService_Delete_Handler,
 		},
 		{
 			MethodName: "Get",
-			Handler:    _CredentialService_Get_Handler,
+			Handler:    _BinaryService_Get_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

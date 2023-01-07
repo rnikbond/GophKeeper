@@ -65,6 +65,18 @@ func main() {
 		logger.Info("success find credential data")
 	}
 
+	if err := cli.CreateBinary(); err != nil {
+		logger.Error("error create binary data", zap.Error(err))
+	} else {
+		logger.Info("success create binary data")
+	}
+
+	if _, err := cli.FindBinary(); err != nil {
+		logger.Error("error find binary data", zap.Error(err))
+	} else {
+		logger.Info("success find binary data")
+	}
+
 	done := make(chan os.Signal)
 	signal.Notify(done, syscall.SIGTERM, syscall.SIGINT, syscall.SIGQUIT)
 	<-done

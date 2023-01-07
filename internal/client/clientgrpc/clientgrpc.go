@@ -1,23 +1,27 @@
 package clientgrpc
 
 import (
-	"GophKeeper/internal/model/cred"
+	"GophKeeper/internal/model/binary"
 	"context"
 	"fmt"
+
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/metadata"
 
+	"GophKeeper/internal/model/cred"
 	pbAuth "GophKeeper/pkg/proto/auth"
+	pbBinary "GophKeeper/pkg/proto/data/binary"
 	pbCred "GophKeeper/pkg/proto/data/credential"
 )
 
 type ClientGRPC struct {
-	addr          string
-	token         string
-	conn          *grpc.ClientConn
-	rpcAuthClient pbAuth.AuthServiceClient
-	rpcCredClient pbCred.CredentialServiceClient
+	addr            string
+	token           string
+	conn            *grpc.ClientConn
+	rpcAuthClient   pbAuth.AuthServiceClient
+	rpcCredClient   pbCred.CredentialServiceClient
+	rpcBinaryClient pbBinary.BinaryServiceClient
 }
 
 func NewClient(addr string) *ClientGRPC {
@@ -99,11 +103,45 @@ func (c ClientGRPC) FindPairCred() (cred.CredentialFull, error) {
 	return data, err
 }
 
+func (c ClientGRPC) CreateBinary() error {
+
+	md := metadata.New(map[string]string{"token": c.token})
+	ctx := metadata.NewOutgoingContext(context.Background(), md)
+
+	_, err := c.rpcBinaryClient.Create(ctx, &pbBinary.CreateRequest{
+		Email:    "ololoev@email.com",
+		MetaInfo: "www.ololo.com",
+		Data:     []byte("123123123123asd"),
+	})
+
+	return err
+}
+
+func (c ClientGRPC) FindBinary() (binary.DataFull, error) {
+
+	md := metadata.New(map[string]string{"token": c.token})
+	ctx := metadata.NewOutgoingContext(context.Background(), md)
+
+	out, err := c.rpcBinaryClient.Get(ctx, &pbBinary.GetRequest{
+		Email:    "ololoev@email.com",
+		MetaInfo: "www.ololo.com",
+	})
+
+	data := binary.DataFull{
+		Email:    out.Email,
+		MetaInfo: out.MetaInfo,
+		Bytes:    out.Data,
+	}
+
+	return data, err
+}
+
 func (c *ClientGRPC) Connect() (err error) {
 
 	c.conn, err = grpc.Dial(c.addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	c.rpcAuthClient = pbAuth.NewAuthServiceClient(c.conn)
 	c.rpcCredClient = pbCred.NewCredentialServiceClient(c.conn)
+	c.rpcBinaryClient = pbBinary.NewBinaryServiceClient(c.conn)
 	return err
 }
 

@@ -1,27 +1,28 @@
 package rpc_services
 
 import (
-	"GophKeeper/internal/model/cred"
-	"GophKeeper/pkg/errs"
 	"context"
+
+	"go.uber.org/zap"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
+	"GophKeeper/internal/model/binary"
 	"GophKeeper/internal/server/app_services"
-	pb "GophKeeper/pkg/proto/data/credential"
-	"go.uber.org/zap"
+	"GophKeeper/pkg/errs"
+	pb "GophKeeper/pkg/proto/data/binary"
 )
 
-type CredServiceRPC struct {
-	pb.CredentialServiceServer
+type BinaryServiceRPC struct {
+	pb.BinaryServiceServer
 
-	credApp app_services.CredentialApp
+	credApp app_services.BinaryApp
 	logger  *zap.Logger
 }
 
-// NewCredServiceRPC - Создание эклемпляра gRPC сервиса дял хранения данных в виде логина и пароля.
-func NewCredServiceRPC(credApp app_services.CredentialApp) *CredServiceRPC {
-	serv := &CredServiceRPC{
+// NewBinaryServiceRPC - Создание эклемпляра gRPC сервиса дял хранения бмнарных данных.
+func NewBinaryServiceRPC(credApp app_services.BinaryApp) *BinaryServiceRPC {
+	serv := &BinaryServiceRPC{
 		credApp: credApp,
 		logger:  zap.L(),
 	}
@@ -30,12 +31,12 @@ func NewCredServiceRPC(credApp app_services.CredentialApp) *CredServiceRPC {
 }
 
 // Create - Добавление новых данных.
-func (serv *CredServiceRPC) Create(ctx context.Context, in *pb.CreateRequest) (*pb.Empty, error) {
+func (serv *BinaryServiceRPC) Create(ctx context.Context, in *pb.CreateRequest) (*pb.Empty, error) {
 
-	data := cred.CredentialFull{
+	data := binary.DataFull{
 		Email:    in.Email,
 		MetaInfo: in.MetaInfo,
-		Password: in.Password,
+		Bytes:    in.Data,
 	}
 
 	err := serv.credApp.Create(data)
@@ -44,11 +45,10 @@ func (serv *CredServiceRPC) Create(ctx context.Context, in *pb.CreateRequest) (*
 			return &pb.Empty{}, status.Errorf(codes.AlreadyExists, err.Error())
 		}
 
-		serv.logger.Error("failed create credential data",
+		serv.logger.Error("failed create binary data",
 			zap.Error(err),
 			zap.String("email", in.Email),
-			zap.String("meta", in.MetaInfo),
-			zap.String("pwd", in.Password))
+			zap.String("meta", in.MetaInfo))
 
 		return &pb.Empty{}, status.Errorf(codes.Internal, InternalErrorText)
 	}
@@ -57,12 +57,12 @@ func (serv *CredServiceRPC) Create(ctx context.Context, in *pb.CreateRequest) (*
 }
 
 // Change - Изменение существующих данных.
-func (serv *CredServiceRPC) Change(ctx context.Context, in *pb.ChangeRequest) (*pb.Empty, error) {
+func (serv *BinaryServiceRPC) Change(ctx context.Context, in *pb.ChangeRequest) (*pb.Empty, error) {
 
-	data := cred.CredentialFull{
+	data := binary.DataFull{
 		Email:    in.Email,
 		MetaInfo: in.MetaInfo,
-		Password: in.Password,
+		Bytes:    in.Data,
 	}
 
 	err := serv.credApp.Change(data)
@@ -71,11 +71,10 @@ func (serv *CredServiceRPC) Change(ctx context.Context, in *pb.ChangeRequest) (*
 			return &pb.Empty{}, status.Errorf(codes.NotFound, err.Error())
 		}
 
-		serv.logger.Error("failed change credential data",
+		serv.logger.Error("failed change binary data",
 			zap.Error(err),
 			zap.String("email", in.Email),
-			zap.String("meta", in.MetaInfo),
-			zap.String("pwd", in.Password))
+			zap.String("meta", in.MetaInfo))
 
 		return &pb.Empty{}, status.Errorf(codes.Internal, InternalErrorText)
 	}
@@ -84,9 +83,9 @@ func (serv *CredServiceRPC) Change(ctx context.Context, in *pb.ChangeRequest) (*
 }
 
 // Delete - Удаление существующих данных.
-func (serv *CredServiceRPC) Delete(ctx context.Context, in *pb.DeleteRequest) (*pb.Empty, error) {
+func (serv *BinaryServiceRPC) Delete(ctx context.Context, in *pb.DeleteRequest) (*pb.Empty, error) {
 
-	data := cred.CredentialGet{
+	data := binary.DataGet{
 		Email:    in.Email,
 		MetaInfo: in.MetaInfo,
 	}
@@ -97,7 +96,7 @@ func (serv *CredServiceRPC) Delete(ctx context.Context, in *pb.DeleteRequest) (*
 			return &pb.Empty{}, status.Errorf(codes.NotFound, err.Error())
 		}
 
-		serv.logger.Error("failed delete credential data",
+		serv.logger.Error("failed delete binary data",
 			zap.Error(err),
 			zap.String("email", in.Email),
 			zap.String("meta", in.MetaInfo))
@@ -109,9 +108,9 @@ func (serv *CredServiceRPC) Delete(ctx context.Context, in *pb.DeleteRequest) (*
 }
 
 // Get - Получение данных по email и метаданным.
-func (serv *CredServiceRPC) Get(ctx context.Context, in *pb.GetRequest) (*pb.GetResponse, error) {
+func (serv *BinaryServiceRPC) Get(ctx context.Context, in *pb.GetRequest) (*pb.GetResponse, error) {
 
-	inData := cred.CredentialGet{
+	inData := binary.DataGet{
 		Email:    in.Email,
 		MetaInfo: in.MetaInfo,
 	}
@@ -122,7 +121,7 @@ func (serv *CredServiceRPC) Get(ctx context.Context, in *pb.GetRequest) (*pb.Get
 			return &pb.GetResponse{}, status.Errorf(codes.NotFound, err.Error())
 		}
 
-		serv.logger.Error("failed get credential data",
+		serv.logger.Error("failed delete get data",
 			zap.Error(err),
 			zap.String("email", in.Email),
 			zap.String("meta", in.MetaInfo))
@@ -133,7 +132,7 @@ func (serv *CredServiceRPC) Get(ctx context.Context, in *pb.GetRequest) (*pb.Get
 	out := &pb.GetResponse{
 		Email:    data.Email,
 		MetaInfo: data.MetaInfo,
-		Password: data.Password,
+		Data:     data.Bytes,
 	}
 
 	return out, nil
