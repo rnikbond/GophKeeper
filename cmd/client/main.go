@@ -42,17 +42,27 @@ func main() {
 			logger.Error("register error", zap.Error(err))
 		}
 
-		logger.Info("Success Register")
+		logger.Info("Success Register and Login")
 	} else {
-		logger.Error("login error", zap.Error(err))
+		logger.Info("Success Login")
 	}
-
-	logger.Info("Success Login")
 
 	if err := cli.ChangePassword(); err != nil {
 		logger.Error("error change password", zap.Error(err))
 	} else {
 		logger.Info("success change password")
+	}
+
+	if err := cli.CreatePairCred(); err != nil {
+		logger.Error("error create credential data", zap.Error(err))
+	} else {
+		logger.Info("success create credential data")
+	}
+
+	if _, err := cli.FindPairCred(); err != nil {
+		logger.Error("error find credential data", zap.Error(err))
+	} else {
+		logger.Info("success find credential data")
 	}
 
 	done := make(chan os.Signal)

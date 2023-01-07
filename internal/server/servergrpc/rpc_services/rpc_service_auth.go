@@ -13,10 +13,6 @@ import (
 	pb "GophKeeper/pkg/proto/auth"
 )
 
-var (
-	InternalErrorText = "Internal server error"
-)
-
 type AuthServiceRPC struct {
 	pb.AuthServiceServer
 

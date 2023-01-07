@@ -3,7 +3,7 @@ package auth_store
 
 import "GophKeeper/internal/model/auth"
 
-type AuthStorager interface {
+type AuthStorage interface {
 	Create(cred auth.Credential) error
 	Find(email string) (auth.Credential, error)
 	Delete(email string) error

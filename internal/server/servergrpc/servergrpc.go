@@ -8,7 +8,8 @@ import (
 	"google.golang.org/grpc"
 
 	"GophKeeper/internal/server/servergrpc/rpc_services"
-	pb "GophKeeper/pkg/proto/auth"
+	pbAuth "GophKeeper/pkg/proto/auth"
+	pbCred "GophKeeper/pkg/proto/data/credential"
 )
 
 // ServerOption - определяет операцию сервиса авторизации.
@@ -50,7 +51,14 @@ func NewServer(addr string, interceptor grpc.ServerOption, opts ...ServerOption)
 // WithAuthServiceRPC - Регистрирует сервис gPRC авторизации
 func WithAuthServiceRPC(auth *rpc_services.AuthServiceRPC) ServerOption {
 	return func(serv *ServerGRPC) {
-		pb.RegisterAuthServiceServer(serv.Server, auth)
+		pbAuth.RegisterAuthServiceServer(serv.Server, auth)
+	}
+}
+
+// WithCredServiceRPC - Регистрирует сервис gPRC для хранения логинов и паролей
+func WithCredServiceRPC(cred *rpc_services.CredServiceRPC) ServerOption {
+	return func(serv *ServerGRPC) {
+		pbCred.RegisterCredentialServiceServer(serv.Server, cred)
 	}
 }
 

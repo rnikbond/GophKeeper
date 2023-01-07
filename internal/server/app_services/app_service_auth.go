@@ -25,13 +25,13 @@ type AuthAppOption func(serv *AuthAppService)
 
 // AuthAppService отвеает за сервис авторизации и регистрации пользователя.
 type AuthAppService struct {
-	store     auth_store.AuthStorager
+	store     auth_store.AuthStorage
 	logger    *zap.Logger
 	secretKey string
 }
 
 // NewAuthService - Создание экземпляра сервиса авторизации.
-func NewAuthService(store auth_store.AuthStorager, opts ...AuthAppOption) *AuthAppService {
+func NewAuthService(store auth_store.AuthStorage, opts ...AuthAppOption) *AuthAppService {
 	auth := &AuthAppService{
 		store:  store,
 		logger: zap.L(),

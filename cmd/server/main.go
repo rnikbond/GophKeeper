@@ -2,6 +2,7 @@ package main
 
 import (
 	"GophKeeper/internal/storage/auth_store"
+	"GophKeeper/internal/storage/data_store/credential_store"
 	"fmt"
 	"os"
 	"os/signal"
@@ -32,11 +33,29 @@ func main() {
 	logzap.ConfigZapLogger()
 
 	cfg := newConfig()
-	store := auth_store.NewMemoryStorage()
 
-	authApp := newAuthAppService(store, cfg)
+	authStore := auth_store.NewMemoryStorage()
+	credStore := credential_store.NewMemoryStorage()
+
+	validate := interceptors.NewValidateInterceptor(cfg.SecretKey)
+
+	authApp := newAuthAppService(authStore, cfg)
+	credApp := newCredAppService(credStore)
+
 	authRPC := newAuthRPCService(authApp)
-	grpcServer := newServer(cfg, authRPC)
+	credRPC := newCredRPCService(credApp)
+
+	grpcServer, err := servergrpc.NewServer(
+		cfg.AddrGRPC,
+		validate,
+		servergrpc.WithAuthServiceRPC(authRPC),
+		servergrpc.WithCredServiceRPC(credRPC),
+	)
+
+	if err != nil {
+		logger := zap.L()
+		logger.Error("failed server run", zap.Error(err))
+	}
 
 	grpcServer.Start()
 
@@ -65,24 +84,18 @@ func newConfig() *server.Config {
 	return cfg
 }
 
-func newAuthAppService(store auth_store.AuthStorager, cfg *server.Config) *app_services.AuthAppService {
+func newAuthAppService(store auth_store.AuthStorage, cfg *server.Config) *app_services.AuthAppService {
 	return app_services.NewAuthService(store, app_services.WithSecretKey(cfg.SecretKey))
+}
+
+func newCredAppService(store credential_store.CredStorage) *app_services.CredentialAppService {
+	return app_services.NewCredentialAppService(store)
 }
 
 func newAuthRPCService(authApp *app_services.AuthAppService) *rpc_services.AuthServiceRPC {
 	return rpc_services.NewAuthServiceRPC(authApp)
 }
 
-// newServer Создание объекта сервера
-func newServer(cfg *server.Config, auth *rpc_services.AuthServiceRPC) *servergrpc.ServerGRPC {
-
-	validate := interceptors.NewValidateInterceptor(cfg.SecretKey)
-
-	serv, err := servergrpc.NewServer(cfg.AddrGRPC, validate, servergrpc.WithAuthServiceRPC(auth))
-	if err != nil {
-		logger := zap.L()
-		logger.Error("failed server run", zap.Error(err))
-	}
-
-	return serv
+func newCredRPCService(credApp *app_services.CredentialAppService) *rpc_services.CredServiceRPC {
+	return rpc_services.NewCredServiceRPC(credApp)
 }
