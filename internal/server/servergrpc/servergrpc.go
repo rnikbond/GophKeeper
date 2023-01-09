@@ -11,6 +11,7 @@ import (
 	pbAuth "GophKeeper/pkg/proto/auth"
 	pbBinary "GophKeeper/pkg/proto/data/binary"
 	pbCred "GophKeeper/pkg/proto/data/credential"
+	pbText "GophKeeper/pkg/proto/data/text"
 )
 
 // ServerOption - определяет операцию сервиса авторизации.
@@ -63,10 +64,17 @@ func WithCredServiceRPC(cred *rpc_services.CredServiceRPC) ServerOption {
 	}
 }
 
-// WithBinaryServiceRPC - Регистрирует сервис gPRC для хранения бинарных
+// WithBinaryServiceRPC - Регистрирует сервис gPRC для хранения бинарных данных
 func WithBinaryServiceRPC(bin *rpc_services.BinaryServiceRPC) ServerOption {
 	return func(serv *ServerGRPC) {
 		pbBinary.RegisterBinaryServiceServer(serv.Server, bin)
+	}
+}
+
+// WithTextServiceRPC - Регистрирует сервис gPRC для хранения текстовых данных
+func WithTextServiceRPC(txt *rpc_services.TextServiceRPC) ServerOption {
+	return func(serv *ServerGRPC) {
+		pbText.RegisterTextServiceServer(serv.Server, txt)
 	}
 }
 

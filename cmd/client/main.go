@@ -77,6 +77,18 @@ func main() {
 		logger.Info("success find binary data")
 	}
 
+	if err := cli.CreateText(); err != nil {
+		logger.Error("error create text data", zap.Error(err))
+	} else {
+		logger.Info("success create text data")
+	}
+
+	if _, err := cli.FindText(); err != nil {
+		logger.Error("error find text data", zap.Error(err))
+	} else {
+		logger.Info("success find text data")
+	}
+
 	done := make(chan os.Signal)
 	signal.Notify(done, syscall.SIGTERM, syscall.SIGINT, syscall.SIGQUIT)
 	<-done

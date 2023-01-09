@@ -4,6 +4,7 @@ import (
 	"GophKeeper/internal/storage/auth_store"
 	"GophKeeper/internal/storage/data_store/binary_store"
 	"GophKeeper/internal/storage/data_store/credential_store"
+	"GophKeeper/internal/storage/data_store/text_store"
 	"fmt"
 	"os"
 	"os/signal"
@@ -38,16 +39,19 @@ func main() {
 	authStore := auth_store.NewMemoryStorage()
 	credStore := credential_store.NewMemoryStorage()
 	binStore := binary_store.NewMemoryStorage()
+	textStore := text_store.NewMemoryStorage()
 
 	validate := interceptors.NewValidateInterceptor(cfg.SecretKey)
 
 	authApp := newAuthAppService(authStore, cfg)
 	credApp := newCredAppService(credStore)
 	binApp := newBinaryAppService(binStore)
+	textApp := newTextAppService(textStore)
 
 	authRPC := newAuthRPCService(authApp)
 	credRPC := newCredRPCService(credApp)
 	binRPC := newBinaryRPCService(binApp)
+	textRPC := newTextRPCService(textApp)
 
 	grpcServer, err := servergrpc.NewServer(
 		cfg.AddrGRPC,
@@ -55,6 +59,7 @@ func main() {
 		servergrpc.WithAuthServiceRPC(authRPC),
 		servergrpc.WithCredServiceRPC(credRPC),
 		servergrpc.WithBinaryServiceRPC(binRPC),
+		servergrpc.WithTextServiceRPC(textRPC),
 	)
 
 	if err != nil {
@@ -101,6 +106,10 @@ func newBinaryAppService(store binary_store.BinaryStorage) *app_services.BinaryA
 	return app_services.NewBinaryAppService(store)
 }
 
+func newTextAppService(store text_store.TextStorage) *app_services.TextAppService {
+	return app_services.NewTextAppService(store)
+}
+
 func newAuthRPCService(authApp *app_services.AuthAppService) *rpc_services.AuthServiceRPC {
 	return rpc_services.NewAuthServiceRPC(authApp)
 }
@@ -111,4 +120,8 @@ func newCredRPCService(credApp *app_services.CredentialAppService) *rpc_services
 
 func newBinaryRPCService(credApp *app_services.BinaryAppService) *rpc_services.BinaryServiceRPC {
 	return rpc_services.NewBinaryServiceRPC(credApp)
+}
+
+func newTextRPCService(textApp *app_services.TextAppService) *rpc_services.TextServiceRPC {
+	return rpc_services.NewTextServiceRPC(textApp)
 }

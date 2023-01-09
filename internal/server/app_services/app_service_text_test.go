@@ -1,34 +1,34 @@
 package app_services
 
 import (
-	"GophKeeper/internal/model/binary"
-	"GophKeeper/internal/storage/data_store/binary_store"
+	"GophKeeper/internal/model/text"
+	"GophKeeper/internal/storage/data_store/text_store"
 	"GophKeeper/pkg/errs"
 	"github.com/stretchr/testify/require"
 	"testing"
 )
 
-func TestBinaryAppService(t *testing.T) {
+func TestTextAppService(t *testing.T) {
 
-	store := binary_store.NewMemoryStorage()
-	serv := NewBinaryAppService(store)
+	store := text_store.NewMemoryStorage()
+	serv := NewTextAppService(store)
 
-	testDataOK := binary.DataFull{
-		MetaInfo: "desktop.bin",
-		Bytes:    []byte("010101010101"),
+	testDataOK := text.DataTextFull{
+		MetaInfo: "note_private",
+		Text:     "text text text",
 	}
 
-	testDataChange := binary.DataFull{
-		MetaInfo: "desktop.bin",
-		Bytes:    []byte("000000000000000000"),
+	testDataChange := text.DataTextFull{
+		MetaInfo: "note_private",
+		Text:     "qwerty123",
 	}
 
-	testDataGet := binary.DataGet{
-		MetaInfo: "desktop.bin",
+	testDataGet := text.DataTextGet{
+		MetaInfo: "note_private",
 	}
 
-	testDataFail := binary.DataGet{
-		MetaInfo: "desktop1.bin",
+	testDataFail := text.DataTextGet{
+		MetaInfo: "note_private_1",
 	}
 
 	errCreate := serv.Create(testDataOK)

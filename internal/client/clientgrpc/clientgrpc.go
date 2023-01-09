@@ -2,6 +2,7 @@ package clientgrpc
 
 import (
 	"GophKeeper/internal/model/binary"
+	"GophKeeper/internal/model/text"
 	"context"
 	"fmt"
 
@@ -13,6 +14,7 @@ import (
 	pbAuth "GophKeeper/pkg/proto/auth"
 	pbBinary "GophKeeper/pkg/proto/data/binary"
 	pbCred "GophKeeper/pkg/proto/data/credential"
+	pbText "GophKeeper/pkg/proto/data/text"
 )
 
 type ClientGRPC struct {
@@ -22,6 +24,7 @@ type ClientGRPC struct {
 	rpcAuthClient   pbAuth.AuthServiceClient
 	rpcCredClient   pbCred.CredentialServiceClient
 	rpcBinaryClient pbBinary.BinaryServiceClient
+	rpcTextClient   pbText.TextServiceClient
 }
 
 func NewClient(addr string) *ClientGRPC {
@@ -109,7 +112,6 @@ func (c ClientGRPC) CreateBinary() error {
 	ctx := metadata.NewOutgoingContext(context.Background(), md)
 
 	_, err := c.rpcBinaryClient.Create(ctx, &pbBinary.CreateRequest{
-		Email:    "ololoev@email.com",
 		MetaInfo: "www.ololo.com",
 		Data:     []byte("123123123123asd"),
 	})
@@ -123,14 +125,42 @@ func (c ClientGRPC) FindBinary() (binary.DataFull, error) {
 	ctx := metadata.NewOutgoingContext(context.Background(), md)
 
 	out, err := c.rpcBinaryClient.Get(ctx, &pbBinary.GetRequest{
-		Email:    "ololoev@email.com",
 		MetaInfo: "www.ololo.com",
 	})
 
 	data := binary.DataFull{
-		Email:    out.Email,
 		MetaInfo: out.MetaInfo,
 		Bytes:    out.Data,
+	}
+
+	return data, err
+}
+
+func (c ClientGRPC) CreateText() error {
+
+	md := metadata.New(map[string]string{"token": c.token})
+	ctx := metadata.NewOutgoingContext(context.Background(), md)
+
+	_, err := c.rpcTextClient.Create(ctx, &pbText.CreateRequest{
+		MetaInfo: "book",
+		Text:     "123123123123asd",
+	})
+
+	return err
+}
+
+func (c ClientGRPC) FindText() (text.DataTextFull, error) {
+
+	md := metadata.New(map[string]string{"token": c.token})
+	ctx := metadata.NewOutgoingContext(context.Background(), md)
+
+	out, err := c.rpcTextClient.Get(ctx, &pbText.GetRequest{
+		MetaInfo: "book",
+	})
+
+	data := text.DataTextFull{
+		MetaInfo: out.MetaInfo,
+		Text:     out.Text,
 	}
 
 	return data, err
@@ -142,6 +172,7 @@ func (c *ClientGRPC) Connect() (err error) {
 	c.rpcAuthClient = pbAuth.NewAuthServiceClient(c.conn)
 	c.rpcCredClient = pbCred.NewCredentialServiceClient(c.conn)
 	c.rpcBinaryClient = pbBinary.NewBinaryServiceClient(c.conn)
+	c.rpcTextClient = pbText.NewTextServiceClient(c.conn)
 	return err
 }
 

@@ -1,29 +1,27 @@
 package rpc_services
 
 import (
+	"GophKeeper/internal/model/text"
+	"GophKeeper/internal/server/app_services"
+	"GophKeeper/pkg/errs"
+	pb "GophKeeper/pkg/proto/data/text"
 	"context"
-
 	"go.uber.org/zap"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-
-	"GophKeeper/internal/model/binary"
-	"GophKeeper/internal/server/app_services"
-	"GophKeeper/pkg/errs"
-	pb "GophKeeper/pkg/proto/data/binary"
 )
 
-type BinaryServiceRPC struct {
-	pb.BinaryServiceServer
+type TextServiceRPC struct {
+	pb.TextServiceServer
 
-	credApp app_services.BinaryApp
+	textApp app_services.TextApp
 	logger  *zap.Logger
 }
 
-// NewBinaryServiceRPC - Создание эклемпляра gRPC сервиса для хранения бинарных данных.
-func NewBinaryServiceRPC(credApp app_services.BinaryApp) *BinaryServiceRPC {
-	serv := &BinaryServiceRPC{
-		credApp: credApp,
+// NewTextServiceRPC - Создание эклемпляра gRPC сервиса для хранения текстовыъ данных.
+func NewTextServiceRPC(textApp app_services.TextApp) *TextServiceRPC {
+	serv := &TextServiceRPC{
+		textApp: textApp,
 		logger:  zap.L(),
 	}
 
@@ -31,20 +29,20 @@ func NewBinaryServiceRPC(credApp app_services.BinaryApp) *BinaryServiceRPC {
 }
 
 // Create - Добавление новых данных.
-func (serv *BinaryServiceRPC) Create(ctx context.Context, in *pb.CreateRequest) (*pb.Empty, error) {
+func (serv *TextServiceRPC) Create(ctx context.Context, in *pb.CreateRequest) (*pb.Empty, error) {
 
-	data := binary.DataFull{
+	data := text.DataTextFull{
 		MetaInfo: in.MetaInfo,
-		Bytes:    in.Data,
+		Text:     in.Text,
 	}
 
-	err := serv.credApp.Create(data)
+	err := serv.textApp.Create(data)
 	if err != nil {
 		if err == errs.ErrAlreadyExist {
 			return &pb.Empty{}, status.Errorf(codes.AlreadyExists, err.Error())
 		}
 
-		serv.logger.Error("failed create binary data",
+		serv.logger.Error("failed create text data",
 			zap.Error(err),
 			zap.String("meta", in.MetaInfo))
 
@@ -55,20 +53,20 @@ func (serv *BinaryServiceRPC) Create(ctx context.Context, in *pb.CreateRequest) 
 }
 
 // Change - Изменение существующих данных.
-func (serv *BinaryServiceRPC) Change(ctx context.Context, in *pb.ChangeRequest) (*pb.Empty, error) {
+func (serv *TextServiceRPC) Change(ctx context.Context, in *pb.ChangeRequest) (*pb.Empty, error) {
 
-	data := binary.DataFull{
+	data := text.DataTextFull{
 		MetaInfo: in.MetaInfo,
-		Bytes:    in.Data,
+		Text:     in.Text,
 	}
 
-	err := serv.credApp.Change(data)
+	err := serv.textApp.Change(data)
 	if err != nil {
 		if err == errs.ErrNotFound {
 			return &pb.Empty{}, status.Errorf(codes.NotFound, err.Error())
 		}
 
-		serv.logger.Error("failed change binary data",
+		serv.logger.Error("failed change text data",
 			zap.Error(err),
 			zap.String("meta", in.MetaInfo))
 
@@ -79,19 +77,19 @@ func (serv *BinaryServiceRPC) Change(ctx context.Context, in *pb.ChangeRequest) 
 }
 
 // Delete - Удаление существующих данных.
-func (serv *BinaryServiceRPC) Delete(ctx context.Context, in *pb.DeleteRequest) (*pb.Empty, error) {
+func (serv *TextServiceRPC) Delete(ctx context.Context, in *pb.DeleteRequest) (*pb.Empty, error) {
 
-	data := binary.DataGet{
+	data := text.DataTextGet{
 		MetaInfo: in.MetaInfo,
 	}
 
-	err := serv.credApp.Delete(data)
+	err := serv.textApp.Delete(data)
 	if err != nil {
 		if err == errs.ErrNotFound {
 			return &pb.Empty{}, status.Errorf(codes.NotFound, err.Error())
 		}
 
-		serv.logger.Error("failed delete binary data",
+		serv.logger.Error("failed delete text data",
 			zap.Error(err),
 			zap.String("meta", in.MetaInfo))
 
@@ -102,19 +100,19 @@ func (serv *BinaryServiceRPC) Delete(ctx context.Context, in *pb.DeleteRequest) 
 }
 
 // Get - Получение данных по email и метаданным.
-func (serv *BinaryServiceRPC) Get(ctx context.Context, in *pb.GetRequest) (*pb.GetResponse, error) {
+func (serv *TextServiceRPC) Get(ctx context.Context, in *pb.GetRequest) (*pb.GetResponse, error) {
 
-	inData := binary.DataGet{
+	inData := text.DataTextGet{
 		MetaInfo: in.MetaInfo,
 	}
 
-	data, err := serv.credApp.Get(inData)
+	data, err := serv.textApp.Get(inData)
 	if err != nil {
 		if err == errs.ErrNotFound {
 			return &pb.GetResponse{}, status.Errorf(codes.NotFound, err.Error())
 		}
 
-		serv.logger.Error("failed get binary data",
+		serv.logger.Error("failed get text data",
 			zap.Error(err),
 			zap.String("meta", in.MetaInfo))
 
@@ -123,7 +121,7 @@ func (serv *BinaryServiceRPC) Get(ctx context.Context, in *pb.GetRequest) (*pb.G
 
 	out := &pb.GetResponse{
 		MetaInfo: data.MetaInfo,
-		Data:     data.Bytes,
+		Text:     data.Text,
 	}
 
 	return out, nil

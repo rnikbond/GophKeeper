@@ -1,32 +1,32 @@
-package binary_store
+package text_store
 
 import (
-	"GophKeeper/internal/model/binary"
+	"GophKeeper/internal/model/text"
 	"GophKeeper/pkg/errs"
 	"github.com/stretchr/testify/require"
 	"testing"
 )
 
-func TestBinaryStore_Memory(t *testing.T) {
+func TestTextStore_Memory(t *testing.T) {
 
 	store := NewMemoryStorage()
 
-	testDataOK := binary.DataFull{
-		MetaInfo: "prog.bin",
-		Bytes:    []byte("00000000000000"),
+	testDataOK := text.DataTextFull{
+		MetaInfo: "www.ololo.com",
+		Text:     "qwerty",
 	}
 
-	testDataChange := binary.DataFull{
-		MetaInfo: "prog.bin",
-		Bytes:    []byte("11111111111111"),
+	testDataChange := text.DataTextFull{
+		MetaInfo: "www.ololo.com",
+		Text:     "qwerty123",
 	}
 
-	testDataGet := binary.DataGet{
-		MetaInfo: "prog.bin",
+	testDataGet := text.DataTextGet{
+		MetaInfo: "www.ololo.com",
 	}
 
-	testDataFail := binary.DataGet{
-		MetaInfo: "prog1.bin",
+	testDataFail := text.DataTextGet{
+		MetaInfo: "www.test.com",
 	}
 
 	errCreate := store.Create(testDataOK)
