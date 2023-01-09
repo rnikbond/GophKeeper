@@ -10,7 +10,8 @@ import (
 
 type Config struct {
 	AddrGRPC  string `env:"ADDRESS_RPC" json:"address_rpc"`
-	SecretKey string `env:"SECRET_KEY" json:"secret_key"`
+	SecretKey string `env:"SECRET_KEY"  json:"secret_key"`
+	DSN       string `env:"DSN"         json:"dsn"`
 }
 
 // NewConfig Конфигурация сервера
@@ -18,6 +19,7 @@ func NewConfig() *Config {
 
 	return &Config{
 		AddrGRPC: ":3200",
+		DSN:      "",
 	}
 }
 

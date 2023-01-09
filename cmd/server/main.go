@@ -6,10 +6,17 @@ import (
 	"GophKeeper/internal/storage/data_store/card_store"
 	"GophKeeper/internal/storage/data_store/credential_store"
 	"GophKeeper/internal/storage/data_store/text_store"
+	"database/sql"
 	"fmt"
+	"github.com/golang-migrate/migrate/v4"
 	"os"
 	"os/signal"
 	"syscall"
+
+	"github.com/golang-migrate/migrate/v4/database/postgres"
+	_ "github.com/golang-migrate/migrate/v4/source/file"
+	"github.com/jmoiron/sqlx"
+	_ "github.com/lib/pq"
 
 	"go.uber.org/zap"
 
@@ -34,6 +41,14 @@ var (
 func main() {
 
 	logzap.ConfigZapLogger()
+
+	dsn := "user=postgres password=postgres dbname=GophKeeper sslmode=disable"
+	db := PostgresDB(dsn)
+	if err := migrateFor(db.DB, "postgres"); err != nil && err != migrate.ErrNoChange {
+		zap.L().Error("error migrate", zap.Error(err))
+	} else {
+		zap.L().Info("Success apply migrations")
+	}
 
 	cfg := newConfig()
 
@@ -83,6 +98,41 @@ func main() {
 	<-done
 
 	grpcServer.Stop()
+}
+
+func PostgresDB(dsn string) *sqlx.DB {
+
+	logger := zap.L()
+
+	db, errOpen := sqlx.Open("postgres", dsn)
+	if errOpen != nil {
+		logger.Error("failed to connect to the database: %s\n", zap.Error(errOpen))
+	}
+
+	if err := db.Ping(); err != nil {
+		logger.Error("connection to DB created, but Ping returned error: %s\n", zap.Error(err))
+	}
+
+	logger.Info("Success connect to database")
+
+	return db
+}
+
+func migrateFor(db *sql.DB, driverDB string) error {
+	driver, err := postgres.WithInstance(db, &postgres.Config{})
+	if err != nil {
+		return err
+	}
+
+	m, err := migrate.NewWithDatabaseInstance(
+		"file://db/migrations",
+		driverDB, driver)
+
+	if err != nil {
+		return err
+	}
+
+	return m.Up()
 }
 
 func init() {
