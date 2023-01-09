@@ -3,6 +3,7 @@ package main
 import (
 	"GophKeeper/internal/storage/auth_store"
 	"GophKeeper/internal/storage/data_store/binary_store"
+	"GophKeeper/internal/storage/data_store/card_store"
 	"GophKeeper/internal/storage/data_store/credential_store"
 	"GophKeeper/internal/storage/data_store/text_store"
 	"fmt"
@@ -36,23 +37,30 @@ func main() {
 
 	cfg := newConfig()
 
+	validate := interceptors.NewValidateInterceptor(cfg.SecretKey)
+
+	// Создание хранилищ
 	authStore := auth_store.NewMemoryStorage()
 	credStore := credential_store.NewMemoryStorage()
 	binStore := binary_store.NewMemoryStorage()
 	textStore := text_store.NewMemoryStorage()
+	cardStore := card_store.NewMemoryStorage()
 
-	validate := interceptors.NewValidateInterceptor(cfg.SecretKey)
+	// Создание сервисов приложения
+	authApp := app_services.NewAuthService(authStore, app_services.WithSecretKey(cfg.SecretKey))
+	credApp := app_services.NewCredentialAppService(credStore)
+	binApp := app_services.NewBinaryAppService(binStore)
+	textApp := app_services.NewTextAppService(textStore)
+	cardApp := app_services.NewCardAppService(cardStore)
 
-	authApp := newAuthAppService(authStore, cfg)
-	credApp := newCredAppService(credStore)
-	binApp := newBinaryAppService(binStore)
-	textApp := newTextAppService(textStore)
+	// Создание gRPC сервисов
+	authRPC := rpc_services.NewAuthServiceRPC(authApp)
+	credRPC := rpc_services.NewCredServiceRPC(credApp)
+	binRPC := rpc_services.NewBinaryServiceRPC(binApp)
+	textRPC := rpc_services.NewTextServiceRPC(textApp)
+	cardRPC := rpc_services.NewCardServiceRPC(cardApp)
 
-	authRPC := newAuthRPCService(authApp)
-	credRPC := newCredRPCService(credApp)
-	binRPC := newBinaryRPCService(binApp)
-	textRPC := newTextRPCService(textApp)
-
+	// Создание сервера
 	grpcServer, err := servergrpc.NewServer(
 		cfg.AddrGRPC,
 		validate,
@@ -60,6 +68,7 @@ func main() {
 		servergrpc.WithCredServiceRPC(credRPC),
 		servergrpc.WithBinaryServiceRPC(binRPC),
 		servergrpc.WithTextServiceRPC(textRPC),
+		servergrpc.WithCardServiceRPC(cardRPC),
 	)
 
 	if err != nil {
@@ -92,36 +101,4 @@ func newConfig() *server.Config {
 	}
 
 	return cfg
-}
-
-func newAuthAppService(store auth_store.AuthStorage, cfg *server.Config) *app_services.AuthAppService {
-	return app_services.NewAuthService(store, app_services.WithSecretKey(cfg.SecretKey))
-}
-
-func newCredAppService(store credential_store.CredStorage) *app_services.CredentialAppService {
-	return app_services.NewCredentialAppService(store)
-}
-
-func newBinaryAppService(store binary_store.BinaryStorage) *app_services.BinaryAppService {
-	return app_services.NewBinaryAppService(store)
-}
-
-func newTextAppService(store text_store.TextStorage) *app_services.TextAppService {
-	return app_services.NewTextAppService(store)
-}
-
-func newAuthRPCService(authApp *app_services.AuthAppService) *rpc_services.AuthServiceRPC {
-	return rpc_services.NewAuthServiceRPC(authApp)
-}
-
-func newCredRPCService(credApp *app_services.CredentialAppService) *rpc_services.CredServiceRPC {
-	return rpc_services.NewCredServiceRPC(credApp)
-}
-
-func newBinaryRPCService(credApp *app_services.BinaryAppService) *rpc_services.BinaryServiceRPC {
-	return rpc_services.NewBinaryServiceRPC(credApp)
-}
-
-func newTextRPCService(textApp *app_services.TextAppService) *rpc_services.TextServiceRPC {
-	return rpc_services.NewTextServiceRPC(textApp)
 }

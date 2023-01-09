@@ -12,6 +12,7 @@ require (
 )
 
 require (
+	github.com/EClaesson/go-luhn v0.0.0-20210207103312-b1c12d658b70 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/golang/mock v1.6.0 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect

@@ -10,6 +10,7 @@ import (
 	"GophKeeper/internal/server/servergrpc/rpc_services"
 	pbAuth "GophKeeper/pkg/proto/auth"
 	pbBinary "GophKeeper/pkg/proto/data/binary"
+	pbCard "GophKeeper/pkg/proto/data/card"
 	pbCred "GophKeeper/pkg/proto/data/credential"
 	pbText "GophKeeper/pkg/proto/data/text"
 )
@@ -75,6 +76,12 @@ func WithBinaryServiceRPC(bin *rpc_services.BinaryServiceRPC) ServerOption {
 func WithTextServiceRPC(txt *rpc_services.TextServiceRPC) ServerOption {
 	return func(serv *ServerGRPC) {
 		pbText.RegisterTextServiceServer(serv.Server, txt)
+	}
+}
+
+func WithCardServiceRPC(cardServ *rpc_services.CardServiceRPC) ServerOption {
+	return func(serv *ServerGRPC) {
+		pbCard.RegisterCardServiceServer(serv.Server, cardServ)
 	}
 }
 

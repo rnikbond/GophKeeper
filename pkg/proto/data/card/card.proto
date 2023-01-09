@@ -1,0 +1,49 @@
+syntax = "proto3";
+
+package card;
+
+option go_package = "./proto/card_store";
+
+service CardService {
+  rpc Create(CreateRequest) returns (Empty);
+  rpc Change(ChangeRequest) returns (Empty);
+  rpc Delete(DeleteRequest) returns (Empty);
+  rpc Get(GetRequest)       returns (GetResponse);
+}
+
+message Empty {}
+
+message CreateRequest {
+  string metaInfo = 1;
+  string number   = 2;
+  string period   = 3;
+  string CVV      = 4;
+  string fullName = 5;
+}
+
+message ChangeRequest {
+  string metaInfo = 1;
+  string number   = 2;
+  string period   = 3;
+  string CVV      = 4;
+  string fullName = 5;
+}
+
+message DeleteRequest {
+  string metaInfo = 1;
+}
+
+message GetRequest {
+  string metaInfo = 1;
+}
+
+message GetResponse {
+  string number   = 2;
+  string period   = 3;
+  string CVV      = 4;
+  string fullName = 5;
+}
+
+/*
+protoc --go_out=. --go_opt=paths=source_relative   --go-grpc_out=. --go-grpc_opt=paths=source_relative   pkg/proto/data/card/card.proto
+*/

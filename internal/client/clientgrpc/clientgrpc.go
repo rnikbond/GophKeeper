@@ -2,6 +2,7 @@ package clientgrpc
 
 import (
 	"GophKeeper/internal/model/binary"
+	"GophKeeper/internal/model/card"
 	"GophKeeper/internal/model/text"
 	"context"
 	"fmt"
@@ -13,6 +14,7 @@ import (
 	"GophKeeper/internal/model/cred"
 	pbAuth "GophKeeper/pkg/proto/auth"
 	pbBinary "GophKeeper/pkg/proto/data/binary"
+	pbCard "GophKeeper/pkg/proto/data/card"
 	pbCred "GophKeeper/pkg/proto/data/credential"
 	pbText "GophKeeper/pkg/proto/data/text"
 )
@@ -25,6 +27,7 @@ type ClientGRPC struct {
 	rpcCredClient   pbCred.CredentialServiceClient
 	rpcBinaryClient pbBinary.BinaryServiceClient
 	rpcTextClient   pbText.TextServiceClient
+	rpcCardClient   pbCard.CardServiceClient
 }
 
 func NewClient(addr string) *ClientGRPC {
@@ -166,6 +169,42 @@ func (c ClientGRPC) FindText() (text.DataTextFull, error) {
 	return data, err
 }
 
+func (c ClientGRPC) CreateCard() error {
+
+	md := metadata.New(map[string]string{"token": c.token})
+	ctx := metadata.NewOutgoingContext(context.Background(), md)
+
+	_, err := c.rpcCardClient.Create(ctx, &pbCard.CreateRequest{
+		MetaInfo: "MirPay",
+		Number:   "4648289760410976",
+		Period:   "10.2030",
+		CVV:      "111",
+		FullName: "Test Test",
+	})
+
+	return err
+}
+
+func (c ClientGRPC) FindCard() (card.DataCard, error) {
+
+	md := metadata.New(map[string]string{"token": c.token})
+	ctx := metadata.NewOutgoingContext(context.Background(), md)
+
+	out, err := c.rpcCardClient.Get(ctx, &pbCard.GetRequest{
+		MetaInfo: "MirPay",
+	})
+
+	data := card.DataCard{
+		MetaInfo: "MirPay",
+		Number:   out.Number,
+		Period:   out.Period,
+		CVV:      out.CVV,
+		FullName: out.FullName,
+	}
+
+	return data, err
+}
+
 func (c *ClientGRPC) Connect() (err error) {
 
 	c.conn, err = grpc.Dial(c.addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
@@ -173,6 +212,7 @@ func (c *ClientGRPC) Connect() (err error) {
 	c.rpcCredClient = pbCred.NewCredentialServiceClient(c.conn)
 	c.rpcBinaryClient = pbBinary.NewBinaryServiceClient(c.conn)
 	c.rpcTextClient = pbText.NewTextServiceClient(c.conn)
+	c.rpcCardClient = pbCard.NewCardServiceClient(c.conn)
 	return err
 }
 

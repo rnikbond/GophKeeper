@@ -42,9 +42,9 @@ func main() {
 			logger.Error("register error", zap.Error(err))
 		}
 
-		logger.Info("Success Register and Login")
+		logger.Info("success Register and Login")
 	} else {
-		logger.Info("Success Login")
+		logger.Info("success Login")
 	}
 
 	if err := cli.ChangePassword(); err != nil {
@@ -87,6 +87,18 @@ func main() {
 		logger.Error("error find text data", zap.Error(err))
 	} else {
 		logger.Info("success find text data")
+	}
+
+	if err := cli.CreateCard(); err != nil {
+		logger.Error("error create card", zap.Error(err))
+	} else {
+		logger.Info("success create card")
+	}
+
+	if _, err := cli.FindText(); err != nil {
+		logger.Error("error find card", zap.Error(err))
+	} else {
+		logger.Info("success find card")
 	}
 
 	done := make(chan os.Signal)

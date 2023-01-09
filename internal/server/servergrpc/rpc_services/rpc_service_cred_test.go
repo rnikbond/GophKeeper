@@ -1,18 +1,20 @@
 package rpc_services
 
 import (
-	"GophKeeper/internal/model/cred"
-	mock "GophKeeper/internal/server/app_services/mocks"
-	"GophKeeper/pkg/errs"
-	pb "GophKeeper/pkg/proto/data/credential"
 	"context"
 	"fmt"
+	"testing"
+
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"testing"
+
+	"GophKeeper/internal/model/cred"
+	mock "GophKeeper/internal/server/app_services/mocks"
+	"GophKeeper/pkg/errs"
+	pb "GophKeeper/pkg/proto/data/credential"
 )
 
 func TestCredServiceRPC_Create(t *testing.T) {
