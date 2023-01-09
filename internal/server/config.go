@@ -9,25 +9,26 @@ import (
 )
 
 type Config struct {
-	AddrGRPC  string `env:"ADDRESS_RPC" json:"address_rpc"`
-	SecretKey string `env:"SECRET_KEY"  json:"secret_key"`
-	DSN       string `env:"DSN"         json:"dsn"`
+	AddrGRPC    string `env:"ADDRESS_RPC" json:"address_rpc"`
+	SecretKey   string `env:"SECRET_KEY"  json:"secret_key"`
+	DatabaseURI string `env:"DatabaseURI" json:"database_uri"`
 }
 
 // NewConfig Конфигурация сервера
 func NewConfig() *Config {
 
 	return &Config{
-		AddrGRPC: ":3200",
-		DSN:      "",
+		AddrGRPC:    ":3200",
+		DatabaseURI: "user=postgres password=postgres dbname=GophKeeper sslmode=disable",
 	}
 }
 
 // ParseArgs Разброр аргументов командной строки
 func (cfg *Config) ParseArgs() error {
 
-	addr := flag.String("ag", "", "address grpc gate")
-	secret := flag.String("sk", "", "secret key for JWT")
+	addr := flag.String("a", "", "address grpc gate")
+	secret := flag.String("s", "", "secret key for JWT")
+	dsn := flag.String("d", "", "database DSN")
 	flag.Parse()
 
 	if addr == nil || len(*addr) == 0 {
@@ -39,6 +40,10 @@ func (cfg *Config) ParseArgs() error {
 	}
 
 	cfg.AddrGRPC = *addr
+
+	if dsn != nil && len(*dsn) > 0 {
+		cfg.DatabaseURI = *dsn
+	}
 
 	if secret != nil {
 		cfg.SecretKey = *secret
