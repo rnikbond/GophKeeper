@@ -5,7 +5,7 @@ import "GophKeeper/internal/model/auth"
 
 type AuthStorage interface {
 	Create(cred auth.Credential) error
-	Find(email string) (auth.Credential, error)
-	Delete(email string) error
+	Find(cred auth.Credential) error
 	Update(email, password string) error
+	Delete(email string) error
 }

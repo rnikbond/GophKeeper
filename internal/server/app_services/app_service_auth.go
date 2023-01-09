@@ -56,18 +56,20 @@ func WithSecretKey(key string) AuthAppOption {
 // При успешной авторизации возвращается JWT.
 func (auth AuthAppService) Login(in authModel.Credential) (string, error) {
 
-	userStore, err := auth.store.Find(in.Email)
-	if err != nil {
-		if err == errs.ErrNotFound {
-			return ``, err
-		}
+	err := auth.store.Find(in)
+	switch err {
+	case nil:
+		break
 
+	case errs.ErrNotFound:
+		return ``, errs.ErrNotFound
+
+	case auth_store.ErrInvalidPassword:
+		return ``, ErrInvalidPassword
+
+	default:
 		auth.logger.Error("failed find user", zap.Error(err))
 		return ``, errs.ErrInternal
-	}
-
-	if in.Password != userStore.Password {
-		return ``, ErrInvalidPassword
 	}
 
 	tokenStr, errJWT := token.GenerateJWT(in.Email, auth.secretKey)
@@ -92,12 +94,7 @@ func (auth AuthAppService) Register(in authModel.Credential) (string, error) {
 		return ``, errCred
 	}
 
-	storeCred := authModel.Credential{
-		Email:    cred.Email,
-		Password: cred.Password,
-	}
-
-	if err := auth.store.Create(storeCred); err != nil {
+	if err := auth.store.Create(cred); err != nil {
 		if err == errs.ErrAlreadyExist {
 			return ``, err
 		}
@@ -120,15 +117,6 @@ func (auth AuthAppService) ChangePassword(email, password string) error {
 
 	if len(password) < minPasswordLength {
 		return ErrShortPassword
-	}
-
-	if _, err := auth.store.Find(email); err != nil {
-		if err == errs.ErrNotFound {
-			return ErrUnauthenticated
-		}
-
-		auth.logger.Error("failed find user", zap.Error(err), zap.String("email", email))
-		return errs.ErrInternal
 	}
 
 	if err := auth.store.Update(email, password); err != nil {

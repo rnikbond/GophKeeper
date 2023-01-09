@@ -32,18 +32,22 @@ func (store *MemoryStorage) Create(cred auth.Credential) error {
 	return nil
 }
 
-// Find Поиск пользователя по Email
-func (store *MemoryStorage) Find(email string) (auth.Credential, error) {
+// Find Поиск пользователя по Email и паролю
+func (store *MemoryStorage) Find(cred auth.Credential) error {
 
 	store.mutex.RLock()
 	defer store.mutex.RUnlock()
 
-	user, ok := store.users[email]
+	user, ok := store.users[cred.Email]
 	if !ok {
-		return auth.Credential{}, errs.ErrNotFound
+		return errs.ErrNotFound
 	}
 
-	return user, nil
+	if user.Password != cred.Password {
+		return ErrInvalidPassword
+	}
+
+	return nil
 }
 
 // Delete Удаление пользователя

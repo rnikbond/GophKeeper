@@ -41,19 +41,34 @@ func main() {
 	logger := zap.L()
 	cfg := newConfig()
 
-	_, errDB := initDB(cfg.DatabaseURI)
-	if errDB != nil {
-		logger.Fatal("failed database connect", zap.Error(errDB))
-	}
-
-	validate := interceptors.NewValidateInterceptor(cfg.SecretKey)
+	var authStore auth_store.AuthStorage
+	var credStore credential_store.CredStorage
+	var binStore binary_store.BinaryStorage
+	var textStore text_store.TextStorage
+	var cardStore card_store.CardStorage
 
 	// Создание хранилищ
-	authStore := auth_store.NewMemoryStorage()
-	credStore := credential_store.NewMemoryStorage()
-	binStore := binary_store.NewMemoryStorage()
-	textStore := text_store.NewMemoryStorage()
-	cardStore := card_store.NewMemoryStorage()
+	if len(cfg.DatabaseURI) != 0 {
+
+		db, errDB := initDB(cfg.DatabaseURI)
+		if errDB != nil {
+			logger.Fatal("failed database connect", zap.Error(errDB))
+		}
+
+		authStore = auth_store.NewPostgresStorage(db)
+
+		credStore = credential_store.NewMemoryStorage()
+		binStore = binary_store.NewMemoryStorage()
+		textStore = text_store.NewMemoryStorage()
+		cardStore = card_store.NewMemoryStorage()
+
+	} else {
+		authStore = auth_store.NewMemoryStorage()
+		credStore = credential_store.NewMemoryStorage()
+		binStore = binary_store.NewMemoryStorage()
+		textStore = text_store.NewMemoryStorage()
+		cardStore = card_store.NewMemoryStorage()
+	}
 
 	// Создание сервисов приложения
 	authApp := app_services.NewAuthService(authStore, app_services.WithSecretKey(cfg.SecretKey))
@@ -68,6 +83,8 @@ func main() {
 	binRPC := rpc_services.NewBinaryServiceRPC(binApp)
 	textRPC := rpc_services.NewTextServiceRPC(textApp)
 	cardRPC := rpc_services.NewCardServiceRPC(cardApp)
+
+	validate := interceptors.NewValidateInterceptor(cfg.SecretKey)
 
 	// Создание сервера
 	grpcServer, err := servergrpc.NewServer(
