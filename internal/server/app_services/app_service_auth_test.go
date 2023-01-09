@@ -7,8 +7,8 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"GophKeeper/internal/model/auth"
-	"GophKeeper/internal/storage/auth_store"
 	storeMock "GophKeeper/internal/storage/auth_store/mocks"
+	"GophKeeper/pkg/errs"
 )
 
 func TestAuthAppService_Login(t *testing.T) {
@@ -45,8 +45,8 @@ func TestAuthAppService_Login(t *testing.T) {
 				Email:    "test@emailcom",
 				Password: "testPassword",
 			},
-			waitErr:  ErrNotFound,
-			storeErr: auth_store.ErrNotFound,
+			waitErr:  errs.ErrNotFound,
+			storeErr: errs.ErrNotFound,
 		},
 		{
 			name: "Invalid password",
@@ -87,7 +87,6 @@ func TestAuthAppService_Register(t *testing.T) {
 		name      string
 		cred      auth.Credential
 		waitErr   error
-		storeErr  error
 		callStore bool
 	}{
 		{
@@ -97,7 +96,6 @@ func TestAuthAppService_Register(t *testing.T) {
 				Password: "testPassword",
 			},
 			waitErr:   nil,
-			storeErr:  nil,
 			callStore: true,
 		},
 		{
@@ -107,7 +105,6 @@ func TestAuthAppService_Register(t *testing.T) {
 				Password: "testPassword",
 			},
 			waitErr:   ErrInvalidEmail,
-			storeErr:  nil,
 			callStore: false,
 		},
 		{
@@ -117,7 +114,6 @@ func TestAuthAppService_Register(t *testing.T) {
 				Password: "pwd",
 			},
 			waitErr:   ErrShortPassword,
-			storeErr:  nil,
 			callStore: false,
 		},
 		{
@@ -126,8 +122,7 @@ func TestAuthAppService_Register(t *testing.T) {
 				Email:    "test@email.com",
 				Password: "passwordTest",
 			},
-			waitErr:   ErrAlreadyExists,
-			storeErr:  auth_store.ErrAlreadyExists,
+			waitErr:   errs.ErrAlreadyExist,
 			callStore: true,
 		},
 	}
@@ -136,7 +131,7 @@ func TestAuthAppService_Register(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 
 			if tt.callStore {
-				store.EXPECT().Create(tt.cred).Return(tt.storeErr)
+				store.EXPECT().Create(tt.cred).Return(tt.waitErr)
 			}
 
 			authServ := NewAuthService(store)
@@ -185,7 +180,7 @@ func TestAuthAppService_ChangePassword(t *testing.T) {
 			waitErr:         ErrUnauthenticated,
 			callStoreFind:   true,
 			callStoreUpdate: false,
-			errStore:        auth_store.ErrNotFound,
+			errStore:        errs.ErrNotFound,
 		},
 	}
 

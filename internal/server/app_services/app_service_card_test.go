@@ -1,12 +1,14 @@
 package app_services
 
 import (
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
 	"GophKeeper/internal/model/card"
 	"GophKeeper/internal/storage/data_store/card_store"
 	"GophKeeper/pkg/errs"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
-	"testing"
 )
 
 func TestCardAppService_Chain(t *testing.T) {

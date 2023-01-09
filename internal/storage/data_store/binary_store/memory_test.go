@@ -1,10 +1,12 @@
 package binary_store
 
 import (
+	"testing"
+
+	"github.com/stretchr/testify/require"
+
 	"GophKeeper/internal/model/binary"
 	"GophKeeper/pkg/errs"
-	"github.com/stretchr/testify/require"
-	"testing"
 )
 
 func TestBinaryStore_Memory(t *testing.T) {

@@ -8,6 +8,7 @@ import (
 
 	authModel "GophKeeper/internal/model/auth"
 	"GophKeeper/internal/storage/auth_store"
+	"GophKeeper/pkg/errs"
 	"GophKeeper/pkg/token"
 )
 
@@ -57,12 +58,12 @@ func (auth AuthAppService) Login(in authModel.Credential) (string, error) {
 
 	userStore, err := auth.store.Find(in.Email)
 	if err != nil {
-		if err == auth_store.ErrNotFound {
-			return ``, ErrNotFound
+		if err == errs.ErrNotFound {
+			return ``, err
 		}
 
 		auth.logger.Error("failed find user", zap.Error(err))
-		return ``, ErrInternal
+		return ``, errs.ErrInternal
 	}
 
 	if in.Password != userStore.Password {
@@ -72,7 +73,7 @@ func (auth AuthAppService) Login(in authModel.Credential) (string, error) {
 	tokenStr, errJWT := token.GenerateJWT(in.Email, auth.secretKey)
 	if errJWT != nil {
 		auth.logger.Error("failed generate JWT", zap.Error(errJWT))
-		return ``, ErrInternal
+		return ``, errs.ErrInternal
 	}
 
 	return tokenStr, nil
@@ -97,18 +98,18 @@ func (auth AuthAppService) Register(in authModel.Credential) (string, error) {
 	}
 
 	if err := auth.store.Create(storeCred); err != nil {
-		if err == auth_store.ErrAlreadyExists {
-			return ``, ErrAlreadyExists
+		if err == errs.ErrAlreadyExist {
+			return ``, err
 		}
 
 		auth.logger.Error("failed create user", zap.Error(err))
-		return ``, ErrInternal
+		return ``, errs.ErrInternal
 	}
 
 	tokenStr, errJWT := token.GenerateJWT(in.Email, auth.secretKey)
 	if errJWT != nil {
 		auth.logger.Error("failed generate JWT", zap.Error(errJWT))
-		return ``, ErrInternal
+		return ``, errs.ErrInternal
 	}
 
 	return tokenStr, nil
@@ -122,17 +123,17 @@ func (auth AuthAppService) ChangePassword(email, password string) error {
 	}
 
 	if _, err := auth.store.Find(email); err != nil {
-		if err == auth_store.ErrNotFound {
+		if err == errs.ErrNotFound {
 			return ErrUnauthenticated
 		}
 
 		auth.logger.Error("failed find user", zap.Error(err), zap.String("email", email))
-		return ErrInternal
+		return errs.ErrInternal
 	}
 
 	if err := auth.store.Update(email, password); err != nil {
 		auth.logger.Error("failed update user password", zap.Error(err))
-		return ErrInternal
+		return errs.ErrInternal
 	}
 
 	return nil

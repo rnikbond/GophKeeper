@@ -1,8 +1,6 @@
 package token
 
 import (
-	"context"
-	"google.golang.org/grpc/metadata"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
@@ -38,9 +36,4 @@ func VerifyJWT(bearerToken, secretKey string) (*jwt.Token, error) {
 	})
 
 	return token, err
-}
-
-func WriteToken(t string) context.Context {
-	md := metadata.New(map[string]string{"token": t})
-	return metadata.NewOutgoingContext(context.Background(), md)
 }

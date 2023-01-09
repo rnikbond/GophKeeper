@@ -1,11 +1,13 @@
 package card_store
 
 import (
-	"GophKeeper/internal/model/card"
-	"GophKeeper/pkg/errs"
-	"github.com/stretchr/testify/require"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/require"
+
+	"GophKeeper/internal/model/card"
+	"GophKeeper/pkg/errs"
 )
 
 func getTime(value string) time.Time {

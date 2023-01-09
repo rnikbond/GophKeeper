@@ -1,15 +1,16 @@
 package rpc_services
 
 import (
-	"GophKeeper/internal/model/cred"
-	"GophKeeper/pkg/errs"
 	"context"
+
+	"go.uber.org/zap"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
+	"GophKeeper/internal/model/cred"
 	"GophKeeper/internal/server/app_services"
+	"GophKeeper/pkg/errs"
 	pb "GophKeeper/pkg/proto/data/credential"
-	"go.uber.org/zap"
 )
 
 type CredServiceRPC struct {
@@ -50,7 +51,7 @@ func (serv *CredServiceRPC) Create(ctx context.Context, in *pb.CreateRequest) (*
 			zap.String("meta", in.MetaInfo),
 			zap.String("pwd", in.Password))
 
-		return &pb.Empty{}, status.Errorf(codes.Internal, InternalErrorText)
+		return &pb.Empty{}, status.Errorf(codes.Internal, errs.ErrInternal.Error())
 	}
 
 	return &pb.Empty{}, nil
@@ -77,7 +78,7 @@ func (serv *CredServiceRPC) Change(ctx context.Context, in *pb.ChangeRequest) (*
 			zap.String("meta", in.MetaInfo),
 			zap.String("pwd", in.Password))
 
-		return &pb.Empty{}, status.Errorf(codes.Internal, InternalErrorText)
+		return &pb.Empty{}, status.Errorf(codes.Internal, errs.ErrInternal.Error())
 	}
 
 	return &pb.Empty{}, nil
@@ -102,7 +103,7 @@ func (serv *CredServiceRPC) Delete(ctx context.Context, in *pb.DeleteRequest) (*
 			zap.String("email", in.Email),
 			zap.String("meta", in.MetaInfo))
 
-		return &pb.Empty{}, status.Errorf(codes.Internal, InternalErrorText)
+		return &pb.Empty{}, status.Errorf(codes.Internal, errs.ErrInternal.Error())
 	}
 
 	return &pb.Empty{}, nil
@@ -127,7 +128,7 @@ func (serv *CredServiceRPC) Get(ctx context.Context, in *pb.GetRequest) (*pb.Get
 			zap.String("email", in.Email),
 			zap.String("meta", in.MetaInfo))
 
-		return &pb.GetResponse{}, status.Errorf(codes.Internal, InternalErrorText)
+		return &pb.GetResponse{}, status.Errorf(codes.Internal, errs.ErrInternal.Error())
 	}
 
 	out := &pb.GetResponse{

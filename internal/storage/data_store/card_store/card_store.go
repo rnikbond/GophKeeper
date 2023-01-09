@@ -1,8 +1,6 @@
 package card_store
 
-import (
-	"GophKeeper/internal/model/card"
-)
+import "GophKeeper/internal/model/card"
 
 type CardStorage interface {
 	Create(data card.DataCardFull) error

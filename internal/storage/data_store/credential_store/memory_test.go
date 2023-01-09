@@ -1,10 +1,12 @@
 package credential_store
 
 import (
+	"testing"
+
+	"github.com/stretchr/testify/require"
+
 	"GophKeeper/internal/model/cred"
 	"GophKeeper/pkg/errs"
-	"github.com/stretchr/testify/require"
-	"testing"
 )
 
 func TestCredentialStore_Memory(t *testing.T) {

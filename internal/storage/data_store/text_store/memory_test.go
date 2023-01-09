@@ -1,10 +1,12 @@
 package text_store
 
 import (
+	"testing"
+
+	"github.com/stretchr/testify/require"
+
 	"GophKeeper/internal/model/text"
 	"GophKeeper/pkg/errs"
-	"github.com/stretchr/testify/require"
-	"testing"
 )
 
 func TestTextStore_Memory(t *testing.T) {

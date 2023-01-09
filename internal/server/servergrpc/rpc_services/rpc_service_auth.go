@@ -9,6 +9,7 @@ import (
 
 	"GophKeeper/internal/model/auth"
 	"GophKeeper/internal/server/app_services"
+	"GophKeeper/pkg/errs"
 	"GophKeeper/pkg/md_ctx"
 	pb "GophKeeper/pkg/proto/auth"
 )
@@ -42,14 +43,14 @@ func (serv *AuthServiceRPC) Register(ctx context.Context, in *pb.AuthRequest) (*
 	if err != nil {
 
 		switch err {
-		case app_services.ErrAlreadyExists:
+		case errs.ErrAlreadyExist:
 			return nil, status.Error(codes.AlreadyExists, err.Error())
 
 		case app_services.ErrInvalidPassword:
 			return nil, status.Error(codes.Unauthenticated, err.Error())
 		}
 
-		return nil, status.Error(codes.Internal, InternalErrorText)
+		return nil, status.Error(codes.Internal, errs.ErrInternal.Error())
 	}
 
 	return &pb.AuthResponse{
@@ -69,14 +70,14 @@ func (serv *AuthServiceRPC) Login(ctx context.Context, in *pb.AuthRequest) (*pb.
 	if err != nil {
 
 		switch err {
-		case app_services.ErrNotFound:
+		case errs.ErrNotFound:
 			return nil, status.Error(codes.NotFound, err.Error())
 
 		case app_services.ErrInvalidPassword:
 			return nil, status.Error(codes.Unauthenticated, err.Error())
 		}
 
-		return nil, status.Error(codes.Internal, InternalErrorText)
+		return nil, status.Error(codes.Internal, errs.ErrInternal.Error())
 	}
 
 	return &pb.AuthResponse{
@@ -92,7 +93,7 @@ func (serv *AuthServiceRPC) ChangePassword(ctx context.Context, in *pb.ChangePas
 	if !ok {
 		serv.logger.Error("failed found email in ctx metadata")
 		// Internal, т.к. Interceptor должен был положить email в ctx
-		return nil, status.Error(codes.Internal, InternalErrorText)
+		return nil, status.Error(codes.Internal, errs.ErrInternal.Error())
 	}
 
 	if err := serv.auth.ChangePassword(email, in.Password); err != nil {
@@ -102,7 +103,7 @@ func (serv *AuthServiceRPC) ChangePassword(ctx context.Context, in *pb.ChangePas
 		}
 
 		serv.logger.Error("failed change password", zap.Error(err))
-		return nil, status.Error(codes.Internal, InternalErrorText)
+		return nil, status.Error(codes.Internal, errs.ErrInternal.Error())
 	}
 
 	return &pb.Empty{}, nil

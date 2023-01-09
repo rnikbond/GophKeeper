@@ -1,14 +1,16 @@
 package rpc_services
 
 import (
+	"context"
+
+	"go.uber.org/zap"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+
 	"GophKeeper/internal/model/text"
 	"GophKeeper/internal/server/app_services"
 	"GophKeeper/pkg/errs"
 	pb "GophKeeper/pkg/proto/data/text"
-	"context"
-	"go.uber.org/zap"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
 type TextServiceRPC struct {
@@ -46,7 +48,7 @@ func (serv *TextServiceRPC) Create(ctx context.Context, in *pb.CreateRequest) (*
 			zap.Error(err),
 			zap.String("meta", in.MetaInfo))
 
-		return &pb.Empty{}, status.Errorf(codes.Internal, InternalErrorText)
+		return &pb.Empty{}, status.Errorf(codes.Internal, errs.ErrInternal.Error())
 	}
 
 	return &pb.Empty{}, nil
@@ -70,7 +72,7 @@ func (serv *TextServiceRPC) Change(ctx context.Context, in *pb.ChangeRequest) (*
 			zap.Error(err),
 			zap.String("meta", in.MetaInfo))
 
-		return &pb.Empty{}, status.Errorf(codes.Internal, InternalErrorText)
+		return &pb.Empty{}, status.Errorf(codes.Internal, errs.ErrInternal.Error())
 	}
 
 	return &pb.Empty{}, nil
@@ -93,7 +95,7 @@ func (serv *TextServiceRPC) Delete(ctx context.Context, in *pb.DeleteRequest) (*
 			zap.Error(err),
 			zap.String("meta", in.MetaInfo))
 
-		return &pb.Empty{}, status.Errorf(codes.Internal, InternalErrorText)
+		return &pb.Empty{}, status.Errorf(codes.Internal, errs.ErrInternal.Error())
 	}
 
 	return &pb.Empty{}, nil
@@ -116,7 +118,7 @@ func (serv *TextServiceRPC) Get(ctx context.Context, in *pb.GetRequest) (*pb.Get
 			zap.Error(err),
 			zap.String("meta", in.MetaInfo))
 
-		return &pb.GetResponse{}, status.Errorf(codes.Internal, InternalErrorText)
+		return &pb.GetResponse{}, status.Errorf(codes.Internal, errs.ErrInternal.Error())
 	}
 
 	out := &pb.GetResponse{

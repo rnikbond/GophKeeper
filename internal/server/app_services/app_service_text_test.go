@@ -1,11 +1,13 @@
 package app_services
 
 import (
+	"testing"
+
+	"github.com/stretchr/testify/require"
+
 	"GophKeeper/internal/model/text"
 	"GophKeeper/internal/storage/data_store/text_store"
 	"GophKeeper/pkg/errs"
-	"github.com/stretchr/testify/require"
-	"testing"
 )
 
 func TestTextAppService(t *testing.T) {

@@ -48,7 +48,7 @@ func (serv *BinaryServiceRPC) Create(ctx context.Context, in *pb.CreateRequest) 
 			zap.Error(err),
 			zap.String("meta", in.MetaInfo))
 
-		return &pb.Empty{}, status.Errorf(codes.Internal, InternalErrorText)
+		return &pb.Empty{}, status.Errorf(codes.Internal, errs.ErrInternal.Error())
 	}
 
 	return &pb.Empty{}, nil
@@ -72,7 +72,7 @@ func (serv *BinaryServiceRPC) Change(ctx context.Context, in *pb.ChangeRequest) 
 			zap.Error(err),
 			zap.String("meta", in.MetaInfo))
 
-		return &pb.Empty{}, status.Errorf(codes.Internal, InternalErrorText)
+		return &pb.Empty{}, status.Errorf(codes.Internal, errs.ErrInternal.Error())
 	}
 
 	return &pb.Empty{}, nil
@@ -95,7 +95,7 @@ func (serv *BinaryServiceRPC) Delete(ctx context.Context, in *pb.DeleteRequest) 
 			zap.Error(err),
 			zap.String("meta", in.MetaInfo))
 
-		return &pb.Empty{}, status.Errorf(codes.Internal, InternalErrorText)
+		return &pb.Empty{}, status.Errorf(codes.Internal, errs.ErrInternal.Error())
 	}
 
 	return &pb.Empty{}, nil
@@ -118,7 +118,7 @@ func (serv *BinaryServiceRPC) Get(ctx context.Context, in *pb.GetRequest) (*pb.G
 			zap.Error(err),
 			zap.String("meta", in.MetaInfo))
 
-		return &pb.GetResponse{}, status.Errorf(codes.Internal, InternalErrorText)
+		return &pb.GetResponse{}, status.Errorf(codes.Internal, errs.ErrInternal.Error())
 	}
 
 	out := &pb.GetResponse{

@@ -1,11 +1,13 @@
 package app_services
 
 import (
+	"testing"
+
+	"github.com/stretchr/testify/require"
+
 	"GophKeeper/internal/model/binary"
 	"GophKeeper/internal/storage/data_store/binary_store"
 	"GophKeeper/pkg/errs"
-	"github.com/stretchr/testify/require"
-	"testing"
 )
 
 func TestBinaryAppService(t *testing.T) {

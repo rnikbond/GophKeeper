@@ -16,6 +16,7 @@ import (
 	"GophKeeper/internal/model/auth"
 	"GophKeeper/internal/server/app_services"
 	mock "GophKeeper/internal/server/app_services/mocks"
+	"GophKeeper/pkg/errs"
 	pb "GophKeeper/pkg/proto/auth"
 	"GophKeeper/pkg/token"
 )
@@ -51,7 +52,7 @@ func TestAuthServiceRPC_Login(t *testing.T) {
 			},
 			wantErr:  true,
 			wantCode: codes.NotFound,
-			errApp:   app_services.ErrNotFound,
+			errApp:   errs.ErrNotFound,
 		},
 		{
 			name: "Invalid password",
@@ -126,7 +127,7 @@ func TestAuthServiceRPC_Register(t *testing.T) {
 			},
 			wantErr:  true,
 			wantCode: codes.AlreadyExists,
-			errApp:   app_services.ErrAlreadyExists,
+			errApp:   errs.ErrAlreadyExist,
 		},
 		{
 			name: "Invalid password",
@@ -235,7 +236,7 @@ func TestAuthServiceRPC_ChangePassword(t *testing.T) {
 				Password: "qwerty123",
 			},
 			callApp:  true,
-			errApp:   app_services.ErrInternal,
+			errApp:   errs.ErrInternal,
 			wantErr:  true,
 			wantCode: codes.Internal,
 		},

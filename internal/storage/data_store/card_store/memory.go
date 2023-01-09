@@ -1,10 +1,10 @@
 package card_store
 
 import (
-	"GophKeeper/pkg/errs"
 	"sync"
 
 	"GophKeeper/internal/model/card"
+	"GophKeeper/pkg/errs"
 )
 
 type MemoryStorage struct {

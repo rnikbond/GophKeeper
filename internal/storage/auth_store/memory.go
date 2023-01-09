@@ -4,6 +4,7 @@ import (
 	"sync"
 
 	"GophKeeper/internal/model/auth"
+	"GophKeeper/pkg/errs"
 )
 
 type MemoryStorage struct {
@@ -24,7 +25,7 @@ func (store *MemoryStorage) Create(cred auth.Credential) error {
 	defer store.mutex.Unlock()
 
 	if _, ok := store.users[cred.Email]; ok {
-		return ErrAlreadyExists
+		return errs.ErrAlreadyExist
 	}
 
 	store.users[cred.Email] = cred
@@ -39,7 +40,7 @@ func (store *MemoryStorage) Find(email string) (auth.Credential, error) {
 
 	user, ok := store.users[email]
 	if !ok {
-		return auth.Credential{}, ErrNotFound
+		return auth.Credential{}, errs.ErrNotFound
 	}
 
 	return user, nil
@@ -52,7 +53,7 @@ func (store *MemoryStorage) Delete(email string) error {
 	defer store.mutex.Unlock()
 
 	if _, ok := store.users[email]; !ok {
-		return ErrNotFound
+		return errs.ErrNotFound
 	}
 
 	delete(store.users, email)
@@ -66,7 +67,7 @@ func (store *MemoryStorage) Update(email, password string) error {
 
 	user, ok := store.users[email]
 	if !ok {
-		return ErrNotFound
+		return errs.ErrNotFound
 	}
 
 	user.Password = password

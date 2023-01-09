@@ -1,11 +1,13 @@
 package app_services
 
 import (
+	"testing"
+
+	"github.com/stretchr/testify/require"
+
 	"GophKeeper/internal/model/cred"
 	"GophKeeper/internal/storage/data_store/credential_store"
 	"GophKeeper/pkg/errs"
-	"github.com/stretchr/testify/require"
-	"testing"
 )
 
 func TestCredentialAppService(t *testing.T) {

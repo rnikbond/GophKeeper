@@ -2,12 +2,14 @@
 package app_services
 
 import (
+	"strconv"
+	"time"
+
+	"go.uber.org/zap"
+
 	"GophKeeper/internal/model/card"
 	"GophKeeper/internal/storage/data_store/card_store"
 	"github.com/EClaesson/go-luhn"
-	"go.uber.org/zap"
-	"strconv"
-	"time"
 )
 
 var PeriodLayout = "01.2006"

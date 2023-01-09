@@ -60,7 +60,7 @@ func (serv *CardServiceRPC) Create(ctx context.Context, in *pb.CreateRequest) (*
 				zap.Error(err),
 				zap.String("meta", in.MetaInfo))
 
-			return &pb.Empty{}, status.Errorf(codes.Internal, InternalErrorText)
+			return &pb.Empty{}, status.Errorf(codes.Internal, errs.ErrInternal.Error())
 		}
 	}
 
@@ -97,7 +97,7 @@ func (serv *CardServiceRPC) Change(ctx context.Context, in *pb.ChangeRequest) (*
 				zap.Error(err),
 				zap.String("meta", in.MetaInfo))
 
-			return &pb.Empty{}, status.Errorf(codes.Internal, InternalErrorText)
+			return &pb.Empty{}, status.Errorf(codes.Internal, errs.ErrInternal.Error())
 		}
 	}
 
@@ -123,7 +123,7 @@ func (serv *CardServiceRPC) Delete(ctx context.Context, in *pb.DeleteRequest) (*
 				zap.Error(err),
 				zap.String("meta", in.MetaInfo))
 
-			return &pb.Empty{}, status.Errorf(codes.Internal, InternalErrorText)
+			return &pb.Empty{}, status.Errorf(codes.Internal, errs.ErrInternal.Error())
 		}
 	}
 
@@ -149,7 +149,7 @@ func (serv *CardServiceRPC) Get(ctx context.Context, in *pb.GetRequest) (*pb.Get
 				zap.Error(err),
 				zap.String("meta", in.MetaInfo))
 
-			return &pb.GetResponse{}, status.Errorf(codes.Internal, InternalErrorText)
+			return &pb.GetResponse{}, status.Errorf(codes.Internal, errs.ErrInternal.Error())
 		}
 	}
 

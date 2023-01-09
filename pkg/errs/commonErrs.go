@@ -17,4 +17,5 @@ func (es ErrKeeper) Error() string {
 var (
 	ErrNotFound     = NewErr("not found")
 	ErrAlreadyExist = NewErr("already exist")
+	ErrInternal     = NewErr("internal error")
 )
