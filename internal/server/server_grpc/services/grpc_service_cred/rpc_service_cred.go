@@ -2,6 +2,7 @@ package grpc_service_cred
 
 import (
 	"context"
+	"errors"
 
 	"go.uber.org/zap"
 	"google.golang.org/grpc/codes"
@@ -41,7 +42,7 @@ func (serv *CredServiceRPC) Create(ctx context.Context, in *credential.CreateReq
 
 	err := serv.credApp.Create(data)
 	if err != nil {
-		if err == errs.ErrAlreadyExist {
+		if errors.Is(err, errs.ErrAlreadyExist) {
 			return &credential.Empty{}, status.Errorf(codes.AlreadyExists, err.Error())
 		}
 
@@ -68,7 +69,7 @@ func (serv *CredServiceRPC) Change(ctx context.Context, in *credential.ChangeReq
 
 	err := serv.credApp.Change(data)
 	if err != nil {
-		if err == errs.ErrNotFound {
+		if errors.Is(err, errs.ErrNotFound) {
 			return &credential.Empty{}, status.Errorf(codes.NotFound, err.Error())
 		}
 
@@ -94,7 +95,7 @@ func (serv *CredServiceRPC) Delete(ctx context.Context, in *credential.DeleteReq
 
 	err := serv.credApp.Delete(data)
 	if err != nil {
-		if err == errs.ErrNotFound {
+		if errors.Is(err, errs.ErrNotFound) {
 			return &credential.Empty{}, status.Errorf(codes.NotFound, err.Error())
 		}
 
@@ -119,7 +120,7 @@ func (serv *CredServiceRPC) Get(ctx context.Context, in *credential.GetRequest) 
 
 	data, err := serv.credApp.Get(inData)
 	if err != nil {
-		if err == errs.ErrNotFound {
+		if errors.Is(err, errs.ErrNotFound) {
 			return &credential.GetResponse{}, status.Errorf(codes.NotFound, err.Error())
 		}
 

@@ -58,19 +58,15 @@ func WithSecretKey(key string) AuthAppOption {
 // При успешной авторизации возвращается JWT.
 func (auth AuthAppService) Login(in authModel.Credential) (string, error) {
 
-	err := auth.store.Find(in)
+	if err := auth.store.Find(in); err != nil {
+		if errors.Is(err, errs.ErrNotFound) {
+			return ``, errs.ErrNotFound
+		}
 
-	switch err {
-	case nil:
-		break
+		if errors.Is(err, auth_store.ErrInvalidPassword) {
+			return ``, ErrInvalidPassword
+		}
 
-	case errs.ErrNotFound:
-		return ``, errs.ErrNotFound
-
-	case auth_store.ErrInvalidPassword:
-		return ``, ErrInvalidPassword
-
-	default:
 		auth.logger.Error("failed find user", zap.Error(err))
 		return ``, errs.ErrInternal
 	}

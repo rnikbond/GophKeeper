@@ -2,6 +2,7 @@ package grpc_service_card
 
 import (
 	"context"
+	"errors"
 
 	"go.uber.org/zap"
 	"google.golang.org/grpc/codes"
@@ -45,24 +46,22 @@ func (serv *CardServiceRPC) Create(ctx context.Context, in *card_store.CreateReq
 	err := serv.cardApp.Create(data)
 	if err != nil {
 
-		switch err {
-		case errs.ErrAlreadyExist:
+		if errors.Is(err, errs.ErrAlreadyExist) {
 			return &card_store.Empty{}, status.Errorf(codes.AlreadyExists, err.Error())
-
-		case
-			app_service_card.ErrInvalidPeriod,
-			app_service_card.ErrInvalidNumber,
-			app_service_card.ErrInvalidCVV,
-			app_service_card.ErrInvalidFullName:
-			return &card_store.Empty{}, status.Errorf(codes.InvalidArgument, err.Error())
-
-		default:
-			serv.logger.Error("failed create card data",
-				zap.Error(err),
-				zap.String("meta", in.MetaInfo))
-
-			return &card_store.Empty{}, status.Errorf(codes.Internal, errs.ErrInternal.Error())
 		}
+
+		if errors.Is(err, app_service_card.ErrInvalidPeriod) ||
+			errors.Is(err, app_service_card.ErrInvalidNumber) ||
+			errors.Is(err, app_service_card.ErrInvalidCVV) ||
+			errors.Is(err, app_service_card.ErrInvalidFullName) {
+			return &card_store.Empty{}, status.Errorf(codes.InvalidArgument, err.Error())
+		}
+
+		serv.logger.Error("failed create card data",
+			zap.Error(err),
+			zap.String("meta", in.MetaInfo))
+
+		return &card_store.Empty{}, status.Errorf(codes.Internal, errs.ErrInternal.Error())
 	}
 
 	return &card_store.Empty{}, nil
@@ -81,25 +80,22 @@ func (serv *CardServiceRPC) Change(ctx context.Context, in *card_store.ChangeReq
 
 	err := serv.cardApp.Change(data)
 	if err != nil {
-
-		switch err {
-		case errs.ErrNotFound:
+		if errors.Is(err, errs.ErrNotFound) {
 			return &card_store.Empty{}, status.Errorf(codes.NotFound, err.Error())
-
-		case
-			app_service_card.ErrInvalidPeriod,
-			app_service_card.ErrInvalidNumber,
-			app_service_card.ErrInvalidCVV,
-			app_service_card.ErrInvalidFullName:
-			return &card_store.Empty{}, status.Errorf(codes.InvalidArgument, err.Error())
-
-		default:
-			serv.logger.Error("failed change card data",
-				zap.Error(err),
-				zap.String("meta", in.MetaInfo))
-
-			return &card_store.Empty{}, status.Errorf(codes.Internal, errs.ErrInternal.Error())
 		}
+
+		if errors.Is(err, app_service_card.ErrInvalidPeriod) ||
+			errors.Is(err, app_service_card.ErrInvalidNumber) ||
+			errors.Is(err, app_service_card.ErrInvalidCVV) ||
+			errors.Is(err, app_service_card.ErrInvalidFullName) {
+			return &card_store.Empty{}, status.Errorf(codes.InvalidArgument, err.Error())
+		}
+
+		serv.logger.Error("failed change card data",
+			zap.Error(err),
+			zap.String("meta", in.MetaInfo))
+
+		return &card_store.Empty{}, status.Errorf(codes.Internal, errs.ErrInternal.Error())
 	}
 
 	return &card_store.Empty{}, nil
@@ -115,17 +111,15 @@ func (serv *CardServiceRPC) Delete(ctx context.Context, in *card_store.DeleteReq
 	err := serv.cardApp.Delete(data)
 	if err != nil {
 
-		switch err {
-		case errs.ErrNotFound:
+		if errors.Is(err, errs.ErrNotFound) {
 			return &card_store.Empty{}, status.Errorf(codes.NotFound, err.Error())
-
-		default:
-			serv.logger.Error("failed delete card data",
-				zap.Error(err),
-				zap.String("meta", in.MetaInfo))
-
-			return &card_store.Empty{}, status.Errorf(codes.Internal, errs.ErrInternal.Error())
 		}
+
+		serv.logger.Error("failed delete card data",
+			zap.Error(err),
+			zap.String("meta", in.MetaInfo))
+
+		return &card_store.Empty{}, status.Errorf(codes.Internal, errs.ErrInternal.Error())
 	}
 
 	return &card_store.Empty{}, nil
@@ -140,18 +134,15 @@ func (serv *CardServiceRPC) Get(ctx context.Context, in *card_store.GetRequest) 
 
 	get, err := serv.cardApp.Get(data)
 	if err != nil {
-
-		switch err {
-		case errs.ErrNotFound:
+		if errors.Is(err, errs.ErrNotFound) {
 			return &card_store.GetResponse{}, status.Errorf(codes.NotFound, err.Error())
-
-		default:
-			serv.logger.Error("failed get card data",
-				zap.Error(err),
-				zap.String("meta", in.MetaInfo))
-
-			return &card_store.GetResponse{}, status.Errorf(codes.Internal, errs.ErrInternal.Error())
 		}
+
+		serv.logger.Error("failed get card data",
+			zap.Error(err),
+			zap.String("meta", in.MetaInfo))
+
+		return &card_store.GetResponse{}, status.Errorf(codes.Internal, errs.ErrInternal.Error())
 	}
 
 	return &card_store.GetResponse{

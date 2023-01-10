@@ -2,6 +2,7 @@ package grpc_service_text
 
 import (
 	"context"
+	"errors"
 
 	"go.uber.org/zap"
 	"google.golang.org/grpc/codes"
@@ -40,7 +41,7 @@ func (serv *TextServiceRPC) Create(ctx context.Context, in *text_store.CreateReq
 
 	err := serv.textApp.Create(data)
 	if err != nil {
-		if err == errs.ErrAlreadyExist {
+		if errors.Is(err, errs.ErrAlreadyExist) {
 			return &text_store.Empty{}, status.Errorf(codes.AlreadyExists, err.Error())
 		}
 
@@ -64,7 +65,7 @@ func (serv *TextServiceRPC) Change(ctx context.Context, in *text_store.ChangeReq
 
 	err := serv.textApp.Change(data)
 	if err != nil {
-		if err == errs.ErrNotFound {
+		if errors.Is(err, errs.ErrNotFound) {
 			return &text_store.Empty{}, status.Errorf(codes.NotFound, err.Error())
 		}
 
@@ -87,7 +88,7 @@ func (serv *TextServiceRPC) Delete(ctx context.Context, in *text_store.DeleteReq
 
 	err := serv.textApp.Delete(data)
 	if err != nil {
-		if err == errs.ErrNotFound {
+		if errors.Is(err, errs.ErrNotFound) {
 			return &text_store.Empty{}, status.Errorf(codes.NotFound, err.Error())
 		}
 
@@ -110,7 +111,7 @@ func (serv *TextServiceRPC) Get(ctx context.Context, in *text_store.GetRequest) 
 
 	data, err := serv.textApp.Get(inData)
 	if err != nil {
-		if err == errs.ErrNotFound {
+		if errors.Is(err, errs.ErrNotFound) {
 			return &text_store.GetResponse{}, status.Errorf(codes.NotFound, err.Error())
 		}
 

@@ -2,6 +2,7 @@ package grpc_service_binary
 
 import (
 	"context"
+	"errors"
 
 	"go.uber.org/zap"
 	"google.golang.org/grpc/codes"
@@ -40,7 +41,7 @@ func (serv *BinaryServiceRPC) Create(ctx context.Context, in *pb.CreateRequest) 
 
 	err := serv.credApp.Create(data)
 	if err != nil {
-		if err == errs.ErrAlreadyExist {
+		if errors.Is(err, errs.ErrAlreadyExist) {
 			return &pb.Empty{}, status.Errorf(codes.AlreadyExists, err.Error())
 		}
 
@@ -64,7 +65,8 @@ func (serv *BinaryServiceRPC) Change(ctx context.Context, in *pb.ChangeRequest) 
 
 	err := serv.credApp.Change(data)
 	if err != nil {
-		if err == errs.ErrNotFound {
+
+		if errors.Is(err, errs.ErrNotFound) {
 			return &pb.Empty{}, status.Errorf(codes.NotFound, err.Error())
 		}
 
@@ -87,7 +89,7 @@ func (serv *BinaryServiceRPC) Delete(ctx context.Context, in *pb.DeleteRequest) 
 
 	err := serv.credApp.Delete(data)
 	if err != nil {
-		if err == errs.ErrNotFound {
+		if errors.Is(err, errs.ErrNotFound) {
 			return &pb.Empty{}, status.Errorf(codes.NotFound, err.Error())
 		}
 
@@ -110,7 +112,7 @@ func (serv *BinaryServiceRPC) Get(ctx context.Context, in *pb.GetRequest) (*pb.G
 
 	data, err := serv.credApp.Get(inData)
 	if err != nil {
-		if err == errs.ErrNotFound {
+		if errors.Is(err, errs.ErrNotFound) {
 			return &pb.GetResponse{}, status.Errorf(codes.NotFound, err.Error())
 		}
 

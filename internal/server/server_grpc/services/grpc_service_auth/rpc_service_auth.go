@@ -2,6 +2,7 @@ package grpc_service_auth
 
 import (
 	"context"
+	"errors"
 
 	"go.uber.org/zap"
 	"google.golang.org/grpc/codes"
@@ -42,11 +43,11 @@ func (serv *AuthServiceRPC) Register(ctx context.Context, in *pb.AuthRequest) (*
 	tokenStr, err := serv.auth.Register(cred)
 	if err != nil {
 
-		switch err {
-		case errs.ErrAlreadyExist:
+		if errors.Is(err, errs.ErrAlreadyExist) {
 			return nil, status.Error(codes.AlreadyExists, err.Error())
+		}
 
-		case app_service_auth.ErrInvalidPassword:
+		if errors.Is(err, app_service_auth.ErrInvalidPassword) {
 			return nil, status.Error(codes.Unauthenticated, err.Error())
 		}
 
@@ -69,11 +70,11 @@ func (serv *AuthServiceRPC) Login(ctx context.Context, in *pb.AuthRequest) (*pb.
 	tkn, err := serv.auth.Login(cred)
 	if err != nil {
 
-		switch err {
-		case errs.ErrNotFound:
+		if errors.Is(err, errs.ErrNotFound) {
 			return nil, status.Error(codes.NotFound, err.Error())
+		}
 
-		case app_service_auth.ErrInvalidPassword:
+		if errors.Is(err, app_service_auth.ErrInvalidPassword) {
 			return nil, status.Error(codes.Unauthenticated, err.Error())
 		}
 
@@ -98,7 +99,7 @@ func (serv *AuthServiceRPC) ChangePassword(ctx context.Context, in *pb.ChangePas
 
 	if err := serv.auth.ChangePassword(email, in.Password); err != nil {
 
-		if err == app_service_auth.ErrShortPassword {
+		if errors.Is(err, app_service_auth.ErrShortPassword) {
 			return nil, status.Error(codes.InvalidArgument, err.Error())
 		}
 
