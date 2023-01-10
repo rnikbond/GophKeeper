@@ -139,6 +139,17 @@ func TestCardAppService_Create(t *testing.T) {
 			waitErr: ErrInvalidCVV,
 		},
 		{
+			name: "Check invalid CVV: short -12",
+			in: card.DataCard{
+				MetaInfo: "GPay",
+				Number:   "4648289760410976",
+				Period:   "10.2030",
+				CVV:      "-12",
+				FullName: "Test Test",
+			},
+			waitErr: ErrInvalidCVV,
+		},
+		{
 			name: "Check invalid full name",
 			in: card.DataCard{
 				MetaInfo: "MirPay",
@@ -155,7 +166,7 @@ func TestCardAppService_Create(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 
 			err := serv.Create(tt.in)
-			assert.Equal(t, err, tt.waitErr)
+			assert.Equal(t, tt.waitErr, err)
 		})
 	}
 }

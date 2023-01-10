@@ -88,7 +88,8 @@ func convertCardData(in card.DataCard) (card.DataCardFull, error) {
 		return card.DataCardFull{}, ErrInvalidCVV
 	}
 
-	if _, err := strconv.Atoi(in.CVV); err != nil {
+	// Используется ParseUint - т.к. не должно быть отрицательного CVV. Например, "-12".
+	if _, err := strconv.ParseUint(in.CVV, 10, 32); err != nil {
 		return card.DataCardFull{}, ErrInvalidCVV
 	}
 

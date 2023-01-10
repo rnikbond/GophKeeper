@@ -1,6 +1,7 @@
 package app_services
 
 import (
+	"GophKeeper/internal/storage/auth_store"
 	"testing"
 
 	"github.com/golang/mock/gomock"
@@ -59,14 +60,14 @@ func TestAuthAppService_Login(t *testing.T) {
 				Password: "testPassword",
 			},
 			waitErr:  ErrInvalidPassword,
-			storeErr: nil,
+			storeErr: auth_store.ErrInvalidPassword,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 
-			store.EXPECT().Find(tt.credServ.Email).Return(tt.credStore, tt.storeErr)
+			store.EXPECT().Find(tt.credServ).Return(tt.storeErr)
 
 			authServ := NewAuthService(store)
 			_, err := authServ.Login(tt.credServ)
@@ -154,7 +155,6 @@ func TestAuthAppService_ChangePassword(t *testing.T) {
 		email           string
 		password        string
 		waitErr         error
-		callStoreFind   bool
 		callStoreUpdate bool
 		errStore        error
 	}{
@@ -162,7 +162,6 @@ func TestAuthAppService_ChangePassword(t *testing.T) {
 			name:            "Success",
 			email:           "test@email.com",
 			password:        "qwerty123",
-			callStoreFind:   true,
 			callStoreUpdate: true,
 		},
 		{
@@ -170,7 +169,6 @@ func TestAuthAppService_ChangePassword(t *testing.T) {
 			email:           "test@email.com",
 			password:        "",
 			waitErr:         ErrShortPassword,
-			callStoreFind:   false,
 			callStoreUpdate: false,
 		},
 		{
@@ -178,18 +176,13 @@ func TestAuthAppService_ChangePassword(t *testing.T) {
 			email:           "test@email.com",
 			password:        "qwerty123",
 			waitErr:         ErrUnauthenticated,
-			callStoreFind:   true,
-			callStoreUpdate: false,
+			callStoreUpdate: true,
 			errStore:        errs.ErrNotFound,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-
-			if tt.callStoreFind {
-				store.EXPECT().Find(tt.email).Return(auth.Credential{}, tt.errStore)
-			}
 
 			if tt.callStoreUpdate {
 				store.EXPECT().Update(tt.email, tt.password).Return(tt.errStore)

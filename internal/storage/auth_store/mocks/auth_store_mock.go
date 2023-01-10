@@ -63,18 +63,17 @@ func (mr *MockAuthStorageMockRecorder) Delete(email interface{}) *gomock.Call {
 }
 
 // Find mocks base method.
-func (m *MockAuthStorage) Find(email string) (auth.Credential, error) {
+func (m *MockAuthStorage) Find(cred auth.Credential) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Find", email)
-	ret0, _ := ret[0].(auth.Credential)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
+	ret := m.ctrl.Call(m, "Find", cred)
+	ret0, _ := ret[0].(error)
+	return ret0
 }
 
 // Find indicates an expected call of Find.
-func (mr *MockAuthStorageMockRecorder) Find(email interface{}) *gomock.Call {
+func (mr *MockAuthStorageMockRecorder) Find(cred interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Find", reflect.TypeOf((*MockAuthStorage)(nil).Find), email)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Find", reflect.TypeOf((*MockAuthStorage)(nil).Find), cred)
 }
 
 // Update mocks base method.

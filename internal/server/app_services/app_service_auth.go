@@ -2,6 +2,7 @@
 package app_services
 
 import (
+	"errors"
 	"strings"
 
 	"go.uber.org/zap"
@@ -33,6 +34,7 @@ type AuthAppService struct {
 
 // NewAuthService - Создание экземпляра сервиса авторизации.
 func NewAuthService(store auth_store.AuthStorage, opts ...AuthAppOption) *AuthAppService {
+
 	auth := &AuthAppService{
 		store:  store,
 		logger: zap.L(),
@@ -57,6 +59,7 @@ func WithSecretKey(key string) AuthAppOption {
 func (auth AuthAppService) Login(in authModel.Credential) (string, error) {
 
 	err := auth.store.Find(in)
+
 	switch err {
 	case nil:
 		break
@@ -120,6 +123,11 @@ func (auth AuthAppService) ChangePassword(email, password string) error {
 	}
 
 	if err := auth.store.Update(email, password); err != nil {
+
+		if errors.Is(err, errs.ErrNotFound) {
+			return ErrUnauthenticated
+		}
+
 		auth.logger.Error("failed update user password", zap.Error(err))
 		return errs.ErrInternal
 	}

@@ -41,6 +41,7 @@ func (serv *CardServiceRPC) Create(ctx context.Context, in *pb.CreateRequest) (*
 		FullName: in.FullName,
 	}
 
+	// TODO :: errors.Is(...)
 	err := serv.cardApp.Create(data)
 	if err != nil {
 
