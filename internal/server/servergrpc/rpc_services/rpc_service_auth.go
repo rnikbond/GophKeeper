@@ -9,7 +9,6 @@ import (
 	"google.golang.org/grpc/status"
 
 	"GophKeeper/internal/model/auth"
-	"GophKeeper/internal/server/app_services"
 	"GophKeeper/pkg/errs"
 	"GophKeeper/pkg/md_ctx"
 	pb "GophKeeper/pkg/proto/auth"
@@ -47,7 +46,7 @@ func (serv *AuthServiceRPC) Register(ctx context.Context, in *pb.AuthRequest) (*
 		case errs.ErrAlreadyExist:
 			return nil, status.Error(codes.AlreadyExists, err.Error())
 
-		case app_services.ErrInvalidPassword:
+		case app_service_auth.ErrInvalidPassword:
 			return nil, status.Error(codes.Unauthenticated, err.Error())
 		}
 
@@ -74,7 +73,7 @@ func (serv *AuthServiceRPC) Login(ctx context.Context, in *pb.AuthRequest) (*pb.
 		case errs.ErrNotFound:
 			return nil, status.Error(codes.NotFound, err.Error())
 
-		case app_services.ErrInvalidPassword:
+		case app_service_auth.ErrInvalidPassword:
 			return nil, status.Error(codes.Unauthenticated, err.Error())
 		}
 
@@ -99,7 +98,7 @@ func (serv *AuthServiceRPC) ChangePassword(ctx context.Context, in *pb.ChangePas
 
 	if err := serv.auth.ChangePassword(email, in.Password); err != nil {
 
-		if err == app_services.ErrShortPassword {
+		if err == app_service_auth.ErrShortPassword {
 			return nil, status.Error(codes.InvalidArgument, err.Error())
 		}
 

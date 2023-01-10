@@ -2,7 +2,6 @@
 package app_service_auth
 
 import (
-	"GophKeeper/internal/server/app_services"
 	"errors"
 	"strings"
 
@@ -69,7 +68,7 @@ func (auth AuthAppService) Login(in authModel.Credential) (string, error) {
 		return ``, errs.ErrNotFound
 
 	case auth_store.ErrInvalidPassword:
-		return ``, app_services.ErrInvalidPassword
+		return ``, ErrInvalidPassword
 
 	default:
 		auth.logger.Error("failed find user", zap.Error(err))
@@ -120,13 +119,13 @@ func (auth AuthAppService) Register(in authModel.Credential) (string, error) {
 func (auth AuthAppService) ChangePassword(email, password string) error {
 
 	if len(password) < minPasswordLength {
-		return app_services.ErrShortPassword
+		return ErrShortPassword
 	}
 
 	if err := auth.store.Update(email, password); err != nil {
 
 		if errors.Is(err, errs.ErrNotFound) {
-			return app_services.ErrUnauthenticated
+			return ErrUnauthenticated
 		}
 
 		auth.logger.Error("failed update user password", zap.Error(err))
@@ -139,11 +138,11 @@ func (auth AuthAppService) ChangePassword(email, password string) error {
 // checkCredential - Проверка корректности пароля и email.
 func checkCredential(cred authModel.Credential) error {
 	if len(cred.Password) < minPasswordLength {
-		return app_services.ErrShortPassword
+		return ErrShortPassword
 	}
 
 	if !strings.Contains(cred.Email, "@") {
-		return app_services.ErrInvalidEmail
+		return ErrInvalidEmail
 	}
 
 	return nil

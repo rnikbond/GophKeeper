@@ -1,4 +1,4 @@
-package app_services
+package app_service_auth
 
 type ErrAppServices struct {
 	Value string

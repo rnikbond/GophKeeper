@@ -1,6 +1,7 @@
 package rpc_services
 
 import (
+	"GophKeeper/internal/server/app_services/app_service_auth"
 	"context"
 
 	"testing"
@@ -14,7 +15,6 @@ import (
 	"google.golang.org/grpc/status"
 
 	"GophKeeper/internal/model/auth"
-	"GophKeeper/internal/server/app_services"
 	mock "GophKeeper/internal/server/app_services/app_service_auth/mocks"
 	"GophKeeper/pkg/errs"
 	pb "GophKeeper/pkg/proto/auth"
@@ -62,7 +62,7 @@ func TestAuthServiceRPC_Login(t *testing.T) {
 			},
 			wantErr:  true,
 			wantCode: codes.Unauthenticated,
-			errApp:   app_services.ErrInvalidPassword,
+			errApp:   app_service_auth.ErrInvalidPassword,
 		},
 	}
 	for _, tt := range tests {
@@ -137,7 +137,7 @@ func TestAuthServiceRPC_Register(t *testing.T) {
 			},
 			wantErr:  true,
 			wantCode: codes.Unauthenticated,
-			errApp:   app_services.ErrInvalidPassword,
+			errApp:   app_service_auth.ErrInvalidPassword,
 		},
 	}
 	for _, tt := range tests {
@@ -214,7 +214,7 @@ func TestAuthServiceRPC_ChangePassword(t *testing.T) {
 				Password: "12345",
 			},
 			callApp:  true,
-			errApp:   app_services.ErrShortPassword,
+			errApp:   app_service_auth.ErrShortPassword,
 			wantErr:  true,
 			wantCode: codes.InvalidArgument,
 		},
@@ -225,7 +225,7 @@ func TestAuthServiceRPC_ChangePassword(t *testing.T) {
 				Password: "",
 			},
 			callApp:  true,
-			errApp:   app_services.ErrShortPassword,
+			errApp:   app_service_auth.ErrShortPassword,
 			wantErr:  true,
 			wantCode: codes.InvalidArgument,
 		},
