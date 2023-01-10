@@ -1,6 +1,7 @@
-package app_services
+package app_service_auth
 
 import (
+	"GophKeeper/internal/server/app_services"
 	"GophKeeper/internal/storage/auth_store"
 	"testing"
 
@@ -59,7 +60,7 @@ func TestAuthAppService_Login(t *testing.T) {
 				Email:    "test@emailcom",
 				Password: "testPassword",
 			},
-			waitErr:  ErrInvalidPassword,
+			waitErr:  app_services.ErrInvalidPassword,
 			storeErr: auth_store.ErrInvalidPassword,
 		},
 	}
@@ -105,7 +106,7 @@ func TestAuthAppService_Register(t *testing.T) {
 				Email:    "test_email.com",
 				Password: "testPassword",
 			},
-			waitErr:   ErrInvalidEmail,
+			waitErr:   app_services.ErrInvalidEmail,
 			callStore: false,
 		},
 		{
@@ -114,7 +115,7 @@ func TestAuthAppService_Register(t *testing.T) {
 				Email:    "test@email.com",
 				Password: "pwd",
 			},
-			waitErr:   ErrShortPassword,
+			waitErr:   app_services.ErrShortPassword,
 			callStore: false,
 		},
 		{
@@ -168,14 +169,14 @@ func TestAuthAppService_ChangePassword(t *testing.T) {
 			name:            "Invalid password",
 			email:           "test@email.com",
 			password:        "",
-			waitErr:         ErrShortPassword,
+			waitErr:         app_services.ErrShortPassword,
 			callStoreUpdate: false,
 		},
 		{
 			name:            "Unauthenticated",
 			email:           "test@email.com",
 			password:        "qwerty123",
-			waitErr:         ErrUnauthenticated,
+			waitErr:         app_services.ErrUnauthenticated,
 			callStoreUpdate: true,
 			errStore:        errs.ErrNotFound,
 		},

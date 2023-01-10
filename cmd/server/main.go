@@ -1,6 +1,11 @@
 package main
 
 import (
+	"GophKeeper/internal/server/app_services/app_service_auth"
+	"GophKeeper/internal/server/app_services/app_service_binary"
+	"GophKeeper/internal/server/app_services/app_service_card"
+	"GophKeeper/internal/server/app_services/app_service_credential"
+	"GophKeeper/internal/server/app_services/app_service_text"
 	"fmt"
 	"os"
 	"os/signal"
@@ -12,7 +17,6 @@ import (
 	"go.uber.org/zap"
 
 	"GophKeeper/internal/server"
-	"GophKeeper/internal/server/app_services"
 	"GophKeeper/internal/server/servergrpc"
 	"GophKeeper/internal/server/servergrpc/interceptors"
 	"GophKeeper/internal/server/servergrpc/rpc_services"
@@ -71,11 +75,11 @@ func main() {
 	}
 
 	// Создание сервисов приложения
-	authApp := app_services.NewAuthService(authStore, app_services.WithSecretKey(cfg.SecretKey))
-	credApp := app_services.NewCredentialAppService(credStore)
-	binApp := app_services.NewBinaryAppService(binStore)
-	textApp := app_services.NewTextAppService(textStore)
-	cardApp := app_services.NewCardAppService(cardStore)
+	authApp := app_service_auth.NewAuthService(authStore, app_service_auth.WithSecretKey(cfg.SecretKey))
+	credApp := app_service_credential.NewCredentialAppService(credStore)
+	binApp := app_service_binary.NewBinaryAppService(binStore)
+	textApp := app_service_text.NewTextAppService(textStore)
+	cardApp := app_service_card.NewCardAppService(cardStore)
 
 	// Создание gRPC сервисов
 	authRPC := rpc_services.NewAuthServiceRPC(authApp)

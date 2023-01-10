@@ -1,6 +1,7 @@
 package rpc_services
 
 import (
+	"GophKeeper/internal/server/app_services/app_service_card"
 	"context"
 
 	"go.uber.org/zap"
@@ -8,7 +9,6 @@ import (
 	"google.golang.org/grpc/status"
 
 	"GophKeeper/internal/model/card"
-	"GophKeeper/internal/server/app_services"
 	"GophKeeper/pkg/errs"
 	pb "GophKeeper/pkg/proto/data/card"
 )
@@ -16,12 +16,12 @@ import (
 type CardServiceRPC struct {
 	pb.CardServiceServer
 
-	cardApp app_services.CardApp
+	cardApp app_service_card.CardApp
 	logger  *zap.Logger
 }
 
 // NewCardServiceRPC - Создание эклемпляра gRPC сервиса для хранения данных банковских карт.
-func NewCardServiceRPC(cardApp app_services.CardApp) *CardServiceRPC {
+func NewCardServiceRPC(cardApp app_service_card.CardApp) *CardServiceRPC {
 	serv := &CardServiceRPC{
 		cardApp: cardApp,
 		logger:  zap.L(),
@@ -50,10 +50,10 @@ func (serv *CardServiceRPC) Create(ctx context.Context, in *pb.CreateRequest) (*
 			return &pb.Empty{}, status.Errorf(codes.AlreadyExists, err.Error())
 
 		case
-			app_services.ErrInvalidPeriod,
-			app_services.ErrInvalidNumber,
-			app_services.ErrInvalidCVV,
-			app_services.ErrInvalidFullName:
+			app_service_card.ErrInvalidPeriod,
+			app_service_card.ErrInvalidNumber,
+			app_service_card.ErrInvalidCVV,
+			app_service_card.ErrInvalidFullName:
 			return &pb.Empty{}, status.Errorf(codes.InvalidArgument, err.Error())
 
 		default:
@@ -87,10 +87,10 @@ func (serv *CardServiceRPC) Change(ctx context.Context, in *pb.ChangeRequest) (*
 			return &pb.Empty{}, status.Errorf(codes.NotFound, err.Error())
 
 		case
-			app_services.ErrInvalidPeriod,
-			app_services.ErrInvalidNumber,
-			app_services.ErrInvalidCVV,
-			app_services.ErrInvalidFullName:
+			app_service_card.ErrInvalidPeriod,
+			app_service_card.ErrInvalidNumber,
+			app_service_card.ErrInvalidCVV,
+			app_service_card.ErrInvalidFullName:
 			return &pb.Empty{}, status.Errorf(codes.InvalidArgument, err.Error())
 
 		default:

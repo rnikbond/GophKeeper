@@ -12,7 +12,7 @@ import (
 	"google.golang.org/grpc/status"
 
 	"GophKeeper/internal/model/cred"
-	mock "GophKeeper/internal/server/app_services/mocks"
+	mock "GophKeeper/internal/server/app_services/app_service_credential/mocks"
 	"GophKeeper/pkg/errs"
 	pb "GophKeeper/pkg/proto/data/credential"
 )

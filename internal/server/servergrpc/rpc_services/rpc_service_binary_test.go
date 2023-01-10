@@ -13,7 +13,7 @@ import (
 	"google.golang.org/grpc/status"
 
 	"GophKeeper/internal/model/binary"
-	mock "GophKeeper/internal/server/app_services/mocks"
+	mock "GophKeeper/internal/server/app_services/app_service_binary/mocks"
 	"GophKeeper/pkg/errs"
 	pb "GophKeeper/pkg/proto/data/binary"
 )

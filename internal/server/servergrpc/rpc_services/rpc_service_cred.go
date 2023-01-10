@@ -1,6 +1,7 @@
 package rpc_services
 
 import (
+	"GophKeeper/internal/server/app_services/app_service_credential"
 	"context"
 
 	"go.uber.org/zap"
@@ -8,7 +9,6 @@ import (
 	"google.golang.org/grpc/status"
 
 	"GophKeeper/internal/model/cred"
-	"GophKeeper/internal/server/app_services"
 	"GophKeeper/pkg/errs"
 	pb "GophKeeper/pkg/proto/data/credential"
 )
@@ -16,12 +16,12 @@ import (
 type CredServiceRPC struct {
 	pb.CredentialServiceServer
 
-	credApp app_services.CredentialApp
+	credApp app_service_credential.CredentialApp
 	logger  *zap.Logger
 }
 
 // NewCredServiceRPC - Создание эклемпляра gRPC сервиса дял хранения данных в виде логина и пароля.
-func NewCredServiceRPC(credApp app_services.CredentialApp) *CredServiceRPC {
+func NewCredServiceRPC(credApp app_service_credential.CredentialApp) *CredServiceRPC {
 	serv := &CredServiceRPC{
 		credApp: credApp,
 		logger:  zap.L(),

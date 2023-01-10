@@ -1,36 +1,40 @@
-package app_services
+package app_service_credential
 
 import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
 
-	"GophKeeper/internal/model/text"
-	"GophKeeper/internal/storage/data_store/text_store"
+	"GophKeeper/internal/model/cred"
+	"GophKeeper/internal/storage/data_store/credential_store"
 	"GophKeeper/pkg/errs"
 )
 
-func TestTextAppService(t *testing.T) {
+func TestCredentialAppService(t *testing.T) {
 
-	store := text_store.NewMemoryStorage()
-	serv := NewTextAppService(store)
+	store := credential_store.NewMemoryStorage()
+	serv := NewCredentialAppService(store)
 
-	testDataOK := text.DataTextFull{
-		MetaInfo: "note_private",
-		Text:     "text text text",
+	testDataOK := cred.CredentialFull{
+		Email:    "test@email.com",
+		MetaInfo: "www.ololo.com",
+		Password: "qwerty",
 	}
 
-	testDataChange := text.DataTextFull{
-		MetaInfo: "note_private",
-		Text:     "qwerty123",
+	testDataChange := cred.CredentialFull{
+		Email:    "test@email.com",
+		MetaInfo: "www.ololo.com",
+		Password: "qwerty123",
 	}
 
-	testDataGet := text.DataTextGet{
-		MetaInfo: "note_private",
+	testDataGet := cred.CredentialGet{
+		Email:    "test@email.com",
+		MetaInfo: "www.ololo.com",
 	}
 
-	testDataFail := text.DataTextGet{
-		MetaInfo: "note_private_1",
+	testDataFail := cred.CredentialGet{
+		Email:    "test@email.com",
+		MetaInfo: "www.test.com",
 	}
 
 	errCreate := serv.Create(testDataOK)

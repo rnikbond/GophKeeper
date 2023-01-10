@@ -1,7 +1,8 @@
 //go:generate mockgen -source app_service_auth.go -destination mocks/app_service_auth_mock.go -package app_services
-package app_services
+package app_service_auth
 
 import (
+	"GophKeeper/internal/server/app_services"
 	"errors"
 	"strings"
 
@@ -68,7 +69,7 @@ func (auth AuthAppService) Login(in authModel.Credential) (string, error) {
 		return ``, errs.ErrNotFound
 
 	case auth_store.ErrInvalidPassword:
-		return ``, ErrInvalidPassword
+		return ``, app_services.ErrInvalidPassword
 
 	default:
 		auth.logger.Error("failed find user", zap.Error(err))
@@ -119,13 +120,13 @@ func (auth AuthAppService) Register(in authModel.Credential) (string, error) {
 func (auth AuthAppService) ChangePassword(email, password string) error {
 
 	if len(password) < minPasswordLength {
-		return ErrShortPassword
+		return app_services.ErrShortPassword
 	}
 
 	if err := auth.store.Update(email, password); err != nil {
 
 		if errors.Is(err, errs.ErrNotFound) {
-			return ErrUnauthenticated
+			return app_services.ErrUnauthenticated
 		}
 
 		auth.logger.Error("failed update user password", zap.Error(err))
@@ -138,11 +139,11 @@ func (auth AuthAppService) ChangePassword(email, password string) error {
 // checkCredential - Проверка корректности пароля и email.
 func checkCredential(cred authModel.Credential) error {
 	if len(cred.Password) < minPasswordLength {
-		return ErrShortPassword
+		return app_services.ErrShortPassword
 	}
 
 	if !strings.Contains(cred.Email, "@") {
-		return ErrInvalidEmail
+		return app_services.ErrInvalidEmail
 	}
 
 	return nil

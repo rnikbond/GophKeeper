@@ -1,6 +1,7 @@
 package rpc_services
 
 import (
+	"GophKeeper/internal/server/app_services/app_service_text"
 	"context"
 
 	"go.uber.org/zap"
@@ -8,7 +9,6 @@ import (
 	"google.golang.org/grpc/status"
 
 	"GophKeeper/internal/model/text"
-	"GophKeeper/internal/server/app_services"
 	"GophKeeper/pkg/errs"
 	pb "GophKeeper/pkg/proto/data/text"
 )
@@ -16,12 +16,12 @@ import (
 type TextServiceRPC struct {
 	pb.TextServiceServer
 
-	textApp app_services.TextApp
+	textApp app_service_text.TextApp
 	logger  *zap.Logger
 }
 
 // NewTextServiceRPC - Создание эклемпляра gRPC сервиса для хранения текстовыъ данных.
-func NewTextServiceRPC(textApp app_services.TextApp) *TextServiceRPC {
+func NewTextServiceRPC(textApp app_service_text.TextApp) *TextServiceRPC {
 	serv := &TextServiceRPC{
 		textApp: textApp,
 		logger:  zap.L(),

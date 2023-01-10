@@ -1,6 +1,7 @@
 package rpc_services
 
 import (
+	"GophKeeper/internal/server/app_services/app_service_card"
 	"context"
 	"testing"
 
@@ -12,8 +13,7 @@ import (
 	"google.golang.org/grpc/status"
 
 	"GophKeeper/internal/model/card"
-	"GophKeeper/internal/server/app_services"
-	mock "GophKeeper/internal/server/app_services/mocks"
+	mock "GophKeeper/internal/server/app_services/app_service_card/mocks"
 	"GophKeeper/pkg/errs"
 	pb "GophKeeper/pkg/proto/data/card"
 )
@@ -66,7 +66,7 @@ func TestCardServiceRPC_Create(t *testing.T) {
 				CVV:      "111",
 				FullName: "Test Test",
 			},
-			errApp:   app_services.ErrInvalidNumber,
+			errApp:   app_service_card.ErrInvalidNumber,
 			wantErr:  true,
 			wantCode: codes.InvalidArgument,
 		},
@@ -79,7 +79,7 @@ func TestCardServiceRPC_Create(t *testing.T) {
 				CVV:      "111",
 				FullName: "Test Test",
 			},
-			errApp:   app_services.ErrInvalidPeriod,
+			errApp:   app_service_card.ErrInvalidPeriod,
 			wantErr:  true,
 			wantCode: codes.InvalidArgument,
 		},
@@ -92,7 +92,7 @@ func TestCardServiceRPC_Create(t *testing.T) {
 				CVV:      "aaa",
 				FullName: "Test Test",
 			},
-			errApp:   app_services.ErrInvalidCVV,
+			errApp:   app_service_card.ErrInvalidCVV,
 			wantErr:  true,
 			wantCode: codes.InvalidArgument,
 		},
@@ -105,7 +105,7 @@ func TestCardServiceRPC_Create(t *testing.T) {
 				CVV:      "11",
 				FullName: "Test Test",
 			},
-			errApp:   app_services.ErrInvalidCVV,
+			errApp:   app_service_card.ErrInvalidCVV,
 			wantErr:  true,
 			wantCode: codes.InvalidArgument,
 		},
@@ -118,7 +118,7 @@ func TestCardServiceRPC_Create(t *testing.T) {
 				CVV:      "111",
 				FullName: "Te",
 			},
-			errApp:   app_services.ErrInvalidFullName,
+			errApp:   app_service_card.ErrInvalidFullName,
 			wantErr:  true,
 			wantCode: codes.InvalidArgument,
 		},
@@ -199,7 +199,7 @@ func TestCardServiceRPC_Change(t *testing.T) {
 				CVV:      "111",
 				FullName: "Test Test",
 			},
-			errApp:   app_services.ErrInvalidNumber,
+			errApp:   app_service_card.ErrInvalidNumber,
 			wantErr:  true,
 			wantCode: codes.InvalidArgument,
 		},
@@ -212,7 +212,7 @@ func TestCardServiceRPC_Change(t *testing.T) {
 				CVV:      "111",
 				FullName: "Test Test",
 			},
-			errApp:   app_services.ErrInvalidPeriod,
+			errApp:   app_service_card.ErrInvalidPeriod,
 			wantErr:  true,
 			wantCode: codes.InvalidArgument,
 		},
@@ -225,7 +225,7 @@ func TestCardServiceRPC_Change(t *testing.T) {
 				CVV:      "aaa",
 				FullName: "Test Test",
 			},
-			errApp:   app_services.ErrInvalidCVV,
+			errApp:   app_service_card.ErrInvalidCVV,
 			wantErr:  true,
 			wantCode: codes.InvalidArgument,
 		},
@@ -238,7 +238,7 @@ func TestCardServiceRPC_Change(t *testing.T) {
 				CVV:      "11",
 				FullName: "Test Test",
 			},
-			errApp:   app_services.ErrInvalidCVV,
+			errApp:   app_service_card.ErrInvalidCVV,
 			wantErr:  true,
 			wantCode: codes.InvalidArgument,
 		},
@@ -251,7 +251,7 @@ func TestCardServiceRPC_Change(t *testing.T) {
 				CVV:      "111",
 				FullName: "Te",
 			},
-			errApp:   app_services.ErrInvalidFullName,
+			errApp:   app_service_card.ErrInvalidFullName,
 			wantErr:  true,
 			wantCode: codes.InvalidArgument,
 		},

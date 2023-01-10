@@ -1,6 +1,7 @@
 package rpc_services
 
 import (
+	"GophKeeper/internal/server/app_services/app_service_binary"
 	"context"
 
 	"go.uber.org/zap"
@@ -8,7 +9,6 @@ import (
 	"google.golang.org/grpc/status"
 
 	"GophKeeper/internal/model/binary"
-	"GophKeeper/internal/server/app_services"
 	"GophKeeper/pkg/errs"
 	pb "GophKeeper/pkg/proto/data/binary"
 )
@@ -16,12 +16,12 @@ import (
 type BinaryServiceRPC struct {
 	pb.BinaryServiceServer
 
-	credApp app_services.BinaryApp
+	credApp app_service_binary.BinaryApp
 	logger  *zap.Logger
 }
 
 // NewBinaryServiceRPC - Создание эклемпляра gRPC сервиса для хранения бинарных данных.
-func NewBinaryServiceRPC(credApp app_services.BinaryApp) *BinaryServiceRPC {
+func NewBinaryServiceRPC(credApp app_service_binary.BinaryApp) *BinaryServiceRPC {
 	serv := &BinaryServiceRPC{
 		credApp: credApp,
 		logger:  zap.L(),

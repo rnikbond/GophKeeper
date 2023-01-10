@@ -1,5 +1,5 @@
 //go:generate mockgen -source app_service_credential.go -destination mocks/app_service_credential_mock.go -package app_services
-package app_services
+package app_service_credential
 
 import (
 	"go.uber.org/zap"

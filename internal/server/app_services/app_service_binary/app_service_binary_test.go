@@ -1,40 +1,36 @@
-package app_services
+package app_service_binary
 
 import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
 
-	"GophKeeper/internal/model/cred"
-	"GophKeeper/internal/storage/data_store/credential_store"
+	"GophKeeper/internal/model/binary"
+	"GophKeeper/internal/storage/data_store/binary_store"
 	"GophKeeper/pkg/errs"
 )
 
-func TestCredentialAppService(t *testing.T) {
+func TestBinaryAppService(t *testing.T) {
 
-	store := credential_store.NewMemoryStorage()
-	serv := NewCredentialAppService(store)
+	store := binary_store.NewMemoryStorage()
+	serv := NewBinaryAppService(store)
 
-	testDataOK := cred.CredentialFull{
-		Email:    "test@email.com",
-		MetaInfo: "www.ololo.com",
-		Password: "qwerty",
+	testDataOK := binary.DataFull{
+		MetaInfo: "desktop.bin",
+		Bytes:    []byte("010101010101"),
 	}
 
-	testDataChange := cred.CredentialFull{
-		Email:    "test@email.com",
-		MetaInfo: "www.ololo.com",
-		Password: "qwerty123",
+	testDataChange := binary.DataFull{
+		MetaInfo: "desktop.bin",
+		Bytes:    []byte("000000000000000000"),
 	}
 
-	testDataGet := cred.CredentialGet{
-		Email:    "test@email.com",
-		MetaInfo: "www.ololo.com",
+	testDataGet := binary.DataGet{
+		MetaInfo: "desktop.bin",
 	}
 
-	testDataFail := cred.CredentialGet{
-		Email:    "test@email.com",
-		MetaInfo: "www.test.com",
+	testDataFail := binary.DataGet{
+		MetaInfo: "desktop1.bin",
 	}
 
 	errCreate := serv.Create(testDataOK)

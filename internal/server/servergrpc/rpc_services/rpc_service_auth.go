@@ -1,6 +1,7 @@
 package rpc_services
 
 import (
+	"GophKeeper/internal/server/app_services/app_service_auth"
 	"context"
 
 	"go.uber.org/zap"
@@ -17,12 +18,12 @@ import (
 type AuthServiceRPC struct {
 	pb.AuthServiceServer
 
-	auth   app_services.AuthApp
+	auth   app_service_auth.AuthApp
 	logger *zap.Logger
 }
 
 // NewAuthServiceRPC - Создание эклемпляра gRPC сервиса авторизации и регистрации
-func NewAuthServiceRPC(auth app_services.AuthApp) *AuthServiceRPC {
+func NewAuthServiceRPC(auth app_service_auth.AuthApp) *AuthServiceRPC {
 	serv := &AuthServiceRPC{
 		auth:   auth,
 		logger: zap.L(),

@@ -1,5 +1,5 @@
 //go:generate mockgen -source app_service_binary.go -destination mocks/app_service_binary_mock.go -package app_services
-package app_services
+package app_service_binary
 
 import (
 	"go.uber.org/zap"
