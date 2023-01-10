@@ -1,6 +1,10 @@
 package servergrpc
 
 import (
+	pbBinary "GophKeeper/pkg/proto/binary"
+	pbCard "GophKeeper/pkg/proto/card"
+	pbCred "GophKeeper/pkg/proto/credential"
+	pbText "GophKeeper/pkg/proto/text"
 	"net"
 	"time"
 
@@ -9,10 +13,6 @@ import (
 
 	"GophKeeper/internal/server/servergrpc/rpc_services"
 	pbAuth "GophKeeper/pkg/proto/auth"
-	pbBinary "GophKeeper/pkg/proto/data/binary"
-	pbCard "GophKeeper/pkg/proto/data/card"
-	pbCred "GophKeeper/pkg/proto/data/credential"
-	pbText "GophKeeper/pkg/proto/data/text"
 )
 
 // ServerOption - определяет операцию сервиса авторизации.

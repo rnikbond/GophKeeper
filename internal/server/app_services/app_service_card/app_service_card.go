@@ -2,13 +2,13 @@
 package app_service_card
 
 import (
+	"GophKeeper/internal/storage/card_store"
 	"strconv"
 	"time"
 
 	"go.uber.org/zap"
 
 	"GophKeeper/internal/model/card"
-	"GophKeeper/internal/storage/data_store/card_store"
 	"github.com/EClaesson/go-luhn"
 )
 

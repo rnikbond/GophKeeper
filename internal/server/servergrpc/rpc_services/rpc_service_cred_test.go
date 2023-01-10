@@ -1,6 +1,7 @@
 package rpc_services
 
 import (
+	pb "GophKeeper/pkg/proto/credential"
 	"context"
 	"fmt"
 	"testing"
@@ -14,7 +15,6 @@ import (
 	"GophKeeper/internal/model/cred"
 	mock "GophKeeper/internal/server/app_services/app_service_credential/mocks"
 	"GophKeeper/pkg/errs"
-	pb "GophKeeper/pkg/proto/data/credential"
 )
 
 func TestCredServiceRPC_Create(t *testing.T) {

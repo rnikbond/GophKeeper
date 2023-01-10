@@ -2,6 +2,7 @@ package rpc_services
 
 import (
 	"GophKeeper/internal/server/app_services/app_service_credential"
+	"GophKeeper/pkg/proto/credential"
 	"context"
 
 	"go.uber.org/zap"
@@ -10,11 +11,10 @@ import (
 
 	"GophKeeper/internal/model/cred"
 	"GophKeeper/pkg/errs"
-	pb "GophKeeper/pkg/proto/data/credential"
 )
 
 type CredServiceRPC struct {
-	pb.CredentialServiceServer
+	credential.CredentialServiceServer
 
 	credApp app_service_credential.CredentialApp
 	logger  *zap.Logger
@@ -31,7 +31,7 @@ func NewCredServiceRPC(credApp app_service_credential.CredentialApp) *CredServic
 }
 
 // Create - Добавление новых данных.
-func (serv *CredServiceRPC) Create(ctx context.Context, in *pb.CreateRequest) (*pb.Empty, error) {
+func (serv *CredServiceRPC) Create(ctx context.Context, in *credential.CreateRequest) (*credential.Empty, error) {
 
 	data := cred.CredentialFull{
 		Email:    in.Email,
@@ -42,7 +42,7 @@ func (serv *CredServiceRPC) Create(ctx context.Context, in *pb.CreateRequest) (*
 	err := serv.credApp.Create(data)
 	if err != nil {
 		if err == errs.ErrAlreadyExist {
-			return &pb.Empty{}, status.Errorf(codes.AlreadyExists, err.Error())
+			return &credential.Empty{}, status.Errorf(codes.AlreadyExists, err.Error())
 		}
 
 		serv.logger.Error("failed create credential data",
@@ -51,14 +51,14 @@ func (serv *CredServiceRPC) Create(ctx context.Context, in *pb.CreateRequest) (*
 			zap.String("meta", in.MetaInfo),
 			zap.String("pwd", in.Password))
 
-		return &pb.Empty{}, status.Errorf(codes.Internal, errs.ErrInternal.Error())
+		return &credential.Empty{}, status.Errorf(codes.Internal, errs.ErrInternal.Error())
 	}
 
-	return &pb.Empty{}, nil
+	return &credential.Empty{}, nil
 }
 
 // Change - Изменение существующих данных.
-func (serv *CredServiceRPC) Change(ctx context.Context, in *pb.ChangeRequest) (*pb.Empty, error) {
+func (serv *CredServiceRPC) Change(ctx context.Context, in *credential.ChangeRequest) (*credential.Empty, error) {
 
 	data := cred.CredentialFull{
 		Email:    in.Email,
@@ -69,7 +69,7 @@ func (serv *CredServiceRPC) Change(ctx context.Context, in *pb.ChangeRequest) (*
 	err := serv.credApp.Change(data)
 	if err != nil {
 		if err == errs.ErrNotFound {
-			return &pb.Empty{}, status.Errorf(codes.NotFound, err.Error())
+			return &credential.Empty{}, status.Errorf(codes.NotFound, err.Error())
 		}
 
 		serv.logger.Error("failed change credential data",
@@ -78,14 +78,14 @@ func (serv *CredServiceRPC) Change(ctx context.Context, in *pb.ChangeRequest) (*
 			zap.String("meta", in.MetaInfo),
 			zap.String("pwd", in.Password))
 
-		return &pb.Empty{}, status.Errorf(codes.Internal, errs.ErrInternal.Error())
+		return &credential.Empty{}, status.Errorf(codes.Internal, errs.ErrInternal.Error())
 	}
 
-	return &pb.Empty{}, nil
+	return &credential.Empty{}, nil
 }
 
 // Delete - Удаление существующих данных.
-func (serv *CredServiceRPC) Delete(ctx context.Context, in *pb.DeleteRequest) (*pb.Empty, error) {
+func (serv *CredServiceRPC) Delete(ctx context.Context, in *credential.DeleteRequest) (*credential.Empty, error) {
 
 	data := cred.CredentialGet{
 		Email:    in.Email,
@@ -95,7 +95,7 @@ func (serv *CredServiceRPC) Delete(ctx context.Context, in *pb.DeleteRequest) (*
 	err := serv.credApp.Delete(data)
 	if err != nil {
 		if err == errs.ErrNotFound {
-			return &pb.Empty{}, status.Errorf(codes.NotFound, err.Error())
+			return &credential.Empty{}, status.Errorf(codes.NotFound, err.Error())
 		}
 
 		serv.logger.Error("failed delete credential data",
@@ -103,14 +103,14 @@ func (serv *CredServiceRPC) Delete(ctx context.Context, in *pb.DeleteRequest) (*
 			zap.String("email", in.Email),
 			zap.String("meta", in.MetaInfo))
 
-		return &pb.Empty{}, status.Errorf(codes.Internal, errs.ErrInternal.Error())
+		return &credential.Empty{}, status.Errorf(codes.Internal, errs.ErrInternal.Error())
 	}
 
-	return &pb.Empty{}, nil
+	return &credential.Empty{}, nil
 }
 
 // Get - Получение данных по email и метаданным.
-func (serv *CredServiceRPC) Get(ctx context.Context, in *pb.GetRequest) (*pb.GetResponse, error) {
+func (serv *CredServiceRPC) Get(ctx context.Context, in *credential.GetRequest) (*credential.GetResponse, error) {
 
 	inData := cred.CredentialGet{
 		Email:    in.Email,
@@ -120,7 +120,7 @@ func (serv *CredServiceRPC) Get(ctx context.Context, in *pb.GetRequest) (*pb.Get
 	data, err := serv.credApp.Get(inData)
 	if err != nil {
 		if err == errs.ErrNotFound {
-			return &pb.GetResponse{}, status.Errorf(codes.NotFound, err.Error())
+			return &credential.GetResponse{}, status.Errorf(codes.NotFound, err.Error())
 		}
 
 		serv.logger.Error("failed get credential data",
@@ -128,10 +128,10 @@ func (serv *CredServiceRPC) Get(ctx context.Context, in *pb.GetRequest) (*pb.Get
 			zap.String("email", in.Email),
 			zap.String("meta", in.MetaInfo))
 
-		return &pb.GetResponse{}, status.Errorf(codes.Internal, errs.ErrInternal.Error())
+		return &credential.GetResponse{}, status.Errorf(codes.Internal, errs.ErrInternal.Error())
 	}
 
-	out := &pb.GetResponse{
+	out := &credential.GetResponse{
 		Email:    data.Email,
 		MetaInfo: data.MetaInfo,
 		Password: data.Password,

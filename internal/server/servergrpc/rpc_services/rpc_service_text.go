@@ -2,6 +2,7 @@ package rpc_services
 
 import (
 	"GophKeeper/internal/server/app_services/app_service_text"
+	"GophKeeper/pkg/proto/text"
 	"context"
 
 	"go.uber.org/zap"
@@ -10,11 +11,10 @@ import (
 
 	"GophKeeper/internal/model/text"
 	"GophKeeper/pkg/errs"
-	pb "GophKeeper/pkg/proto/data/text"
 )
 
 type TextServiceRPC struct {
-	pb.TextServiceServer
+	text_store.TextServiceServer
 
 	textApp app_service_text.TextApp
 	logger  *zap.Logger
@@ -31,7 +31,7 @@ func NewTextServiceRPC(textApp app_service_text.TextApp) *TextServiceRPC {
 }
 
 // Create - Добавление новых данных.
-func (serv *TextServiceRPC) Create(ctx context.Context, in *pb.CreateRequest) (*pb.Empty, error) {
+func (serv *TextServiceRPC) Create(ctx context.Context, in *text_store.CreateRequest) (*text_store.Empty, error) {
 
 	data := text.DataTextFull{
 		MetaInfo: in.MetaInfo,
@@ -41,21 +41,21 @@ func (serv *TextServiceRPC) Create(ctx context.Context, in *pb.CreateRequest) (*
 	err := serv.textApp.Create(data)
 	if err != nil {
 		if err == errs.ErrAlreadyExist {
-			return &pb.Empty{}, status.Errorf(codes.AlreadyExists, err.Error())
+			return &text_store.Empty{}, status.Errorf(codes.AlreadyExists, err.Error())
 		}
 
 		serv.logger.Error("failed create text data",
 			zap.Error(err),
 			zap.String("meta", in.MetaInfo))
 
-		return &pb.Empty{}, status.Errorf(codes.Internal, errs.ErrInternal.Error())
+		return &text_store.Empty{}, status.Errorf(codes.Internal, errs.ErrInternal.Error())
 	}
 
-	return &pb.Empty{}, nil
+	return &text_store.Empty{}, nil
 }
 
 // Change - Изменение существующих данных.
-func (serv *TextServiceRPC) Change(ctx context.Context, in *pb.ChangeRequest) (*pb.Empty, error) {
+func (serv *TextServiceRPC) Change(ctx context.Context, in *text_store.ChangeRequest) (*text_store.Empty, error) {
 
 	data := text.DataTextFull{
 		MetaInfo: in.MetaInfo,
@@ -65,21 +65,21 @@ func (serv *TextServiceRPC) Change(ctx context.Context, in *pb.ChangeRequest) (*
 	err := serv.textApp.Change(data)
 	if err != nil {
 		if err == errs.ErrNotFound {
-			return &pb.Empty{}, status.Errorf(codes.NotFound, err.Error())
+			return &text_store.Empty{}, status.Errorf(codes.NotFound, err.Error())
 		}
 
 		serv.logger.Error("failed change text data",
 			zap.Error(err),
 			zap.String("meta", in.MetaInfo))
 
-		return &pb.Empty{}, status.Errorf(codes.Internal, errs.ErrInternal.Error())
+		return &text_store.Empty{}, status.Errorf(codes.Internal, errs.ErrInternal.Error())
 	}
 
-	return &pb.Empty{}, nil
+	return &text_store.Empty{}, nil
 }
 
 // Delete - Удаление существующих данных.
-func (serv *TextServiceRPC) Delete(ctx context.Context, in *pb.DeleteRequest) (*pb.Empty, error) {
+func (serv *TextServiceRPC) Delete(ctx context.Context, in *text_store.DeleteRequest) (*text_store.Empty, error) {
 
 	data := text.DataTextGet{
 		MetaInfo: in.MetaInfo,
@@ -88,21 +88,21 @@ func (serv *TextServiceRPC) Delete(ctx context.Context, in *pb.DeleteRequest) (*
 	err := serv.textApp.Delete(data)
 	if err != nil {
 		if err == errs.ErrNotFound {
-			return &pb.Empty{}, status.Errorf(codes.NotFound, err.Error())
+			return &text_store.Empty{}, status.Errorf(codes.NotFound, err.Error())
 		}
 
 		serv.logger.Error("failed delete text data",
 			zap.Error(err),
 			zap.String("meta", in.MetaInfo))
 
-		return &pb.Empty{}, status.Errorf(codes.Internal, errs.ErrInternal.Error())
+		return &text_store.Empty{}, status.Errorf(codes.Internal, errs.ErrInternal.Error())
 	}
 
-	return &pb.Empty{}, nil
+	return &text_store.Empty{}, nil
 }
 
 // Get - Получение данных по email и метаданным.
-func (serv *TextServiceRPC) Get(ctx context.Context, in *pb.GetRequest) (*pb.GetResponse, error) {
+func (serv *TextServiceRPC) Get(ctx context.Context, in *text_store.GetRequest) (*text_store.GetResponse, error) {
 
 	inData := text.DataTextGet{
 		MetaInfo: in.MetaInfo,
@@ -111,17 +111,17 @@ func (serv *TextServiceRPC) Get(ctx context.Context, in *pb.GetRequest) (*pb.Get
 	data, err := serv.textApp.Get(inData)
 	if err != nil {
 		if err == errs.ErrNotFound {
-			return &pb.GetResponse{}, status.Errorf(codes.NotFound, err.Error())
+			return &text_store.GetResponse{}, status.Errorf(codes.NotFound, err.Error())
 		}
 
 		serv.logger.Error("failed get text data",
 			zap.Error(err),
 			zap.String("meta", in.MetaInfo))
 
-		return &pb.GetResponse{}, status.Errorf(codes.Internal, errs.ErrInternal.Error())
+		return &text_store.GetResponse{}, status.Errorf(codes.Internal, errs.ErrInternal.Error())
 	}
 
-	out := &pb.GetResponse{
+	out := &text_store.GetResponse{
 		MetaInfo: data.MetaInfo,
 		Text:     data.Text,
 	}

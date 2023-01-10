@@ -1,12 +1,12 @@
 package app_service_credential
 
 import (
+	"GophKeeper/internal/storage/credential_store"
 	"testing"
 
 	"github.com/stretchr/testify/require"
 
 	"GophKeeper/internal/model/cred"
-	"GophKeeper/internal/storage/data_store/credential_store"
 	"GophKeeper/pkg/errs"
 )
 

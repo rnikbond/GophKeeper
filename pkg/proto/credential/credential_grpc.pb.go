@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.2.0
 // - protoc             v3.17.3
-// source: pkg/proto/data/credential/credential.proto
+// source: pkg/proto/credential/credential.proto
 
 package credential
 
@@ -209,5 +209,5 @@ var CredentialService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "pkg/proto/data/credential/credential.proto",
+	Metadata: "pkg/proto/credential/credential.proto",
 }

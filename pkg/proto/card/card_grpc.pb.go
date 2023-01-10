@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.2.0
 // - protoc             v3.17.3
-// source: pkg/proto/data/card/card.proto
+// source: pkg/proto/card/card.proto
 
 package card_store
 
@@ -209,5 +209,5 @@ var CardService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "pkg/proto/data/card/card.proto",
+	Metadata: "pkg/proto/card/card.proto",
 }

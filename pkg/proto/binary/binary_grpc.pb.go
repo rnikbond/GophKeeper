@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.2.0
 // - protoc             v3.17.3
-// source: pkg/proto/data/binary/binary.proto
+// source: pkg/proto/binary/binary.proto
 
 package binary
 
@@ -209,5 +209,5 @@ var BinaryService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "pkg/proto/data/binary/binary.proto",
+	Metadata: "pkg/proto/binary/binary.proto",
 }

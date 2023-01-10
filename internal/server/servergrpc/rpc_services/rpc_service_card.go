@@ -2,6 +2,7 @@ package rpc_services
 
 import (
 	"GophKeeper/internal/server/app_services/app_service_card"
+	"GophKeeper/pkg/proto/card"
 	"context"
 
 	"go.uber.org/zap"
@@ -10,11 +11,10 @@ import (
 
 	"GophKeeper/internal/model/card"
 	"GophKeeper/pkg/errs"
-	pb "GophKeeper/pkg/proto/data/card"
 )
 
 type CardServiceRPC struct {
-	pb.CardServiceServer
+	card_store.CardServiceServer
 
 	cardApp app_service_card.CardApp
 	logger  *zap.Logger
@@ -31,7 +31,7 @@ func NewCardServiceRPC(cardApp app_service_card.CardApp) *CardServiceRPC {
 }
 
 // Create - Добавление новых данных.
-func (serv *CardServiceRPC) Create(ctx context.Context, in *pb.CreateRequest) (*pb.Empty, error) {
+func (serv *CardServiceRPC) Create(ctx context.Context, in *card_store.CreateRequest) (*card_store.Empty, error) {
 
 	data := card.DataCard{
 		MetaInfo: in.MetaInfo,
@@ -47,29 +47,29 @@ func (serv *CardServiceRPC) Create(ctx context.Context, in *pb.CreateRequest) (*
 
 		switch err {
 		case errs.ErrAlreadyExist:
-			return &pb.Empty{}, status.Errorf(codes.AlreadyExists, err.Error())
+			return &card_store.Empty{}, status.Errorf(codes.AlreadyExists, err.Error())
 
 		case
 			app_service_card.ErrInvalidPeriod,
 			app_service_card.ErrInvalidNumber,
 			app_service_card.ErrInvalidCVV,
 			app_service_card.ErrInvalidFullName:
-			return &pb.Empty{}, status.Errorf(codes.InvalidArgument, err.Error())
+			return &card_store.Empty{}, status.Errorf(codes.InvalidArgument, err.Error())
 
 		default:
 			serv.logger.Error("failed create card data",
 				zap.Error(err),
 				zap.String("meta", in.MetaInfo))
 
-			return &pb.Empty{}, status.Errorf(codes.Internal, errs.ErrInternal.Error())
+			return &card_store.Empty{}, status.Errorf(codes.Internal, errs.ErrInternal.Error())
 		}
 	}
 
-	return &pb.Empty{}, nil
+	return &card_store.Empty{}, nil
 }
 
 // Change - Изменение существующих данных.
-func (serv *CardServiceRPC) Change(ctx context.Context, in *pb.ChangeRequest) (*pb.Empty, error) {
+func (serv *CardServiceRPC) Change(ctx context.Context, in *card_store.ChangeRequest) (*card_store.Empty, error) {
 
 	data := card.DataCard{
 		MetaInfo: in.MetaInfo,
@@ -84,29 +84,29 @@ func (serv *CardServiceRPC) Change(ctx context.Context, in *pb.ChangeRequest) (*
 
 		switch err {
 		case errs.ErrNotFound:
-			return &pb.Empty{}, status.Errorf(codes.NotFound, err.Error())
+			return &card_store.Empty{}, status.Errorf(codes.NotFound, err.Error())
 
 		case
 			app_service_card.ErrInvalidPeriod,
 			app_service_card.ErrInvalidNumber,
 			app_service_card.ErrInvalidCVV,
 			app_service_card.ErrInvalidFullName:
-			return &pb.Empty{}, status.Errorf(codes.InvalidArgument, err.Error())
+			return &card_store.Empty{}, status.Errorf(codes.InvalidArgument, err.Error())
 
 		default:
 			serv.logger.Error("failed change card data",
 				zap.Error(err),
 				zap.String("meta", in.MetaInfo))
 
-			return &pb.Empty{}, status.Errorf(codes.Internal, errs.ErrInternal.Error())
+			return &card_store.Empty{}, status.Errorf(codes.Internal, errs.ErrInternal.Error())
 		}
 	}
 
-	return &pb.Empty{}, nil
+	return &card_store.Empty{}, nil
 }
 
 // Delete - Удаление существующих данных.
-func (serv *CardServiceRPC) Delete(ctx context.Context, in *pb.DeleteRequest) (*pb.Empty, error) {
+func (serv *CardServiceRPC) Delete(ctx context.Context, in *card_store.DeleteRequest) (*card_store.Empty, error) {
 
 	data := card.DataCardGet{
 		MetaInfo: in.MetaInfo,
@@ -117,22 +117,22 @@ func (serv *CardServiceRPC) Delete(ctx context.Context, in *pb.DeleteRequest) (*
 
 		switch err {
 		case errs.ErrNotFound:
-			return &pb.Empty{}, status.Errorf(codes.NotFound, err.Error())
+			return &card_store.Empty{}, status.Errorf(codes.NotFound, err.Error())
 
 		default:
 			serv.logger.Error("failed delete card data",
 				zap.Error(err),
 				zap.String("meta", in.MetaInfo))
 
-			return &pb.Empty{}, status.Errorf(codes.Internal, errs.ErrInternal.Error())
+			return &card_store.Empty{}, status.Errorf(codes.Internal, errs.ErrInternal.Error())
 		}
 	}
 
-	return &pb.Empty{}, nil
+	return &card_store.Empty{}, nil
 }
 
 // Get - Получение существующих данных.
-func (serv *CardServiceRPC) Get(ctx context.Context, in *pb.GetRequest) (*pb.GetResponse, error) {
+func (serv *CardServiceRPC) Get(ctx context.Context, in *card_store.GetRequest) (*card_store.GetResponse, error) {
 
 	data := card.DataCardGet{
 		MetaInfo: in.MetaInfo,
@@ -143,18 +143,18 @@ func (serv *CardServiceRPC) Get(ctx context.Context, in *pb.GetRequest) (*pb.Get
 
 		switch err {
 		case errs.ErrNotFound:
-			return &pb.GetResponse{}, status.Errorf(codes.NotFound, err.Error())
+			return &card_store.GetResponse{}, status.Errorf(codes.NotFound, err.Error())
 
 		default:
 			serv.logger.Error("failed get card data",
 				zap.Error(err),
 				zap.String("meta", in.MetaInfo))
 
-			return &pb.GetResponse{}, status.Errorf(codes.Internal, errs.ErrInternal.Error())
+			return &card_store.GetResponse{}, status.Errorf(codes.Internal, errs.ErrInternal.Error())
 		}
 	}
 
-	return &pb.GetResponse{
+	return &card_store.GetResponse{
 		Number:   get.Number,
 		Period:   get.Period,
 		CVV:      get.CVV,

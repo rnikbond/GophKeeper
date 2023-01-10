@@ -2,10 +2,10 @@
 package app_service_binary
 
 import (
+	"GophKeeper/internal/storage/binary_store"
 	"go.uber.org/zap"
 
 	"GophKeeper/internal/model/binary"
-	"GophKeeper/internal/storage/data_store/binary_store"
 )
 
 type BinaryApp interface {

@@ -14,7 +14,6 @@ func (es ErrAppServices) Error() string {
 	return es.Value
 }
 
-// Ошибки User
 var (
 	ErrInvalidEmail    = NewErr("invalid email")
 	ErrInvalidPassword = NewErr("invalid password")

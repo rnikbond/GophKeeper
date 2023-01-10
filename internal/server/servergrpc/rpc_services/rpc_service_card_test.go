@@ -2,6 +2,7 @@ package rpc_services
 
 import (
 	"GophKeeper/internal/server/app_services/app_service_card"
+	pb "GophKeeper/pkg/proto/card"
 	"context"
 	"testing"
 
@@ -15,7 +16,6 @@ import (
 	"GophKeeper/internal/model/card"
 	mock "GophKeeper/internal/server/app_services/app_service_card/mocks"
 	"GophKeeper/pkg/errs"
-	pb "GophKeeper/pkg/proto/data/card"
 )
 
 func TestCardServiceRPC_Create(t *testing.T) {

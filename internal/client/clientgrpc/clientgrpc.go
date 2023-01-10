@@ -4,6 +4,10 @@ import (
 	"GophKeeper/internal/model/binary"
 	"GophKeeper/internal/model/card"
 	"GophKeeper/internal/model/text"
+	binary2 "GophKeeper/pkg/proto/binary"
+	"GophKeeper/pkg/proto/card"
+	"GophKeeper/pkg/proto/credential"
+	"GophKeeper/pkg/proto/text"
 	"context"
 	"fmt"
 
@@ -13,10 +17,6 @@ import (
 
 	"GophKeeper/internal/model/cred"
 	pbAuth "GophKeeper/pkg/proto/auth"
-	pbBinary "GophKeeper/pkg/proto/data/binary"
-	pbCard "GophKeeper/pkg/proto/data/card"
-	pbCred "GophKeeper/pkg/proto/data/credential"
-	pbText "GophKeeper/pkg/proto/data/text"
 )
 
 type ClientGRPC struct {
@@ -24,10 +24,10 @@ type ClientGRPC struct {
 	token           string
 	conn            *grpc.ClientConn
 	rpcAuthClient   pbAuth.AuthServiceClient
-	rpcCredClient   pbCred.CredentialServiceClient
-	rpcBinaryClient pbBinary.BinaryServiceClient
-	rpcTextClient   pbText.TextServiceClient
-	rpcCardClient   pbCard.CardServiceClient
+	rpcCredClient   credential.CredentialServiceClient
+	rpcBinaryClient binary2.BinaryServiceClient
+	rpcTextClient   text_store.TextServiceClient
+	rpcCardClient   card_store.CardServiceClient
 }
 
 func NewClient(addr string) *ClientGRPC {
@@ -81,7 +81,7 @@ func (c ClientGRPC) CreatePairCred() error {
 	md := metadata.New(map[string]string{"token": c.token})
 	ctx := metadata.NewOutgoingContext(context.Background(), md)
 
-	_, err := c.rpcCredClient.Create(ctx, &pbCred.CreateRequest{
+	_, err := c.rpcCredClient.Create(ctx, &credential.CreateRequest{
 		Email:    "ololoev@email.com",
 		Password: "qwerty123",
 		MetaInfo: "www.ololo.com",
@@ -95,7 +95,7 @@ func (c ClientGRPC) FindPairCred() (cred.CredentialFull, error) {
 	md := metadata.New(map[string]string{"token": c.token})
 	ctx := metadata.NewOutgoingContext(context.Background(), md)
 
-	out, err := c.rpcCredClient.Get(ctx, &pbCred.GetRequest{
+	out, err := c.rpcCredClient.Get(ctx, &credential.GetRequest{
 		Email:    "ololoev@email.com",
 		MetaInfo: "www.ololo.com",
 	})
@@ -114,7 +114,7 @@ func (c ClientGRPC) CreateBinary() error {
 	md := metadata.New(map[string]string{"token": c.token})
 	ctx := metadata.NewOutgoingContext(context.Background(), md)
 
-	_, err := c.rpcBinaryClient.Create(ctx, &pbBinary.CreateRequest{
+	_, err := c.rpcBinaryClient.Create(ctx, &binary2.CreateRequest{
 		MetaInfo: "www.ololo.com",
 		Data:     []byte("123123123123asd"),
 	})
@@ -127,7 +127,7 @@ func (c ClientGRPC) FindBinary() (binary.DataFull, error) {
 	md := metadata.New(map[string]string{"token": c.token})
 	ctx := metadata.NewOutgoingContext(context.Background(), md)
 
-	out, err := c.rpcBinaryClient.Get(ctx, &pbBinary.GetRequest{
+	out, err := c.rpcBinaryClient.Get(ctx, &binary2.GetRequest{
 		MetaInfo: "www.ololo.com",
 	})
 
@@ -144,7 +144,7 @@ func (c ClientGRPC) CreateText() error {
 	md := metadata.New(map[string]string{"token": c.token})
 	ctx := metadata.NewOutgoingContext(context.Background(), md)
 
-	_, err := c.rpcTextClient.Create(ctx, &pbText.CreateRequest{
+	_, err := c.rpcTextClient.Create(ctx, &text_store.CreateRequest{
 		MetaInfo: "book",
 		Text:     "123123123123asd",
 	})
@@ -157,7 +157,7 @@ func (c ClientGRPC) FindText() (text.DataTextFull, error) {
 	md := metadata.New(map[string]string{"token": c.token})
 	ctx := metadata.NewOutgoingContext(context.Background(), md)
 
-	out, err := c.rpcTextClient.Get(ctx, &pbText.GetRequest{
+	out, err := c.rpcTextClient.Get(ctx, &text_store.GetRequest{
 		MetaInfo: "book",
 	})
 
@@ -174,7 +174,7 @@ func (c ClientGRPC) CreateCard() error {
 	md := metadata.New(map[string]string{"token": c.token})
 	ctx := metadata.NewOutgoingContext(context.Background(), md)
 
-	_, err := c.rpcCardClient.Create(ctx, &pbCard.CreateRequest{
+	_, err := c.rpcCardClient.Create(ctx, &card_store.CreateRequest{
 		MetaInfo: "MirPay",
 		Number:   "4648289760410976",
 		Period:   "10.2030",
@@ -190,7 +190,7 @@ func (c ClientGRPC) FindCard() (card.DataCard, error) {
 	md := metadata.New(map[string]string{"token": c.token})
 	ctx := metadata.NewOutgoingContext(context.Background(), md)
 
-	out, err := c.rpcCardClient.Get(ctx, &pbCard.GetRequest{
+	out, err := c.rpcCardClient.Get(ctx, &card_store.GetRequest{
 		MetaInfo: "MirPay",
 	})
 
@@ -209,10 +209,10 @@ func (c *ClientGRPC) Connect() (err error) {
 
 	c.conn, err = grpc.Dial(c.addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	c.rpcAuthClient = pbAuth.NewAuthServiceClient(c.conn)
-	c.rpcCredClient = pbCred.NewCredentialServiceClient(c.conn)
-	c.rpcBinaryClient = pbBinary.NewBinaryServiceClient(c.conn)
-	c.rpcTextClient = pbText.NewTextServiceClient(c.conn)
-	c.rpcCardClient = pbCard.NewCardServiceClient(c.conn)
+	c.rpcCredClient = credential.NewCredentialServiceClient(c.conn)
+	c.rpcBinaryClient = binary2.NewBinaryServiceClient(c.conn)
+	c.rpcTextClient = text_store.NewTextServiceClient(c.conn)
+	c.rpcCardClient = card_store.NewCardServiceClient(c.conn)
 	return err
 }
 

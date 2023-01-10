@@ -1,12 +1,12 @@
 package app_service_text
 
 import (
+	"GophKeeper/internal/storage/text_store"
 	"testing"
 
 	"github.com/stretchr/testify/require"
 
 	"GophKeeper/internal/model/text"
-	"GophKeeper/internal/storage/data_store/text_store"
 	"GophKeeper/pkg/errs"
 )
 

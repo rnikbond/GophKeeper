@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.2.0
 // - protoc             v3.17.3
-// source: pkg/proto/data/text/text.proto
+// source: pkg/proto/text/text.proto
 
 package text_store
 
@@ -209,5 +209,5 @@ var TextService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "pkg/proto/data/text/text.proto",
+	Metadata: "pkg/proto/text/text.proto",
 }
