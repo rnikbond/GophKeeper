@@ -1,7 +1,6 @@
-package rpc_services
+package grpc_service_auth
 
 import (
-	"GophKeeper/internal/server/app_services/app_service_auth"
 	"context"
 
 	"go.uber.org/zap"
@@ -9,6 +8,7 @@ import (
 	"google.golang.org/grpc/status"
 
 	"GophKeeper/internal/model/auth"
+	"GophKeeper/internal/server/app_services/app_service_auth"
 	"GophKeeper/pkg/errs"
 	"GophKeeper/pkg/md_ctx"
 	pb "GophKeeper/pkg/proto/auth"

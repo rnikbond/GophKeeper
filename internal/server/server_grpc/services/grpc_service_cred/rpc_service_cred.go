@@ -1,8 +1,6 @@
-package rpc_services
+package grpc_service_cred
 
 import (
-	"GophKeeper/internal/server/app_services/app_service_credential"
-	"GophKeeper/pkg/proto/credential"
 	"context"
 
 	"go.uber.org/zap"
@@ -10,7 +8,9 @@ import (
 	"google.golang.org/grpc/status"
 
 	"GophKeeper/internal/model/cred"
+	"GophKeeper/internal/server/app_services/app_service_credential"
 	"GophKeeper/pkg/errs"
+	"GophKeeper/pkg/proto/credential"
 )
 
 type CredServiceRPC struct {

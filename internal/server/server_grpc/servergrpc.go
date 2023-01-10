@@ -1,6 +1,11 @@
-package servergrpc
+package server_grpc
 
 import (
+	"GophKeeper/internal/server/server_grpc/services/grpc_service_auth"
+	"GophKeeper/internal/server/server_grpc/services/grpc_service_binary"
+	"GophKeeper/internal/server/server_grpc/services/grpc_service_card"
+	"GophKeeper/internal/server/server_grpc/services/grpc_service_cred"
+	"GophKeeper/internal/server/server_grpc/services/grpc_service_text"
 	pbBinary "GophKeeper/pkg/proto/binary"
 	pbCard "GophKeeper/pkg/proto/card"
 	pbCred "GophKeeper/pkg/proto/credential"
@@ -11,7 +16,6 @@ import (
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 
-	"GophKeeper/internal/server/servergrpc/rpc_services"
 	pbAuth "GophKeeper/pkg/proto/auth"
 )
 
@@ -23,7 +27,7 @@ type ServerGRPC struct {
 	*grpc.Server
 	net.Listener
 
-	auth   *rpc_services.AuthServiceRPC
+	auth   *grpc_service_auth.AuthServiceRPC
 	logger *zap.Logger
 
 	secretKey string
@@ -52,34 +56,34 @@ func NewServer(addr string, interceptor grpc.ServerOption, opts ...ServerOption)
 }
 
 // WithAuthServiceRPC - Регистрирует сервис gPRC авторизации
-func WithAuthServiceRPC(auth *rpc_services.AuthServiceRPC) ServerOption {
+func WithAuthServiceRPC(auth *grpc_service_auth.AuthServiceRPC) ServerOption {
 	return func(serv *ServerGRPC) {
 		pbAuth.RegisterAuthServiceServer(serv.Server, auth)
 	}
 }
 
 // WithCredServiceRPC - Регистрирует сервис gPRC для хранения логинов и паролей
-func WithCredServiceRPC(cred *rpc_services.CredServiceRPC) ServerOption {
+func WithCredServiceRPC(cred *grpc_service_cred.CredServiceRPC) ServerOption {
 	return func(serv *ServerGRPC) {
 		pbCred.RegisterCredentialServiceServer(serv.Server, cred)
 	}
 }
 
 // WithBinaryServiceRPC - Регистрирует сервис gPRC для хранения бинарных данных
-func WithBinaryServiceRPC(bin *rpc_services.BinaryServiceRPC) ServerOption {
+func WithBinaryServiceRPC(bin *grpc_service_binary.BinaryServiceRPC) ServerOption {
 	return func(serv *ServerGRPC) {
 		pbBinary.RegisterBinaryServiceServer(serv.Server, bin)
 	}
 }
 
 // WithTextServiceRPC - Регистрирует сервис gPRC для хранения текстовых данных
-func WithTextServiceRPC(txt *rpc_services.TextServiceRPC) ServerOption {
+func WithTextServiceRPC(txt *grpc_service_text.TextServiceRPC) ServerOption {
 	return func(serv *ServerGRPC) {
 		pbText.RegisterTextServiceServer(serv.Server, txt)
 	}
 }
 
-func WithCardServiceRPC(cardServ *rpc_services.CardServiceRPC) ServerOption {
+func WithCardServiceRPC(cardServ *grpc_service_card.CardServiceRPC) ServerOption {
 	return func(serv *ServerGRPC) {
 		pbCard.RegisterCardServiceServer(serv.Server, cardServ)
 	}

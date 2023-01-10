@@ -2,10 +2,10 @@
 package app_service_credential
 
 import (
-	"GophKeeper/internal/storage/credential_store"
 	"go.uber.org/zap"
 
 	"GophKeeper/internal/model/cred"
+	"GophKeeper/internal/storage/credential_store"
 )
 
 type CredentialApp interface {

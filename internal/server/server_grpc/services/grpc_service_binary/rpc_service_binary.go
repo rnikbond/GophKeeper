@@ -1,8 +1,6 @@
-package rpc_services
+package grpc_service_binary
 
 import (
-	"GophKeeper/internal/server/app_services/app_service_binary"
-	binary2 "GophKeeper/pkg/proto/binary"
 	"context"
 
 	"go.uber.org/zap"
@@ -10,11 +8,13 @@ import (
 	"google.golang.org/grpc/status"
 
 	"GophKeeper/internal/model/binary"
+	"GophKeeper/internal/server/app_services/app_service_binary"
 	"GophKeeper/pkg/errs"
+	pb "GophKeeper/pkg/proto/binary"
 )
 
 type BinaryServiceRPC struct {
-	binary2.BinaryServiceServer
+	pb.BinaryServiceServer
 
 	credApp app_service_binary.BinaryApp
 	logger  *zap.Logger
@@ -31,7 +31,7 @@ func NewBinaryServiceRPC(credApp app_service_binary.BinaryApp) *BinaryServiceRPC
 }
 
 // Create - Добавление новых данных.
-func (serv *BinaryServiceRPC) Create(ctx context.Context, in *binary2.CreateRequest) (*binary2.Empty, error) {
+func (serv *BinaryServiceRPC) Create(ctx context.Context, in *pb.CreateRequest) (*pb.Empty, error) {
 
 	data := binary.DataFull{
 		MetaInfo: in.MetaInfo,
@@ -41,21 +41,21 @@ func (serv *BinaryServiceRPC) Create(ctx context.Context, in *binary2.CreateRequ
 	err := serv.credApp.Create(data)
 	if err != nil {
 		if err == errs.ErrAlreadyExist {
-			return &binary2.Empty{}, status.Errorf(codes.AlreadyExists, err.Error())
+			return &pb.Empty{}, status.Errorf(codes.AlreadyExists, err.Error())
 		}
 
 		serv.logger.Error("failed create binary data",
 			zap.Error(err),
 			zap.String("meta", in.MetaInfo))
 
-		return &binary2.Empty{}, status.Errorf(codes.Internal, errs.ErrInternal.Error())
+		return &pb.Empty{}, status.Errorf(codes.Internal, errs.ErrInternal.Error())
 	}
 
-	return &binary2.Empty{}, nil
+	return &pb.Empty{}, nil
 }
 
 // Change - Изменение существующих данных.
-func (serv *BinaryServiceRPC) Change(ctx context.Context, in *binary2.ChangeRequest) (*binary2.Empty, error) {
+func (serv *BinaryServiceRPC) Change(ctx context.Context, in *pb.ChangeRequest) (*pb.Empty, error) {
 
 	data := binary.DataFull{
 		MetaInfo: in.MetaInfo,
@@ -65,21 +65,21 @@ func (serv *BinaryServiceRPC) Change(ctx context.Context, in *binary2.ChangeRequ
 	err := serv.credApp.Change(data)
 	if err != nil {
 		if err == errs.ErrNotFound {
-			return &binary2.Empty{}, status.Errorf(codes.NotFound, err.Error())
+			return &pb.Empty{}, status.Errorf(codes.NotFound, err.Error())
 		}
 
 		serv.logger.Error("failed change binary data",
 			zap.Error(err),
 			zap.String("meta", in.MetaInfo))
 
-		return &binary2.Empty{}, status.Errorf(codes.Internal, errs.ErrInternal.Error())
+		return &pb.Empty{}, status.Errorf(codes.Internal, errs.ErrInternal.Error())
 	}
 
-	return &binary2.Empty{}, nil
+	return &pb.Empty{}, nil
 }
 
 // Delete - Удаление существующих данных.
-func (serv *BinaryServiceRPC) Delete(ctx context.Context, in *binary2.DeleteRequest) (*binary2.Empty, error) {
+func (serv *BinaryServiceRPC) Delete(ctx context.Context, in *pb.DeleteRequest) (*pb.Empty, error) {
 
 	data := binary.DataGet{
 		MetaInfo: in.MetaInfo,
@@ -88,21 +88,21 @@ func (serv *BinaryServiceRPC) Delete(ctx context.Context, in *binary2.DeleteRequ
 	err := serv.credApp.Delete(data)
 	if err != nil {
 		if err == errs.ErrNotFound {
-			return &binary2.Empty{}, status.Errorf(codes.NotFound, err.Error())
+			return &pb.Empty{}, status.Errorf(codes.NotFound, err.Error())
 		}
 
 		serv.logger.Error("failed delete binary data",
 			zap.Error(err),
 			zap.String("meta", in.MetaInfo))
 
-		return &binary2.Empty{}, status.Errorf(codes.Internal, errs.ErrInternal.Error())
+		return &pb.Empty{}, status.Errorf(codes.Internal, errs.ErrInternal.Error())
 	}
 
-	return &binary2.Empty{}, nil
+	return &pb.Empty{}, nil
 }
 
 // Get - Получение данных по email и метаданным.
-func (serv *BinaryServiceRPC) Get(ctx context.Context, in *binary2.GetRequest) (*binary2.GetResponse, error) {
+func (serv *BinaryServiceRPC) Get(ctx context.Context, in *pb.GetRequest) (*pb.GetResponse, error) {
 
 	inData := binary.DataGet{
 		MetaInfo: in.MetaInfo,
@@ -111,17 +111,17 @@ func (serv *BinaryServiceRPC) Get(ctx context.Context, in *binary2.GetRequest) (
 	data, err := serv.credApp.Get(inData)
 	if err != nil {
 		if err == errs.ErrNotFound {
-			return &binary2.GetResponse{}, status.Errorf(codes.NotFound, err.Error())
+			return &pb.GetResponse{}, status.Errorf(codes.NotFound, err.Error())
 		}
 
 		serv.logger.Error("failed get binary data",
 			zap.Error(err),
 			zap.String("meta", in.MetaInfo))
 
-		return &binary2.GetResponse{}, status.Errorf(codes.Internal, errs.ErrInternal.Error())
+		return &pb.GetResponse{}, status.Errorf(codes.Internal, errs.ErrInternal.Error())
 	}
 
-	out := &binary2.GetResponse{
+	out := &pb.GetResponse{
 		MetaInfo: data.MetaInfo,
 		Data:     data.Bytes,
 	}

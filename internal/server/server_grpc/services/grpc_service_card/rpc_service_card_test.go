@@ -1,8 +1,6 @@
-package rpc_services
+package grpc_service_card
 
 import (
-	"GophKeeper/internal/server/app_services/app_service_card"
-	pb "GophKeeper/pkg/proto/card"
 	"context"
 	"testing"
 
@@ -14,8 +12,10 @@ import (
 	"google.golang.org/grpc/status"
 
 	"GophKeeper/internal/model/card"
+	"GophKeeper/internal/server/app_services/app_service_card"
 	mock "GophKeeper/internal/server/app_services/app_service_card/mocks"
 	"GophKeeper/pkg/errs"
+	pb "GophKeeper/pkg/proto/card"
 )
 
 func TestCardServiceRPC_Create(t *testing.T) {

@@ -1,12 +1,12 @@
 package app_service_binary
 
 import (
-	"GophKeeper/internal/storage/binary_store"
 	"testing"
 
 	"github.com/stretchr/testify/require"
 
 	"GophKeeper/internal/model/binary"
+	"GophKeeper/internal/storage/binary_store"
 	"GophKeeper/pkg/errs"
 )
 

@@ -2,14 +2,15 @@
 package app_service_card
 
 import (
-	"GophKeeper/internal/storage/card_store"
 	"strconv"
 	"time"
+
+	"github.com/EClaesson/go-luhn"
 
 	"go.uber.org/zap"
 
 	"GophKeeper/internal/model/card"
-	"github.com/EClaesson/go-luhn"
+	"GophKeeper/internal/storage/card_store"
 )
 
 var PeriodLayout = "01.2006"

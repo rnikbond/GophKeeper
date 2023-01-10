@@ -6,6 +6,11 @@ import (
 	"GophKeeper/internal/server/app_services/app_service_card"
 	"GophKeeper/internal/server/app_services/app_service_credential"
 	"GophKeeper/internal/server/app_services/app_service_text"
+	"GophKeeper/internal/server/server_grpc/services/grpc_service_auth"
+	"GophKeeper/internal/server/server_grpc/services/grpc_service_binary"
+	"GophKeeper/internal/server/server_grpc/services/grpc_service_card"
+	"GophKeeper/internal/server/server_grpc/services/grpc_service_cred"
+	"GophKeeper/internal/server/server_grpc/services/grpc_service_text"
 	binary_store2 "GophKeeper/internal/storage/binary_store"
 	card_store2 "GophKeeper/internal/storage/card_store"
 	credential_store2 "GophKeeper/internal/storage/credential_store"
@@ -21,15 +26,14 @@ import (
 	"go.uber.org/zap"
 
 	"GophKeeper/internal/server"
-	"GophKeeper/internal/server/servergrpc"
-	"GophKeeper/internal/server/servergrpc/interceptors"
-	"GophKeeper/internal/server/servergrpc/rpc_services"
+	"GophKeeper/internal/server/server_grpc"
+	"GophKeeper/internal/server/server_grpc/interceptors"
 	"GophKeeper/internal/storage/auth_store"
 	"GophKeeper/pkg/logzap"
 )
 
 var (
-	_ = (*servergrpc.ServerGRPC)(nil)
+	_ = (*server_grpc.ServerGRPC)(nil)
 )
 
 var (
@@ -82,23 +86,23 @@ func main() {
 	cardApp := app_service_card.NewCardAppService(cardStore)
 
 	// Создание gRPC сервисов
-	authRPC := rpc_services.NewAuthServiceRPC(authApp)
-	credRPC := rpc_services.NewCredServiceRPC(credApp)
-	binRPC := rpc_services.NewBinaryServiceRPC(binApp)
-	textRPC := rpc_services.NewTextServiceRPC(textApp)
-	cardRPC := rpc_services.NewCardServiceRPC(cardApp)
+	authRPC := grpc_service_auth.NewAuthServiceRPC(authApp)
+	credRPC := grpc_service_cred.NewCredServiceRPC(credApp)
+	binRPC := grpc_service_binary.NewBinaryServiceRPC(binApp)
+	textRPC := grpc_service_text.NewTextServiceRPC(textApp)
+	cardRPC := grpc_service_card.NewCardServiceRPC(cardApp)
 
 	validate := interceptors.NewValidateInterceptor(cfg.SecretKey)
 
 	// Создание сервера
-	grpcServer, err := servergrpc.NewServer(
+	grpcServer, err := server_grpc.NewServer(
 		cfg.AddrGRPC,
 		validate,
-		servergrpc.WithAuthServiceRPC(authRPC),
-		servergrpc.WithCredServiceRPC(credRPC),
-		servergrpc.WithBinaryServiceRPC(binRPC),
-		servergrpc.WithTextServiceRPC(textRPC),
-		servergrpc.WithCardServiceRPC(cardRPC),
+		server_grpc.WithAuthServiceRPC(authRPC),
+		server_grpc.WithCredServiceRPC(credRPC),
+		server_grpc.WithBinaryServiceRPC(binRPC),
+		server_grpc.WithTextServiceRPC(textRPC),
+		server_grpc.WithCardServiceRPC(cardRPC),
 	)
 
 	if err != nil {

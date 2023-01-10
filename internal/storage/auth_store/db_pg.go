@@ -1,12 +1,13 @@
 package auth_store
 
 import (
-	"GophKeeper/pkg/errs"
 	"context"
+
 	"github.com/jmoiron/sqlx"
 	"go.uber.org/zap"
 
 	"GophKeeper/internal/model/auth"
+	"GophKeeper/pkg/errs"
 )
 
 var (

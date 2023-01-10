@@ -1,13 +1,13 @@
 package app_service_card
 
 import (
-	"GophKeeper/internal/storage/card_store"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"GophKeeper/internal/model/card"
+	"GophKeeper/internal/storage/card_store"
 	"GophKeeper/pkg/errs"
 )
 

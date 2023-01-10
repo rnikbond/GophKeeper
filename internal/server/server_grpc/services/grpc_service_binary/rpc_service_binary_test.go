@@ -1,4 +1,4 @@
-package rpc_services
+package grpc_service_binary
 
 import (
 	pb "GophKeeper/pkg/proto/binary"

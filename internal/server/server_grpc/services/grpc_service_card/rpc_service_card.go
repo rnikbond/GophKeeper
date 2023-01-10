@@ -1,8 +1,6 @@
-package rpc_services
+package grpc_service_card
 
 import (
-	"GophKeeper/internal/server/app_services/app_service_card"
-	"GophKeeper/pkg/proto/card"
 	"context"
 
 	"go.uber.org/zap"
@@ -10,7 +8,9 @@ import (
 	"google.golang.org/grpc/status"
 
 	"GophKeeper/internal/model/card"
+	"GophKeeper/internal/server/app_services/app_service_card"
 	"GophKeeper/pkg/errs"
+	"GophKeeper/pkg/proto/card"
 )
 
 type CardServiceRPC struct {

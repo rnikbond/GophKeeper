@@ -1,7 +1,6 @@
-package rpc_services
+package grpc_service_text
 
 import (
-	pb "GophKeeper/pkg/proto/text"
 	"context"
 	"fmt"
 	"testing"
@@ -16,6 +15,7 @@ import (
 	"GophKeeper/internal/model/text"
 	mock "GophKeeper/internal/server/app_services/app_service_text/mocks"
 	"GophKeeper/pkg/errs"
+	pb "GophKeeper/pkg/proto/text"
 )
 
 func TestTextServiceRPC_Create(t *testing.T) {

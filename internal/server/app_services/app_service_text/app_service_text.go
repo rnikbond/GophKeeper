@@ -2,10 +2,10 @@
 package app_service_text
 
 import (
-	"GophKeeper/internal/storage/text_store"
 	"go.uber.org/zap"
 
 	"GophKeeper/internal/model/text"
+	"GophKeeper/internal/storage/text_store"
 )
 
 type TextApp interface {

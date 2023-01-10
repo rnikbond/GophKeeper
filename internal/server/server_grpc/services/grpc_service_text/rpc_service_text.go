@@ -1,8 +1,6 @@
-package rpc_services
+package grpc_service_text
 
 import (
-	"GophKeeper/internal/server/app_services/app_service_text"
-	"GophKeeper/pkg/proto/text"
 	"context"
 
 	"go.uber.org/zap"
@@ -10,7 +8,9 @@ import (
 	"google.golang.org/grpc/status"
 
 	"GophKeeper/internal/model/text"
+	"GophKeeper/internal/server/app_services/app_service_text"
 	"GophKeeper/pkg/errs"
+	"GophKeeper/pkg/proto/text"
 )
 
 type TextServiceRPC struct {
