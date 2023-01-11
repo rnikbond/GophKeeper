@@ -11,10 +11,10 @@ import (
 	"GophKeeper/internal/server/server_grpc/services/grpc_service_card"
 	"GophKeeper/internal/server/server_grpc/services/grpc_service_cred"
 	"GophKeeper/internal/server/server_grpc/services/grpc_service_text"
-	binary_store2 "GophKeeper/internal/storage/binary_store"
-	card_store2 "GophKeeper/internal/storage/card_store"
-	credential_store2 "GophKeeper/internal/storage/credential_store"
-	text_store2 "GophKeeper/internal/storage/text_store"
+	"GophKeeper/internal/storage/binary_store"
+	"GophKeeper/internal/storage/card_store"
+	"GophKeeper/internal/storage/credential_store"
+	"GophKeeper/internal/storage/text_store"
 	"fmt"
 	"os"
 	"os/signal"
@@ -50,10 +50,10 @@ func main() {
 	cfg := newConfig()
 
 	var authStore auth_store.AuthStorage
-	var credStore credential_store2.CredStorage
-	var binStore binary_store2.BinaryStorage
-	var textStore text_store2.TextStorage
-	var cardStore card_store2.CardStorage
+	var credStore credential_store.CredStorage
+	var binStore binary_store.BinaryStorage
+	var textStore text_store.TextStorage
+	var cardStore card_store.CardStorage
 
 	// Создание хранилищ
 	if len(cfg.DatabaseURI) != 0 {
@@ -64,18 +64,18 @@ func main() {
 		}
 
 		authStore = auth_store.NewPostgresStorage(db)
+		textStore = text_store.NewPostgresStorage(db)
 
-		credStore = credential_store2.NewMemoryStorage()
-		binStore = binary_store2.NewMemoryStorage()
-		textStore = text_store2.NewMemoryStorage()
-		cardStore = card_store2.NewMemoryStorage()
+		credStore = credential_store.NewMemoryStorage()
+		binStore = binary_store.NewMemoryStorage()
+		cardStore = card_store.NewMemoryStorage()
 
 	} else {
 		authStore = auth_store.NewMemoryStorage()
-		credStore = credential_store2.NewMemoryStorage()
-		binStore = binary_store2.NewMemoryStorage()
-		textStore = text_store2.NewMemoryStorage()
-		cardStore = card_store2.NewMemoryStorage()
+		credStore = credential_store.NewMemoryStorage()
+		binStore = binary_store.NewMemoryStorage()
+		textStore = text_store.NewMemoryStorage()
+		cardStore = card_store.NewMemoryStorage()
 	}
 
 	// Создание сервисов приложения
