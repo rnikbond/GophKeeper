@@ -17,9 +17,6 @@ var (
                        VALUES ($1, $2)`
 	queryDeleteText = `DELETE FROM text_data 
                         WHERE meta = $1`
-	queryGetMetaID = `SELECT id
-                      FROM text_data 
-                      WHERE meta = $1`
 	queryUpdateText = `UPDATE text_data
                        SET text = $1
                        WHERE meta = $2`
@@ -41,7 +38,7 @@ func NewPostgresStorage(db *sqlx.DB) *PostgresStorage {
 	}
 }
 
-// Create Создание нового пользователя.
+// Create Создание новых текстовых данных.
 func (store *PostgresStorage) Create(data text.DataTextFull) error {
 
 	if _, err := store.db.ExecContext(context.Background(), queryInsertText, data.MetaInfo, data.Text); err != nil {
@@ -115,17 +112,4 @@ func (store *PostgresStorage) Get(in text.DataTextGet) (text.DataTextFull, error
 		MetaInfo: in.MetaInfo,
 		Text:     data,
 	}, nil
-}
-
-// textID Получение индекса записи по информации
-func (store *PostgresStorage) textID(metaInfo string) (int64, bool) {
-
-	row := store.db.QueryRowContext(context.Background(), queryGetMetaID, metaInfo)
-
-	var id int64
-	if err := row.Scan(&id); err != nil {
-		return 0, false
-	}
-
-	return id, true
 }
