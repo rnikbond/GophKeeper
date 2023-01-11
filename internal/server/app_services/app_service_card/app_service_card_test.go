@@ -16,7 +16,7 @@ func TestCardAppService_Chain(t *testing.T) {
 	store := card_store.NewMemoryStorage()
 	serv := NewCardAppService(store)
 
-	testDataOK := card.DataCard{
+	testDataOK := card.DataCardFull{
 		MetaInfo: "MirPay",
 		Number:   "4648289760410976",
 		Period:   "10.2030",
@@ -24,7 +24,7 @@ func TestCardAppService_Chain(t *testing.T) {
 		FullName: "Test Test",
 	}
 
-	testDataChange := card.DataCard{
+	testDataChange := card.DataCardFull{
 		MetaInfo: "MirPay",
 		Number:   "4648289760410976",
 		Period:   "11.2030",
@@ -80,12 +80,12 @@ func TestCardAppService_Create(t *testing.T) {
 
 	tests := []struct {
 		name    string
-		in      card.DataCard
+		in      card.DataCardFull
 		waitErr error
 	}{
 		{
 			name: "Success",
-			in: card.DataCard{
+			in: card.DataCardFull{
 				MetaInfo: "MirPay",
 				Number:   "4648289760410976",
 				Period:   "10.2030",
@@ -96,7 +96,7 @@ func TestCardAppService_Create(t *testing.T) {
 		},
 		{
 			name: "Check invalid number",
-			in: card.DataCard{
+			in: card.DataCardFull{
 				MetaInfo: "MirPay",
 				Number:   "464289760410976",
 				Period:   "10.2030",
@@ -107,7 +107,7 @@ func TestCardAppService_Create(t *testing.T) {
 		},
 		{
 			name: "Check invalid period",
-			in: card.DataCard{
+			in: card.DataCardFull{
 				MetaInfo: "MirPay",
 				Number:   "4648289760410976",
 				Period:   "102030",
@@ -118,7 +118,7 @@ func TestCardAppService_Create(t *testing.T) {
 		},
 		{
 			name: "Check invalid CVV: chars",
-			in: card.DataCard{
+			in: card.DataCardFull{
 				MetaInfo: "MirPay",
 				Number:   "4648289760410976",
 				Period:   "10.2030",
@@ -129,7 +129,7 @@ func TestCardAppService_Create(t *testing.T) {
 		},
 		{
 			name: "Check invalid CVV: short len",
-			in: card.DataCard{
+			in: card.DataCardFull{
 				MetaInfo: "MirPay",
 				Number:   "4648289760410976",
 				Period:   "10.2030",
@@ -140,7 +140,7 @@ func TestCardAppService_Create(t *testing.T) {
 		},
 		{
 			name: "Check invalid CVV: short -12",
-			in: card.DataCard{
+			in: card.DataCardFull{
 				MetaInfo: "GPay",
 				Number:   "4648289760410976",
 				Period:   "10.2030",
@@ -151,7 +151,7 @@ func TestCardAppService_Create(t *testing.T) {
 		},
 		{
 			name: "Check invalid full name",
-			in: card.DataCard{
+			in: card.DataCardFull{
 				MetaInfo: "MirPay",
 				Number:   "4648289760410976",
 				Period:   "10.2030",

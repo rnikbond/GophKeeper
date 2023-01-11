@@ -185,7 +185,7 @@ func (c ClientGRPC) CreateCard() error {
 	return err
 }
 
-func (c ClientGRPC) FindCard() (card.DataCard, error) {
+func (c ClientGRPC) FindCard() (card.DataCardFull, error) {
 
 	md := metadata.New(map[string]string{"token": c.token})
 	ctx := metadata.NewOutgoingContext(context.Background(), md)
@@ -194,7 +194,7 @@ func (c ClientGRPC) FindCard() (card.DataCard, error) {
 		MetaInfo: "MirPay",
 	})
 
-	data := card.DataCard{
+	data := card.DataCardFull{
 		MetaInfo: "MirPay",
 		Number:   out.Number,
 		Period:   out.Period,

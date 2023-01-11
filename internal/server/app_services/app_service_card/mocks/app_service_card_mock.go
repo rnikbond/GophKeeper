@@ -35,7 +35,7 @@ func (m *MockCardApp) EXPECT() *MockCardAppMockRecorder {
 }
 
 // Change mocks base method.
-func (m *MockCardApp) Change(in card.DataCard) error {
+func (m *MockCardApp) Change(in card.DataCardFull) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Change", in)
 	ret0, _ := ret[0].(error)
@@ -49,7 +49,7 @@ func (mr *MockCardAppMockRecorder) Change(in interface{}) *gomock.Call {
 }
 
 // Create mocks base method.
-func (m *MockCardApp) Create(data card.DataCard) error {
+func (m *MockCardApp) Create(data card.DataCardFull) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Create", data)
 	ret0, _ := ret[0].(error)
@@ -77,10 +77,10 @@ func (mr *MockCardAppMockRecorder) Delete(in interface{}) *gomock.Call {
 }
 
 // Get mocks base method.
-func (m *MockCardApp) Get(in card.DataCardGet) (card.DataCard, error) {
+func (m *MockCardApp) Get(in card.DataCardGet) (card.DataCardFull, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Get", in)
-	ret0, _ := ret[0].(card.DataCard)
+	ret0, _ := ret[0].(card.DataCardFull)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

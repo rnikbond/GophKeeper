@@ -22,3 +22,12 @@ CREATE TABLE IF NOT EXISTS text_data (
     meta         CHARACTER VARYING(50) UNIQUE NOT NULL,
     text         TEXT
 );
+
+CREATE TABLE IF NOT EXISTS card_data (
+    id            SERIAL PRIMARY KEY,
+    meta          CHARACTER VARYING(50) UNIQUE NOT NULL,
+    num           CHARACTER VARYING(16),
+    period_dt     CHARACTER VARYING(7),
+    cvv           CHARACTER VARYING(3),
+    full_name     TEXT
+);

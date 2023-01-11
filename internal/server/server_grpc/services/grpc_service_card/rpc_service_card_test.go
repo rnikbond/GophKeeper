@@ -127,7 +127,7 @@ func TestCardServiceRPC_Create(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 
-			data := card.DataCard{
+			data := card.DataCardFull{
 				MetaInfo: tt.in.MetaInfo,
 				Number:   tt.in.Number,
 				Period:   tt.in.Period,
@@ -260,7 +260,7 @@ func TestCardServiceRPC_Change(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 
-			data := card.DataCard{
+			data := card.DataCardFull{
 				MetaInfo: tt.in.MetaInfo,
 				Number:   tt.in.Number,
 				Period:   tt.in.Period,
@@ -351,7 +351,7 @@ func TestCardServiceRPC_Get(t *testing.T) {
 		name     string
 		in       *pb.GetRequest
 		out      *pb.GetResponse
-		outApp   card.DataCard
+		outApp   card.DataCardFull
 		errApp   error
 		wantErr  bool
 		wantCode codes.Code
@@ -367,7 +367,7 @@ func TestCardServiceRPC_Get(t *testing.T) {
 				CVV:      "111",
 				FullName: "Test Test",
 			},
-			outApp: card.DataCard{
+			outApp: card.DataCardFull{
 				Number:   "4648289760410976",
 				Period:   "10.2030",
 				CVV:      "111",
@@ -382,7 +382,7 @@ func TestCardServiceRPC_Get(t *testing.T) {
 				MetaInfo: "MirPay",
 			},
 			out:      &pb.GetResponse{},
-			outApp:   card.DataCard{},
+			outApp:   card.DataCardFull{},
 			errApp:   errs.ErrNotFound,
 			wantErr:  true,
 			wantCode: codes.NotFound,

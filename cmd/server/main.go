@@ -16,12 +16,11 @@ import (
 	"GophKeeper/internal/storage/credential_store"
 	"GophKeeper/internal/storage/text_store"
 	"fmt"
+	_ "github.com/golang-migrate/migrate/v4/source/file"
+	_ "github.com/lib/pq"
 	"os"
 	"os/signal"
 	"syscall"
-
-	_ "github.com/golang-migrate/migrate/v4/source/file"
-	_ "github.com/lib/pq"
 
 	"go.uber.org/zap"
 
@@ -67,9 +66,7 @@ func main() {
 		textStore = text_store.NewPostgresStorage(db)
 		binStore = binary_store.NewPostgresStorage(db)
 		credStore = credential_store.NewPostgresStorage(db)
-
-		cardStore = card_store.NewMemoryStorage()
-
+		cardStore = card_store.NewPostgresStorage(db)
 	} else {
 		authStore = auth_store.NewMemoryStorage()
 		credStore = credential_store.NewMemoryStorage()

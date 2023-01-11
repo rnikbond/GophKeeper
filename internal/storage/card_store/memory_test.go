@@ -1,19 +1,12 @@
 package card_store
 
 import (
-	"testing"
-	"time"
-
 	"github.com/stretchr/testify/require"
+	"testing"
 
 	"GophKeeper/internal/model/card"
 	"GophKeeper/pkg/errs"
 )
-
-func getTime(value string) time.Time {
-	t, _ := time.Parse("01.2006", value)
-	return t
-}
 
 func TestCardStore_Memory(t *testing.T) {
 
@@ -22,7 +15,7 @@ func TestCardStore_Memory(t *testing.T) {
 	testDataOK := card.DataCardFull{
 		MetaInfo: "MirPay",
 		Number:   "4648289760410976",
-		Period:   getTime("10.2030"),
+		Period:   "10.2030",
 		CVV:      "111",
 		FullName: "Test Test",
 	}
@@ -30,7 +23,7 @@ func TestCardStore_Memory(t *testing.T) {
 	testDataChange := card.DataCardFull{
 		MetaInfo: "MirPay",
 		Number:   "4648289760410976",
-		Period:   getTime("11.2030"),
+		Period:   "11.2030",
 		CVV:      "111",
 		FullName: "Test Test",
 	}

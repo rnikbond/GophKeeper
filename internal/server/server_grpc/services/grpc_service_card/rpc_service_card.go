@@ -34,7 +34,7 @@ func NewCardServiceRPC(cardApp app_service_card.CardApp) *CardServiceRPC {
 // Create - Добавление новых данных.
 func (serv *CardServiceRPC) Create(ctx context.Context, in *card_store.CreateRequest) (*card_store.Empty, error) {
 
-	data := card.DataCard{
+	data := card.DataCardFull{
 		MetaInfo: in.MetaInfo,
 		Number:   in.Number,
 		Period:   in.Period,
@@ -42,7 +42,6 @@ func (serv *CardServiceRPC) Create(ctx context.Context, in *card_store.CreateReq
 		FullName: in.FullName,
 	}
 
-	// TODO :: errors.Is(...)
 	err := serv.cardApp.Create(data)
 	if err != nil {
 
@@ -70,7 +69,7 @@ func (serv *CardServiceRPC) Create(ctx context.Context, in *card_store.CreateReq
 // Change - Изменение существующих данных.
 func (serv *CardServiceRPC) Change(ctx context.Context, in *card_store.ChangeRequest) (*card_store.Empty, error) {
 
-	data := card.DataCard{
+	data := card.DataCardFull{
 		MetaInfo: in.MetaInfo,
 		Number:   in.Number,
 		Period:   in.Period,
