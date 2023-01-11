@@ -66,8 +66,8 @@ func main() {
 		authStore = auth_store.NewPostgresStorage(db)
 		textStore = text_store.NewPostgresStorage(db)
 		binStore = binary_store.NewPostgresStorage(db)
+		credStore = credential_store.NewPostgresStorage(db)
 
-		credStore = credential_store.NewMemoryStorage()
 		cardStore = card_store.NewMemoryStorage()
 
 	} else {
