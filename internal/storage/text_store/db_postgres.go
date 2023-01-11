@@ -13,16 +13,16 @@ import (
 )
 
 var (
-	queryInsertText = `INSERT INTO text_data (meta, text) 
-                       VALUES ($1, $2)`
-	queryDeleteText = `DELETE FROM text_data 
-                        WHERE meta = $1`
-	queryUpdateText = `UPDATE text_data
-                       SET text = $1
-                       WHERE meta = $2`
-	queryGetText = `SELECT text
-                    FROM text_data 
-                    WHERE meta = $1`
+	queryInsert = `INSERT INTO text_data (meta, text) 
+                   VALUES ($1, $2)`
+	queryDelete = `DELETE FROM text_data 
+                   WHERE meta = $1`
+	queryUpdate = `UPDATE text_data
+                   SET text = $1
+                   WHERE meta = $2`
+	queryGet = `SELECT text
+                FROM text_data 
+                WHERE meta = $1`
 )
 
 type PostgresStorage struct {
@@ -41,7 +41,7 @@ func NewPostgresStorage(db *sqlx.DB) *PostgresStorage {
 // Create Создание новых текстовых данных.
 func (store *PostgresStorage) Create(data text.DataTextFull) error {
 
-	if _, err := store.db.ExecContext(context.Background(), queryInsertText, data.MetaInfo, data.Text); err != nil {
+	if _, err := store.db.ExecContext(context.Background(), queryInsert, data.MetaInfo, data.Text); err != nil {
 
 		pqErr := err.(*pq.Error)
 		if pqErr.Code == "23505" {
@@ -58,7 +58,7 @@ func (store *PostgresStorage) Create(data text.DataTextFull) error {
 // Delete Удаление текстовых данных.
 func (store *PostgresStorage) Delete(in text.DataTextGet) error {
 
-	res, err := store.db.ExecContext(context.Background(), queryDeleteText, in.MetaInfo)
+	res, err := store.db.ExecContext(context.Background(), queryDelete, in.MetaInfo)
 	if err != nil {
 		pqErr := err.(*pq.Error)
 		err = fmt.Errorf("pg error on DELETE: %s. %v", pqErr.Code.Name(), err)
@@ -76,7 +76,7 @@ func (store *PostgresStorage) Delete(in text.DataTextGet) error {
 // Change Изменение текстовых данных.
 func (store *PostgresStorage) Change(in text.DataTextFull) error {
 
-	res, err := store.db.ExecContext(context.Background(), queryUpdateText, in.Text, in.MetaInfo)
+	res, err := store.db.ExecContext(context.Background(), queryUpdate, in.Text, in.MetaInfo)
 	if err != nil {
 		pqErr := err.(*pq.Error)
 		err = fmt.Errorf("pg error on UPDATE: %s. %v", pqErr.Code.Name(), err)
@@ -94,7 +94,7 @@ func (store *PostgresStorage) Change(in text.DataTextFull) error {
 // Get Получение текстовых данных по метаинформации.
 func (store *PostgresStorage) Get(in text.DataTextGet) (text.DataTextFull, error) {
 
-	row := store.db.QueryRowContext(context.Background(), queryGetText, in.MetaInfo)
+	row := store.db.QueryRowContext(context.Background(), queryGet, in.MetaInfo)
 
 	var data string
 	if err := row.Scan(&data); err != nil {

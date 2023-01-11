@@ -13,16 +13,16 @@ import (
 )
 
 var (
-	queryInsertData = `INSERT INTO bin_data (meta, bytes) 
-                       VALUES ($1, $2)`
-	queryDeleteData = `DELETE FROM bin_data 
-                        WHERE meta = $1`
-	queryUpdateData = `UPDATE bin_data
-                       SET bytes = $1
-                       WHERE meta = $2`
-	queryGetData = `SELECT bytes
-                    FROM bin_data 
-                    WHERE meta = $1`
+	queryInsert = `INSERT INTO bin_data (meta, bytes) 
+                   VALUES ($1, $2)`
+	queryDelete = `DELETE FROM bin_data 
+                   WHERE meta = $1`
+	queryUpdate = `UPDATE bin_data
+                   SET bytes = $1
+                   WHERE meta = $2`
+	queryGet = `SELECT bytes
+                FROM bin_data 
+                WHERE meta = $1`
 )
 
 type PostgresStorage struct {
@@ -41,7 +41,7 @@ func NewPostgresStorage(db *sqlx.DB) *PostgresStorage {
 // Create Создание новых бинарных данных.
 func (store *PostgresStorage) Create(data binary.DataFull) error {
 
-	if _, err := store.db.ExecContext(context.Background(), queryInsertData, data.MetaInfo, data.Bytes); err != nil {
+	if _, err := store.db.ExecContext(context.Background(), queryInsert, data.MetaInfo, data.Bytes); err != nil {
 
 		pqErr := err.(*pq.Error)
 		if pqErr.Code == "23505" {
@@ -58,7 +58,7 @@ func (store *PostgresStorage) Create(data binary.DataFull) error {
 // Delete Удаление бинарных данных.
 func (store *PostgresStorage) Delete(in binary.DataGet) error {
 
-	res, err := store.db.ExecContext(context.Background(), queryDeleteData, in.MetaInfo)
+	res, err := store.db.ExecContext(context.Background(), queryDelete, in.MetaInfo)
 	if err != nil {
 		pqErr := err.(*pq.Error)
 		err = fmt.Errorf("pg error on DELETE: %s. %v", pqErr.Code.Name(), err)
@@ -76,7 +76,7 @@ func (store *PostgresStorage) Delete(in binary.DataGet) error {
 // Change Изменение бинарных данных.
 func (store *PostgresStorage) Change(in binary.DataFull) error {
 
-	res, err := store.db.ExecContext(context.Background(), queryUpdateData, in.Bytes, in.MetaInfo)
+	res, err := store.db.ExecContext(context.Background(), queryUpdate, in.Bytes, in.MetaInfo)
 	if err != nil {
 		pqErr := err.(*pq.Error)
 		err = fmt.Errorf("pg error on UPDATE: %s. %v", pqErr.Code.Name(), err)
@@ -94,7 +94,7 @@ func (store *PostgresStorage) Change(in binary.DataFull) error {
 // Get Получение бинарных данных по метаинформации.
 func (store *PostgresStorage) Get(in binary.DataGet) (binary.DataFull, error) {
 
-	row := store.db.QueryRowContext(context.Background(), queryGetData, in.MetaInfo)
+	row := store.db.QueryRowContext(context.Background(), queryGet, in.MetaInfo)
 
 	var data []byte
 	if err := row.Scan(&data); err != nil {

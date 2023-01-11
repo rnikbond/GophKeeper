@@ -145,7 +145,7 @@ func (c ClientGRPC) CreateText() error {
 	ctx := metadata.NewOutgoingContext(context.Background(), md)
 
 	_, err := c.rpcTextClient.Create(ctx, &text_store.CreateRequest{
-		MetaInfo: "book3211231",
+		MetaInfo: "book",
 		Text:     "123123123123asd",
 	})
 
