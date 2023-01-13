@@ -44,6 +44,8 @@ func (c *AuthService) SignIn() error {
 			switch e.Code() {
 			case codes.NotFound:
 				return errs.ErrNotFound
+			case codes.InvalidArgument:
+				return errs.ErrInvalidArgument
 			case codes.Internal:
 				return errs.ErrInternal
 			}
@@ -73,8 +75,6 @@ func (c *AuthService) SignUp() error {
 			switch e.Code() {
 			case codes.AlreadyExists:
 				return errs.ErrAlreadyExist
-			case codes.InvalidArgument:
-				return errs.ErrInvalidArgument
 			case codes.Internal:
 				return errs.ErrInternal
 			}

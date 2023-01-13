@@ -77,7 +77,7 @@ func (serv *AuthServiceRPC) Login(ctx context.Context, in *pb.AuthRequest) (*pb.
 		}
 
 		if errors.Is(err, app_service_auth.ErrInvalidPassword) {
-			return nil, status.Error(codes.Unauthenticated, err.Error())
+			return nil, status.Error(codes.InvalidArgument, err.Error())
 		}
 
 		return nil, status.Error(codes.Internal, errs.ErrInternal.Error())

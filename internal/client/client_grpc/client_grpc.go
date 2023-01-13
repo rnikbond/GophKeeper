@@ -106,6 +106,8 @@ func (c *ClientGRPC) showStartMenu() bool {
 
 				if errors.Is(err, errs.ErrNotFound) {
 					fmt.Println("Пользователь не найден")
+				} else if errors.Is(err, errs.ErrInvalidArgument) {
+					fmt.Println("Неверный логин или пароль")
 				} else {
 					fmt.Println("Внутренняя ошибка сервиса")
 					c.logger.Fatal("failed sing in", zap.Error(err))
