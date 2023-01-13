@@ -47,8 +47,10 @@ func (serv *AuthServiceRPC) Register(ctx context.Context, in *pb.AuthRequest) (*
 			return nil, status.Error(codes.AlreadyExists, err.Error())
 		}
 
-		if errors.Is(err, app_service_auth.ErrInvalidPassword) {
-			return nil, status.Error(codes.Unauthenticated, err.Error())
+		if errors.Is(err, app_service_auth.ErrInvalidPassword) ||
+			errors.Is(err, app_service_auth.ErrShortPassword) ||
+			errors.Is(err, app_service_auth.ErrInvalidEmail) {
+			return nil, status.Error(codes.InvalidArgument, err.Error())
 		}
 
 		return nil, status.Error(codes.Internal, errs.ErrInternal.Error())

@@ -1,125 +1,56 @@
 package main
 
 import (
-	"fmt"
-	"os"
-	"os/signal"
-	"syscall"
-
-	"go.uber.org/zap"
-
-	"GophKeeper/internal/client/clientgrpc"
+	clientGrpc "GophKeeper/internal/client/client_grpc"
+	"GophKeeper/internal/client/client_grpc/services/auth_service"
+	"GophKeeper/internal/client/client_grpc/services/text_service"
 	"GophKeeper/internal/server"
 	"GophKeeper/pkg/logzap"
+	"go.uber.org/zap"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
-var (
-	_ = (*clientgrpc.ClientGRPC)(nil)
-)
-
-var (
-	buildVersion = "N/A"
-	buildDate    = "N/A"
-	buildCommit  = "N/A"
-)
+//
+//var (
+//	_ = (*clientgrpc.ClientGRPC)(nil)
+//)
+//
+//var (
+//	buildVersion = "N/A"
+//	buildDate    = "N/A"
+//	buildCommit  = "N/A"
+//)
 
 func main() {
 
 	logzap.ConfigZapLogger()
 
 	logger := zap.L()
-
 	cfg := newConfig()
-	cli := newClient(cfg)
 
-	if err := cli.Connect(); err != nil {
-		logger.Fatal("connection error", zap.Error(err))
+	conn, err := grpc.Dial(cfg.AddrGRPC, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		logger.Fatal("failed gRPC connect", zap.Error(err))
 	}
 
-	if err := cli.Login(); err != nil {
+	cli := newClient(conn)
+	cli.Start()
 
-		if err = cli.Register(); err != nil {
-			logger.Error("register error", zap.Error(err))
-		}
-
-		logger.Info("success Register and Login")
-	} else {
-		logger.Info("success Login")
+	if err := conn.Close(); err != nil {
+		logger.Fatal("failed gRPC disconnect", zap.Error(err))
 	}
 
-	if err := cli.ChangePassword(); err != nil {
-		logger.Error("error change password", zap.Error(err))
-	} else {
-		logger.Info("success change password")
-	}
-
-	if err := cli.CreatePairCred(); err != nil {
-		logger.Error("error create credential data", zap.Error(err))
-	} else {
-		logger.Info("success create credential data")
-	}
-
-	if _, err := cli.FindPairCred(); err != nil {
-		logger.Error("error find credential data", zap.Error(err))
-	} else {
-		logger.Info("success find credential data")
-	}
-
-	if err := cli.CreateBinary(); err != nil {
-		logger.Error("error create binary data", zap.Error(err))
-	} else {
-		logger.Info("success create binary data")
-	}
-
-	if _, err := cli.FindBinary(); err != nil {
-		logger.Error("error find binary data", zap.Error(err))
-	} else {
-		logger.Info("success find binary data")
-	}
-
-	if err := cli.CreateText(); err != nil {
-		logger.Error("error create text data", zap.Error(err))
-	} else {
-		logger.Info("success create text data")
-	}
-
-	if _, err := cli.FindText(); err != nil {
-		logger.Error("error find text data", zap.Error(err))
-	} else {
-		logger.Info("success find text data")
-	}
-
-	if err := cli.CreateCard(); err != nil {
-		logger.Error("error create card", zap.Error(err))
-	} else {
-		logger.Info("success create card")
-	}
-
-	if _, err := cli.FindText(); err != nil {
-		logger.Error("error find card", zap.Error(err))
-	} else {
-		logger.Info("success find card")
-	}
-
-	done := make(chan os.Signal)
-	signal.Notify(done, syscall.SIGTERM, syscall.SIGINT, syscall.SIGQUIT)
-	<-done
-
-	if err := cli.Disconnect(); err != nil {
-		logger.Error("could not disconnect", zap.Error(err))
-	}
-
-	logger.Info("Goodbye...")
 }
 
-func init() {
+//func init() {
+//
+//	fmt.Printf("Build version: %s\n", buildVersion)
+//	fmt.Printf("Build date: %s\n", buildDate)
+//	fmt.Printf("Build commit: %s\n", buildCommit)
+//}
+//
 
-	fmt.Printf("Build version: %s\n", buildVersion)
-	fmt.Printf("Build date: %s\n", buildDate)
-	fmt.Printf("Build commit: %s\n", buildCommit)
-}
-
-// newServer Создание объекта конфигурации
 func newConfig() *server.Config {
 	cfg := server.NewConfig()
 	if err := cfg.ParseArgs(); err != nil {
@@ -130,8 +61,10 @@ func newConfig() *server.Config {
 	return cfg
 }
 
-// newClient Создание объекта клиента
-func newClient(cfg *server.Config) *clientgrpc.ClientGRPC {
+func newClient(conn *grpc.ClientConn) *clientGrpc.ClientGRPC {
 
-	return clientgrpc.NewClient(cfg.AddrGRPC)
+	authServ := auth_service.NewService(conn)
+	textServ := text_service.NewService(conn)
+
+	return clientGrpc.NewClient(authServ, clientGrpc.WithTextService(textServ))
 }

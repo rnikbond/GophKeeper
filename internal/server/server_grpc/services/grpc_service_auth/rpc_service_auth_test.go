@@ -135,7 +135,7 @@ func TestAuthServiceRPC_Register(t *testing.T) {
 				Password: "testPassword",
 			},
 			wantErr:  true,
-			wantCode: codes.Unauthenticated,
+			wantCode: codes.InvalidArgument,
 			errApp:   app_service_auth.ErrInvalidPassword,
 		},
 	}

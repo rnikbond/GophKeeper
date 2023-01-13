@@ -10,10 +10,10 @@ import (
 	"GophKeeper/pkg/proto/text"
 	"context"
 	"fmt"
-
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/metadata"
+	"os"
 
 	"GophKeeper/internal/model/cred"
 	pbAuth "GophKeeper/pkg/proto/auth"
@@ -37,14 +37,18 @@ func NewClient(addr string) *ClientGRPC {
 }
 
 func (c *ClientGRPC) Login() error {
-	resp, err := c.rpcAuthClient.Login(context.Background(), &pbAuth.AuthRequest{
-		Email:    "rnikbond@yandex.ru",
-		Password: "qwerty123",
-	})
 
-	if resp != nil {
+	auth := &pbAuth.AuthRequest{}
+
+	fmt.Print("Email: ")
+	fmt.Fscan(os.Stdin, &auth.Email)
+
+	fmt.Print("Пароль: ")
+	fmt.Fscan(os.Stdin, &auth.Password)
+
+	resp, err := c.rpcAuthClient.Login(context.Background(), auth)
+	if err == nil && resp != nil {
 		c.token = resp.Token
-		fmt.Printf("token: %s\n", resp.Token)
 	}
 
 	return err
