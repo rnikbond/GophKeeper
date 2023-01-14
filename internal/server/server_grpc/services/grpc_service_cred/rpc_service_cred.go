@@ -35,9 +35,9 @@ func NewCredServiceRPC(credApp app_service_credential.CredentialApp) *CredServic
 func (serv *CredServiceRPC) Create(ctx context.Context, in *credential.CreateRequest) (*credential.Empty, error) {
 
 	data := cred.CredentialFull{
-		Email:    in.Email,
 		MetaInfo: in.MetaInfo,
-		Password: in.Password,
+		Email:    string(in.Email),
+		Password: string(in.Password),
 	}
 
 	err := serv.credApp.Create(data)
@@ -48,9 +48,9 @@ func (serv *CredServiceRPC) Create(ctx context.Context, in *credential.CreateReq
 
 		serv.logger.Error("failed create credential data",
 			zap.Error(err),
-			zap.String("email", in.Email),
 			zap.String("meta", in.MetaInfo),
-			zap.String("pwd", in.Password))
+			zap.String("email", string(in.Email)),
+			zap.String("pwd", string(in.Password)))
 
 		return &credential.Empty{}, status.Errorf(codes.Internal, errs.ErrInternal.Error())
 	}
@@ -62,9 +62,9 @@ func (serv *CredServiceRPC) Create(ctx context.Context, in *credential.CreateReq
 func (serv *CredServiceRPC) Change(ctx context.Context, in *credential.ChangeRequest) (*credential.Empty, error) {
 
 	data := cred.CredentialFull{
-		Email:    in.Email,
 		MetaInfo: in.MetaInfo,
-		Password: in.Password,
+		Email:    string(in.Email),
+		Password: string(in.Password),
 	}
 
 	err := serv.credApp.Change(data)
@@ -75,9 +75,9 @@ func (serv *CredServiceRPC) Change(ctx context.Context, in *credential.ChangeReq
 
 		serv.logger.Error("failed change credential data",
 			zap.Error(err),
-			zap.String("email", in.Email),
 			zap.String("meta", in.MetaInfo),
-			zap.String("pwd", in.Password))
+			zap.String("email", string(in.Email)),
+			zap.String("pwd", string(in.Password)))
 
 		return &credential.Empty{}, status.Errorf(codes.Internal, errs.ErrInternal.Error())
 	}
@@ -89,7 +89,6 @@ func (serv *CredServiceRPC) Change(ctx context.Context, in *credential.ChangeReq
 func (serv *CredServiceRPC) Delete(ctx context.Context, in *credential.DeleteRequest) (*credential.Empty, error) {
 
 	data := cred.CredentialGet{
-		Email:    in.Email,
 		MetaInfo: in.MetaInfo,
 	}
 
@@ -101,7 +100,6 @@ func (serv *CredServiceRPC) Delete(ctx context.Context, in *credential.DeleteReq
 
 		serv.logger.Error("failed delete credential data",
 			zap.Error(err),
-			zap.String("email", in.Email),
 			zap.String("meta", in.MetaInfo))
 
 		return &credential.Empty{}, status.Errorf(codes.Internal, errs.ErrInternal.Error())
@@ -114,7 +112,6 @@ func (serv *CredServiceRPC) Delete(ctx context.Context, in *credential.DeleteReq
 func (serv *CredServiceRPC) Get(ctx context.Context, in *credential.GetRequest) (*credential.GetResponse, error) {
 
 	inData := cred.CredentialGet{
-		Email:    in.Email,
 		MetaInfo: in.MetaInfo,
 	}
 
@@ -126,16 +123,14 @@ func (serv *CredServiceRPC) Get(ctx context.Context, in *credential.GetRequest) 
 
 		serv.logger.Error("failed get credential data",
 			zap.Error(err),
-			zap.String("email", in.Email),
 			zap.String("meta", in.MetaInfo))
 
 		return &credential.GetResponse{}, status.Errorf(codes.Internal, errs.ErrInternal.Error())
 	}
 
 	out := &credential.GetResponse{
-		Email:    data.Email,
-		MetaInfo: data.MetaInfo,
-		Password: data.Password,
+		Email:    []byte(data.Email),
+		Password: []byte(data.Password),
 	}
 
 	return out, nil

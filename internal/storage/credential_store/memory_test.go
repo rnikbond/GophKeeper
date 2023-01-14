@@ -26,12 +26,10 @@ func TestCredentialStore_Memory(t *testing.T) {
 	}
 
 	testDataGet := cred.CredentialGet{
-		Email:    "test@email.com",
 		MetaInfo: "www.ololo.com",
 	}
 
 	testDataFail := cred.CredentialGet{
-		Email:    "test@email.com",
 		MetaInfo: "www.test.com",
 	}
 

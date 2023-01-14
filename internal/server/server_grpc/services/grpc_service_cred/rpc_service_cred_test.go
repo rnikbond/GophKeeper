@@ -34,9 +34,9 @@ func TestCredServiceRPC_Create(t *testing.T) {
 		{
 			name: "Success",
 			in: &pb.CreateRequest{
-				Email:    "test@email.com",
 				MetaInfo: "www.test.ru",
-				Password: "testPwd",
+				Email:    []byte("test@email.com"),
+				Password: []byte("testPwd"),
 			},
 			errApp:  nil,
 			wantErr: false,
@@ -44,9 +44,9 @@ func TestCredServiceRPC_Create(t *testing.T) {
 		{
 			name: "Already exist",
 			in: &pb.CreateRequest{
-				Email:    "test@email.com",
 				MetaInfo: "www.test.ru",
-				Password: "testPwd",
+				Email:    []byte("test@email.com"),
+				Password: []byte("testPwd"),
 			},
 			errApp:   errs.ErrAlreadyExist,
 			wantErr:  true,
@@ -55,9 +55,9 @@ func TestCredServiceRPC_Create(t *testing.T) {
 		{
 			name: "Anomaly app service",
 			in: &pb.CreateRequest{
-				Email:    "test@email.com",
 				MetaInfo: "www.test.ru",
-				Password: "testPwd",
+				Email:    []byte("test@email.com"),
+				Password: []byte("testPwd"),
 			},
 			errApp:   fmt.Errorf("unknown error"),
 			wantErr:  true,
@@ -69,9 +69,9 @@ func TestCredServiceRPC_Create(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 
 			data := cred.CredentialFull{
-				Email:    tt.in.Email,
 				MetaInfo: tt.in.MetaInfo,
-				Password: tt.in.Password,
+				Email:    string(tt.in.Email),
+				Password: string(tt.in.Password),
 			}
 
 			credApp.EXPECT().Create(data).Return(tt.errApp)
@@ -107,9 +107,9 @@ func TestCredServiceRPC_Change(t *testing.T) {
 		{
 			name: "Success",
 			in: &pb.ChangeRequest{
-				Email:    "test@email.com",
 				MetaInfo: "www.test.ru",
-				Password: "testPwd",
+				Email:    []byte("test@email.com"),
+				Password: []byte("testPwd"),
 			},
 			errApp:  nil,
 			wantErr: false,
@@ -117,9 +117,9 @@ func TestCredServiceRPC_Change(t *testing.T) {
 		{
 			name: "Not found",
 			in: &pb.ChangeRequest{
-				Email:    "test@email.com",
 				MetaInfo: "www.test.ru",
-				Password: "testPwd",
+				Email:    []byte("test@email.com"),
+				Password: []byte("testPwd"),
 			},
 			errApp:   errs.ErrNotFound,
 			wantErr:  true,
@@ -128,9 +128,9 @@ func TestCredServiceRPC_Change(t *testing.T) {
 		{
 			name: "Anomaly app service",
 			in: &pb.ChangeRequest{
-				Email:    "test@email.com",
 				MetaInfo: "www.test.ru",
-				Password: "testPwd",
+				Email:    []byte("test@email.com"),
+				Password: []byte("testPwd"),
 			},
 			errApp:   fmt.Errorf("unknown error"),
 			wantErr:  true,
@@ -142,9 +142,9 @@ func TestCredServiceRPC_Change(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 
 			data := cred.CredentialFull{
-				Email:    tt.in.Email,
 				MetaInfo: tt.in.MetaInfo,
-				Password: tt.in.Password,
+				Email:    string(tt.in.Email),
+				Password: string(tt.in.Password),
 			}
 
 			credApp.EXPECT().Change(data).Return(tt.errApp)
@@ -180,7 +180,6 @@ func TestCredServiceRPC_Delete(t *testing.T) {
 		{
 			name: "Success",
 			in: &pb.DeleteRequest{
-				Email:    "test@email.com",
 				MetaInfo: "www.test.ru",
 			},
 			errApp:  nil,
@@ -189,7 +188,6 @@ func TestCredServiceRPC_Delete(t *testing.T) {
 		{
 			name: "Not found",
 			in: &pb.DeleteRequest{
-				Email:    "test@email.com",
 				MetaInfo: "www.test.ru",
 			},
 			errApp:   errs.ErrNotFound,
@@ -199,7 +197,6 @@ func TestCredServiceRPC_Delete(t *testing.T) {
 		{
 			name: "Anomaly app service",
 			in: &pb.DeleteRequest{
-				Email:    "test@email.com",
 				MetaInfo: "www.test.ru",
 			},
 			errApp:   fmt.Errorf("unknown error"),
@@ -212,7 +209,6 @@ func TestCredServiceRPC_Delete(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 
 			data := cred.CredentialGet{
-				Email:    tt.in.Email,
 				MetaInfo: tt.in.MetaInfo,
 			}
 
@@ -250,13 +246,11 @@ func TestCredServiceRPC_Get(t *testing.T) {
 		{
 			name: "Success",
 			in: &pb.GetRequest{
-				Email:    "test@email.com",
 				MetaInfo: "www.test.ru",
 			},
 			out: &pb.GetResponse{
-				Email:    "test@email.com",
-				MetaInfo: "www.test.ru",
-				Password: "testPwd",
+				Email:    []byte("test@email.com"),
+				Password: []byte("testPwd"),
 			},
 			errApp:  nil,
 			wantErr: false,
@@ -264,7 +258,6 @@ func TestCredServiceRPC_Get(t *testing.T) {
 		{
 			name: "Not found",
 			in: &pb.GetRequest{
-				Email:    "test@email.com",
 				MetaInfo: "www.test.ru",
 			},
 			errApp:   errs.ErrNotFound,
@@ -274,7 +267,6 @@ func TestCredServiceRPC_Get(t *testing.T) {
 		{
 			name: "Anomaly app service",
 			in: &pb.GetRequest{
-				Email:    "test@email.com",
 				MetaInfo: "www.test.ru",
 			},
 			errApp:   fmt.Errorf("unknown error"),
@@ -287,14 +279,17 @@ func TestCredServiceRPC_Get(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 
 			data := cred.CredentialGet{
-				Email:    tt.in.Email,
 				MetaInfo: tt.in.MetaInfo,
 			}
 
-			outApp := cred.CredentialFull{
-				Email:    tt.in.Email,
-				MetaInfo: tt.in.MetaInfo,
-				Password: "testPwd",
+			var outApp cred.CredentialFull
+
+			if tt.out != nil {
+				outApp = cred.CredentialFull{
+					MetaInfo: tt.in.MetaInfo,
+					Email:    string(tt.out.Email),
+					Password: string(tt.out.Password),
+				}
 			}
 
 			credApp.EXPECT().Get(data).Return(outApp, tt.errApp)

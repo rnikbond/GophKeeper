@@ -2,10 +2,12 @@ package main
 
 import (
 	"GophKeeper/internal/client/client_grpc/services/binary_service"
+	"GophKeeper/internal/client/client_grpc/services/cred_service"
 	"crypto/rsa"
 	"crypto/x509"
 	"encoding/pem"
 	"fmt"
+	"github.com/fatih/color"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -70,9 +72,9 @@ func newClient(conn *grpc.ClientConn, cfg *client.Config) *clientGrpc.ClientGRPC
 	privKey := privateKey(cfg.PrivateKey)
 
 	if pubKey != nil && privKey != nil {
-		fmt.Println("Encoding data: enabled")
+		color.Green("Encoding data: enabled")
 	} else {
-		fmt.Println("Encoding data: disabled")
+		color.Yellow("Encoding data: disabled")
 	}
 
 	//reader := bufio.NewReader(os.Stdin)
@@ -87,11 +89,13 @@ func newClient(conn *grpc.ClientConn, cfg *client.Config) *clientGrpc.ClientGRPC
 	authServ := auth_service.NewService(conn, auth_service.WithSalt(cfg.Salt))
 	textServ := text_service.NewService(conn, text_service.WithPublicKey(pubKey), text_service.WithPrivateKey(privKey))
 	binServ := binary_service.NewService(conn, binary_service.WithPublicKey(pubKey), binary_service.WithPrivateKey(privKey))
+	credServ := cred_service.NewService(conn, cred_service.WithPublicKey(pubKey), cred_service.WithPrivateKey(privKey))
 
 	return clientGrpc.NewClient(
 		authServ,
 		clientGrpc.WithService(textServ),
-		clientGrpc.WithService(binServ))
+		clientGrpc.WithService(binServ),
+		clientGrpc.WithService(credServ))
 }
 
 func publicKey(key []byte) *rsa.PublicKey {

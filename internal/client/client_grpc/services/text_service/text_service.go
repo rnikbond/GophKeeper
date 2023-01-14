@@ -123,7 +123,7 @@ func (serv TextService) ShowMenu() error {
 					color.Red("Такие данные не найдены")
 				} else {
 					serv.logger.Error("failed delete text data", zap.Error(err))
-					color.Red("Внутренняя ошибка при удалиении данных")
+					color.Red("Внутренняя ошибка при удалении данных")
 				}
 			} else {
 				color.Green("Данные успешно удалены")
@@ -147,46 +147,18 @@ func (serv TextService) ShowMenu() error {
 
 func (serv TextService) Create() error {
 
-	reader := bufio.NewReader(os.Stdin)
+	meta := serv.getInput("Метаинформация: ")
+	data := serv.getInputEncode("Текст: ")
 
-	fmt.Print("Метаинформация: ")
-	meta, _ := reader.ReadString('\n')
-	meta = strings.Replace(meta, "\n", "", -1)
-	meta = strings.Replace(meta, "\r", "", -1)
-
-	fmt.Print("Текст: ")
-	text, _ := reader.ReadString('\n')
-	text = strings.Replace(text, "\n", "", -1)
-	text = strings.Replace(text, "\r", "", -1)
-
-	// Выбрали путь к файлу
-	if _, err := os.Stat(text); err == nil {
-		fileData, errRead := ioutil.ReadFile(text)
-		if errRead != nil {
-			return errs.ErrNotFound
-		}
-
-		color.Cyan("Выбран файл")
-		text = string(fileData)
-	} else {
-		color.Cyan("Вы ввели данные вручную")
-	}
-
-	encodeData, errEncode := secret.Encrypt(serv.publicKey, []byte(text))
-	if errEncode != nil {
-		serv.logger.Error("failed crypt data", zap.Error(errEncode))
-		return errs.ErrInternal
-	}
-
-	data := &pb.CreateRequest{
+	dataReq := &pb.CreateRequest{
 		MetaInfo: meta,
-		Text:     encodeData,
+		Text:     data,
 	}
 
 	md := metadata.New(map[string]string{"token": serv.Token})
 	ctx := metadata.NewOutgoingContext(context.Background(), md)
 
-	_, err := serv.rpc.Create(ctx, data)
+	_, err := serv.rpc.Create(ctx, dataReq)
 	if err != nil {
 		if e, ok := status.FromError(err); ok {
 
@@ -206,12 +178,7 @@ func (serv TextService) Create() error {
 func (serv TextService) Get() (string, error) {
 
 	data := &pb.GetRequest{}
-	reader := bufio.NewReader(os.Stdin)
-
-	fmt.Print("Метаинформация: ")
-	data.MetaInfo, _ = reader.ReadString('\n')
-	data.MetaInfo = strings.Replace(data.MetaInfo, "\n", "", -1)
-	data.MetaInfo = strings.Replace(data.MetaInfo, "\r", "", -1)
+	data.MetaInfo = serv.getInput("Метаинформация: ")
 
 	md := metadata.New(map[string]string{"token": serv.Token})
 	ctx := metadata.NewOutgoingContext(context.Background(), md)
@@ -243,12 +210,7 @@ func (serv TextService) Get() (string, error) {
 func (serv TextService) Delete() error {
 
 	data := &pb.DeleteRequest{}
-	reader := bufio.NewReader(os.Stdin)
-
-	fmt.Print("Метаинформация: ")
-	data.MetaInfo, _ = reader.ReadString('\n')
-	data.MetaInfo = strings.Replace(data.MetaInfo, "\n", "", -1)
-	data.MetaInfo = strings.Replace(data.MetaInfo, "\r", "", -1)
+	data.MetaInfo = serv.getInput("Метаинформация: ")
 
 	md := metadata.New(map[string]string{"token": serv.Token})
 	ctx := metadata.NewOutgoingContext(context.Background(), md)
@@ -273,33 +235,18 @@ func (serv TextService) Delete() error {
 
 func (serv TextService) Change() error {
 
-	reader := bufio.NewReader(os.Stdin)
+	meta := serv.getInput("Метаинформация: ")
+	data := serv.getInputEncode("Текст: ")
 
-	fmt.Print("Метаинформация: ")
-	meta, _ := reader.ReadString('\n')
-	meta = strings.Replace(meta, "\n", "", -1)
-	meta = strings.Replace(meta, "\r", "", -1)
-
-	fmt.Print("Текст: ")
-	text, _ := reader.ReadString('\n')
-	text = strings.Replace(text, "\n", "", -1)
-	text = strings.Replace(text, "\r", "", -1)
-
-	encodeData, errEncode := secret.Encrypt(serv.publicKey, []byte(text))
-	if errEncode != nil {
-		serv.logger.Error("failed crypt data", zap.Error(errEncode))
-		return errs.ErrInternal
-	}
-
-	data := &pb.ChangeRequest{
+	dataReq := &pb.ChangeRequest{
 		MetaInfo: meta,
-		Text:     encodeData,
+		Text:     data,
 	}
 
 	md := metadata.New(map[string]string{"token": serv.Token})
 	ctx := metadata.NewOutgoingContext(context.Background(), md)
 
-	_, err := serv.rpc.Change(ctx, data)
+	_, err := serv.rpc.Change(ctx, dataReq)
 	if err != nil {
 		if e, ok := status.FromError(err); ok {
 			switch e.Code() {
@@ -314,6 +261,44 @@ func (serv TextService) Change() error {
 	}
 
 	return nil
+}
+
+func (serv TextService) getInput(title string) string {
+
+	reader := bufio.NewReader(os.Stdin)
+
+	fmt.Print(title)
+	data, _ := reader.ReadString('\n')
+	data = strings.Replace(data, "\n", "", -1)
+	data = strings.Replace(data, "\r", "", -1)
+
+	return data
+}
+
+func (serv TextService) getInputEncode(title string) []byte {
+
+	reader := bufio.NewReader(os.Stdin)
+
+	fmt.Print(title)
+	data, _ := reader.ReadString('\n')
+	data = strings.Replace(data, "\n", "", -1)
+	data = strings.Replace(data, "\r", "", -1)
+
+	// Выбрали путь к файлу
+	if _, err := os.Stat(data); err == nil {
+		fileData, errRead := ioutil.ReadFile(data)
+		if errRead != nil {
+			return nil
+		}
+
+		color.Cyan("Выбран файл")
+		data = string(fileData)
+	} else {
+		color.Cyan("Вы ввели данные вручную")
+	}
+
+	encodeData, _ := secret.Encrypt(serv.publicKey, []byte(data))
+	return encodeData
 }
 
 func (serv TextService) Name() string {

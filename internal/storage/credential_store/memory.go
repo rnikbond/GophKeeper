@@ -21,7 +21,7 @@ func (store *MemoryStorage) Create(data cred.CredentialFull) error {
 	store.mutex.Lock()
 	defer store.mutex.Unlock()
 
-	_, err := store.Find(data.Email, data.MetaInfo)
+	_, err := store.Find(data.MetaInfo)
 	if err == nil {
 		return errs.ErrAlreadyExist
 	}
@@ -35,7 +35,7 @@ func (store *MemoryStorage) Get(in cred.CredentialGet) (cred.CredentialFull, err
 	store.mutex.RLock()
 	defer store.mutex.RUnlock()
 
-	idx, err := store.Find(in.Email, in.MetaInfo)
+	idx, err := store.Find(in.MetaInfo)
 	if err != nil {
 		return cred.CredentialFull{}, err
 	}
@@ -48,7 +48,7 @@ func (store *MemoryStorage) Delete(in cred.CredentialGet) error {
 	store.mutex.Lock()
 	defer store.mutex.Unlock()
 
-	idx, err := store.Find(in.Email, in.MetaInfo)
+	idx, err := store.Find(in.MetaInfo)
 	if err != nil {
 		return err
 	}
@@ -65,7 +65,7 @@ func (store *MemoryStorage) Change(in cred.CredentialFull) error {
 	store.mutex.Lock()
 	defer store.mutex.Unlock()
 
-	idx, err := store.Find(in.Email, in.MetaInfo)
+	idx, err := store.Find(in.MetaInfo)
 	if err != nil {
 		return err
 	}
@@ -74,10 +74,10 @@ func (store *MemoryStorage) Change(in cred.CredentialFull) error {
 	return nil
 }
 
-func (store *MemoryStorage) Find(email, metaInfo string) (int, error) {
+func (store *MemoryStorage) Find(metaInfo string) (int, error) {
 
 	for idx, data := range store.creds {
-		if data.Email == email && data.MetaInfo == metaInfo {
+		if data.MetaInfo == metaInfo {
 			return idx, nil
 		}
 	}

@@ -1,8 +1,8 @@
-package binary_service
+package cred_service
 
 import (
 	"GophKeeper/pkg/errs"
-	pb "GophKeeper/pkg/proto/binary"
+	pb "GophKeeper/pkg/proto/credential"
 	"GophKeeper/pkg/secret"
 	"bufio"
 	"context"
@@ -15,15 +15,14 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
-	"io/ioutil"
 	"os"
 	"strings"
 )
 
-type BinaryOptions func(c *BinaryService)
+type CredOptions func(c *CredService)
 
-type BinaryService struct {
-	rpc        pb.BinaryServiceClient
+type CredService struct {
+	rpc        pb.CredentialServiceClient
 	logger     *zap.Logger
 	publicKey  *rsa.PublicKey
 	privateKey *rsa.PrivateKey
@@ -32,10 +31,10 @@ type BinaryService struct {
 }
 
 // NewService - Создание экземпляра сервиса для текстовых данных.
-func NewService(conn *grpc.ClientConn, opts ...BinaryOptions) *BinaryService {
+func NewService(conn *grpc.ClientConn, opts ...CredOptions) *CredService {
 
-	serv := &BinaryService{
-		rpc:    pb.NewBinaryServiceClient(conn),
+	serv := &CredService{
+		rpc:    pb.NewCredentialServiceClient(conn),
 		logger: zap.L(),
 	}
 
@@ -46,19 +45,19 @@ func NewService(conn *grpc.ClientConn, opts ...BinaryOptions) *BinaryService {
 	return serv
 }
 
-func WithPublicKey(key *rsa.PublicKey) BinaryOptions {
-	return func(serv *BinaryService) {
+func WithPublicKey(key *rsa.PublicKey) CredOptions {
+	return func(serv *CredService) {
 		serv.publicKey = key
 	}
 }
 
-func WithPrivateKey(key *rsa.PrivateKey) BinaryOptions {
-	return func(serv *BinaryService) {
+func WithPrivateKey(key *rsa.PrivateKey) CredOptions {
+	return func(serv *CredService) {
 		serv.privateKey = key
 	}
 }
 
-func (serv BinaryService) ShowMenu() error {
+func (serv CredService) ShowMenu() error {
 	if len(serv.Token) == 0 {
 		return fmt.Errorf("token is empty")
 	}
@@ -92,11 +91,9 @@ func (serv BinaryService) ShowMenu() error {
 			if err := serv.Create(); err != nil {
 				if errors.Is(err, errs.ErrAlreadyExist) {
 					color.Yellow("Такие данные уже существуют")
-				} else if errors.Is(err, errs.ErrNotFound) {
-					color.Yellow("Файл с бинарными данными не найден")
 				} else {
-					serv.logger.Error("failed create text data", zap.Error(err))
-					color.Red("Внутренняя ошибка при создании бинарных данных")
+					serv.logger.Error("failed create credential data", zap.Error(err))
+					color.Red("Внутренняя ошибка при создании данных авторизации")
 				}
 
 			} else {
@@ -105,7 +102,7 @@ func (serv BinaryService) ShowMenu() error {
 
 		case 2:
 
-			data, err := serv.Get()
+			login, pwd, err := serv.Get()
 			if err != nil {
 
 				if errors.Is(err, errs.ErrNotFound) {
@@ -115,7 +112,8 @@ func (serv BinaryService) ShowMenu() error {
 					color.Red("Внутренняя ошибка при поиске данные")
 				}
 			} else {
-				color.Cyan("Данные: %s", data)
+				color.Cyan("Логин : %s", login)
+				color.Cyan("Пароль: %s", pwd)
 			}
 
 		case 3:
@@ -147,14 +145,16 @@ func (serv BinaryService) ShowMenu() error {
 	}
 }
 
-func (serv BinaryService) Create() error {
+func (serv CredService) Create() error {
 
 	meta := serv.getInput("Метаинформация: ")
-	data := serv.getInputEncode("Данные: ")
+	login := serv.getInputEncode("Логин: ")
+	password := serv.getInputEncode("Пароль: ")
 
 	dataReq := &pb.CreateRequest{
 		MetaInfo: meta,
-		Data:     data,
+		Email:    login,
+		Password: password,
 	}
 
 	md := metadata.New(map[string]string{"token": serv.Token})
@@ -176,7 +176,7 @@ func (serv BinaryService) Create() error {
 	return nil
 }
 
-func (serv BinaryService) Get() (string, error) {
+func (serv CredService) Get() (string, string, error) {
 
 	data := &pb.GetRequest{}
 	data.MetaInfo = serv.getInput("Метаинформация: ")
@@ -190,25 +190,31 @@ func (serv BinaryService) Get() (string, error) {
 
 			switch e.Code() {
 			case codes.NotFound:
-				return ``, errs.ErrNotFound
+				return ``, ``, errs.ErrNotFound
 			}
 
-			return ``, fmt.Errorf("%d - %s %w", e.Code(), e.String(), errs.ErrInternal)
+			return ``, ``, fmt.Errorf("%d - %s %w", e.Code(), e.String(), errs.ErrInternal)
 		}
 
-		return ``, fmt.Errorf("%s %w", err.Error(), errs.ErrInternal)
+		return ``, ``, fmt.Errorf("%s %w", err.Error(), errs.ErrInternal)
 	}
 
-	dataDecrypt, errDecode := secret.Decrypt(serv.privateKey, resp.Data)
+	loginDecrypt, errDecode := secret.Decrypt(serv.privateKey, resp.Email)
 	if errDecode != nil {
 		serv.logger.Error("failed decrypt data", zap.Error(errDecode))
-		return ``, errs.ErrInternal
+		return ``, ``, errs.ErrInternal
 	}
 
-	return string(dataDecrypt), nil
+	passwordDecrypt, errDecode := secret.Decrypt(serv.privateKey, resp.Password)
+	if errDecode != nil {
+		serv.logger.Error("failed decrypt data", zap.Error(errDecode))
+		return ``, ``, errs.ErrInternal
+	}
+
+	return string(loginDecrypt), string(passwordDecrypt), nil
 }
 
-func (serv BinaryService) Delete() error {
+func (serv CredService) Delete() error {
 
 	data := &pb.DeleteRequest{}
 	data.MetaInfo = serv.getInput("Метаинформация: ")
@@ -234,14 +240,16 @@ func (serv BinaryService) Delete() error {
 	return nil
 }
 
-func (serv BinaryService) Change() error {
+func (serv CredService) Change() error {
 
 	meta := serv.getInput("Метаинформация: ")
-	data := serv.getInputEncode("Данные: ")
+	login := serv.getInputEncode("Логин: ")
+	password := serv.getInputEncode("Пароль: ")
 
 	dataReq := &pb.ChangeRequest{
 		MetaInfo: meta,
-		Data:     data,
+		Email:    login,
+		Password: password,
 	}
 
 	md := metadata.New(map[string]string{"token": serv.Token})
@@ -264,7 +272,7 @@ func (serv BinaryService) Change() error {
 	return nil
 }
 
-func (serv BinaryService) getInput(title string) string {
+func (serv CredService) getInput(title string) string {
 
 	reader := bufio.NewReader(os.Stdin)
 
@@ -276,7 +284,7 @@ func (serv BinaryService) getInput(title string) string {
 	return data
 }
 
-func (serv BinaryService) getInputEncode(title string) []byte {
+func (serv CredService) getInputEncode(title string) []byte {
 
 	reader := bufio.NewReader(os.Stdin)
 
@@ -285,27 +293,14 @@ func (serv BinaryService) getInputEncode(title string) []byte {
 	data = strings.Replace(data, "\n", "", -1)
 	data = strings.Replace(data, "\r", "", -1)
 
-	// Выбрали путь к файлу
-	if _, err := os.Stat(data); err == nil {
-		fileData, errRead := ioutil.ReadFile(data)
-		if errRead != nil {
-			return nil
-		}
-
-		color.Cyan("Выбран файл")
-		data = string(fileData)
-	} else {
-		color.Cyan("Вы ввели данные вручную")
-	}
-
 	encodeData, _ := secret.Encrypt(serv.publicKey, []byte(data))
 	return encodeData
 }
 
-func (serv BinaryService) Name() string {
-	return "Бинарные данные"
+func (serv CredService) Name() string {
+	return "Логины и пароли"
 }
 
-func (serv *BinaryService) SetToken(token string) {
+func (serv *CredService) SetToken(token string) {
 	serv.Token = token
 }
