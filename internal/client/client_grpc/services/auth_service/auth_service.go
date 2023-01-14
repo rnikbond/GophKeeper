@@ -48,16 +48,16 @@ func WithSalt(salt string) AuthOptions {
 func (c *AuthService) SignIn() error {
 
 	auth := &pbAuth.AuthRequest{}
-	reader := bufio.NewReader(os.Stdin)
+	//reader := bufio.NewReader(os.Stdin)
+	//
+	//fmt.Print("Email: ")
+	//auth.Email, _ = reader.ReadString('\n')
+	//
+	//fmt.Print("Пароль: ")
+	//auth.Password, _ = reader.ReadString('\n')
 
-	fmt.Print("Метаинформация: ")
-	auth.Email, _ = reader.ReadString('\n')
-
-	fmt.Print("Текст: ")
-	auth.Password, _ = reader.ReadString('\n')
-
-	//auth.Email = "test@mail.ru"
-	//auth.Password = "test"
+	auth.Email = "test@mail.ru"
+	auth.Password = "test"
 
 	auth.Password = secret.GeneratePasswordHash(auth.Password, c.salt)
 
@@ -85,10 +85,10 @@ func (c *AuthService) SignUp() error {
 	auth := &pbAuth.AuthRequest{}
 	reader := bufio.NewReader(os.Stdin)
 
-	fmt.Print("Метаинформация: ")
+	fmt.Print("Email: ")
 	auth.Email, _ = reader.ReadString('\n')
 
-	fmt.Print("Текст: ")
+	fmt.Print("Пароль: ")
 	auth.Password, _ = reader.ReadString('\n')
 
 	//auth.Email = "test@mail.ru"

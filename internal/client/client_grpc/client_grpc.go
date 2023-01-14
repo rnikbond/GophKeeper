@@ -46,7 +46,7 @@ func NewClient(auth *auth_service.AuthService, opts ...ClientOptions) *ClientGRP
 	return c
 }
 
-func WithTextService(serv services.IService) ClientOptions {
+func WithService(serv services.IService) ClientOptions {
 	return func(c *ClientGRPC) {
 		c.services = append(c.services, serv)
 	}
