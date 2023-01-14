@@ -1,4 +1,4 @@
-package app_service_card
+package card_service
 
 import "fmt"
 

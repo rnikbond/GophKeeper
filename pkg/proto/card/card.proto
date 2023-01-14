@@ -15,18 +15,18 @@ message Empty {}
 
 message CreateRequest {
   string metaInfo = 1;
-  string number   = 2;
-  string period   = 3;
-  string CVV      = 4;
-  string fullName = 5;
+  bytes  number   = 2;
+  bytes  period   = 3;
+  bytes  CVV      = 4;
+  bytes  fullName = 5;
 }
 
 message ChangeRequest {
   string metaInfo = 1;
-  string number   = 2;
-  string period   = 3;
-  string CVV      = 4;
-  string fullName = 5;
+  bytes  number   = 2;
+  bytes  period   = 3;
+  bytes  CVV      = 4;
+  bytes  fullName = 5;
 }
 
 message DeleteRequest {
@@ -38,10 +38,10 @@ message GetRequest {
 }
 
 message GetResponse {
-  string number   = 2;
-  string period   = 3;
-  string CVV      = 4;
-  string fullName = 5;
+  bytes number   = 1;
+  bytes period   = 2;
+  bytes CVV      = 3;
+  bytes fullName = 4;
 }
 
 /*

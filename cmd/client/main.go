@@ -2,6 +2,7 @@ package main
 
 import (
 	"GophKeeper/internal/client/client_grpc/services/binary_service"
+	"GophKeeper/internal/client/client_grpc/services/card_service"
 	"GophKeeper/internal/client/client_grpc/services/cred_service"
 	"crypto/rsa"
 	"crypto/x509"
@@ -90,12 +91,14 @@ func newClient(conn *grpc.ClientConn, cfg *client.Config) *clientGrpc.ClientGRPC
 	textServ := text_service.NewService(conn, text_service.WithPublicKey(pubKey), text_service.WithPrivateKey(privKey))
 	binServ := binary_service.NewService(conn, binary_service.WithPublicKey(pubKey), binary_service.WithPrivateKey(privKey))
 	credServ := cred_service.NewService(conn, cred_service.WithPublicKey(pubKey), cred_service.WithPrivateKey(privKey))
+	cardServ := card_service.NewService(conn, card_service.WithPublicKey(pubKey), card_service.WithPrivateKey(privKey))
 
 	return clientGrpc.NewClient(
 		authServ,
 		clientGrpc.WithService(textServ),
 		clientGrpc.WithService(binServ),
-		clientGrpc.WithService(credServ))
+		clientGrpc.WithService(credServ),
+		clientGrpc.WithService(cardServ))
 }
 
 func publicKey(key []byte) *rsa.PublicKey {

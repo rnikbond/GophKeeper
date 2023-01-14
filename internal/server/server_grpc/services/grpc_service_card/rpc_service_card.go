@@ -1,6 +1,7 @@
 package grpc_service_card
 
 import (
+	"GophKeeper/internal/client/client_grpc/services/card_service"
 	"context"
 	"errors"
 
@@ -36,10 +37,10 @@ func (serv *CardServiceRPC) Create(ctx context.Context, in *card_store.CreateReq
 
 	data := card.DataCardFull{
 		MetaInfo: in.MetaInfo,
-		Number:   in.Number,
-		Period:   in.Period,
-		CVV:      in.CVV,
-		FullName: in.FullName,
+		Number:   string(in.Number),
+		Period:   string(in.Period),
+		CVV:      string(in.CVV),
+		FullName: string(in.FullName),
 	}
 
 	err := serv.cardApp.Create(data)
@@ -49,10 +50,10 @@ func (serv *CardServiceRPC) Create(ctx context.Context, in *card_store.CreateReq
 			return &card_store.Empty{}, status.Errorf(codes.AlreadyExists, err.Error())
 		}
 
-		if errors.Is(err, app_service_card.ErrInvalidPeriod) ||
-			errors.Is(err, app_service_card.ErrInvalidNumber) ||
-			errors.Is(err, app_service_card.ErrInvalidCVV) ||
-			errors.Is(err, app_service_card.ErrInvalidFullName) {
+		if errors.Is(err, card_service.ErrInvalidPeriod) ||
+			errors.Is(err, card_service.ErrInvalidNumber) ||
+			errors.Is(err, card_service.ErrInvalidCVV) ||
+			errors.Is(err, card_service.ErrInvalidFullName) {
 			return &card_store.Empty{}, status.Errorf(codes.InvalidArgument, err.Error())
 		}
 
@@ -71,10 +72,10 @@ func (serv *CardServiceRPC) Change(ctx context.Context, in *card_store.ChangeReq
 
 	data := card.DataCardFull{
 		MetaInfo: in.MetaInfo,
-		Number:   in.Number,
-		Period:   in.Period,
-		CVV:      in.CVV,
-		FullName: in.FullName,
+		Number:   string(in.Number),
+		Period:   string(in.Period),
+		CVV:      string(in.CVV),
+		FullName: string(in.FullName),
 	}
 
 	err := serv.cardApp.Change(data)
@@ -83,10 +84,10 @@ func (serv *CardServiceRPC) Change(ctx context.Context, in *card_store.ChangeReq
 			return &card_store.Empty{}, status.Errorf(codes.NotFound, err.Error())
 		}
 
-		if errors.Is(err, app_service_card.ErrInvalidPeriod) ||
-			errors.Is(err, app_service_card.ErrInvalidNumber) ||
-			errors.Is(err, app_service_card.ErrInvalidCVV) ||
-			errors.Is(err, app_service_card.ErrInvalidFullName) {
+		if errors.Is(err, card_service.ErrInvalidPeriod) ||
+			errors.Is(err, card_service.ErrInvalidNumber) ||
+			errors.Is(err, card_service.ErrInvalidCVV) ||
+			errors.Is(err, card_service.ErrInvalidFullName) {
 			return &card_store.Empty{}, status.Errorf(codes.InvalidArgument, err.Error())
 		}
 
@@ -145,9 +146,9 @@ func (serv *CardServiceRPC) Get(ctx context.Context, in *card_store.GetRequest) 
 	}
 
 	return &card_store.GetResponse{
-		Number:   get.Number,
-		Period:   get.Period,
-		CVV:      get.CVV,
-		FullName: get.FullName,
+		Number:   []byte(get.Number),
+		Period:   []byte(get.Period),
+		CVV:      []byte(get.CVV),
+		FullName: []byte(get.FullName),
 	}, nil
 }
