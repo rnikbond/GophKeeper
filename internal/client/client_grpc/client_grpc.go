@@ -1,6 +1,15 @@
 package client_grpc
 
 import (
+	"bufio"
+	"errors"
+	"fmt"
+	"os"
+
+	"github.com/fatih/color"
+	"go.uber.org/zap"
+	"google.golang.org/grpc"
+
 	"GophKeeper/internal/client/client_grpc/services"
 	"GophKeeper/internal/client/client_grpc/services/auth_service"
 	"GophKeeper/pkg/errs"
@@ -8,13 +17,6 @@ import (
 	cardStore "GophKeeper/pkg/proto/card"
 	"GophKeeper/pkg/proto/credential"
 	textStore "GophKeeper/pkg/proto/text"
-	"bufio"
-	"errors"
-	"fmt"
-	"github.com/fatih/color"
-	"go.uber.org/zap"
-	"google.golang.org/grpc"
-	"os"
 )
 
 type ClientOptions func(c *ClientGRPC)

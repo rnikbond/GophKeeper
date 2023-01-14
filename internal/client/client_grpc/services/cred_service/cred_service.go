@@ -1,22 +1,24 @@
 package cred_service
 
 import (
-	"GophKeeper/pkg/errs"
-	pb "GophKeeper/pkg/proto/credential"
-	"GophKeeper/pkg/secret"
 	"bufio"
 	"context"
 	"crypto/rsa"
 	"errors"
 	"fmt"
+	"os"
+	"strings"
+
 	"github.com/fatih/color"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
-	"os"
-	"strings"
+
+	"GophKeeper/pkg/errs"
+	pb "GophKeeper/pkg/proto/credential"
+	"GophKeeper/pkg/secret"
 )
 
 type CredOptions func(c *CredService)

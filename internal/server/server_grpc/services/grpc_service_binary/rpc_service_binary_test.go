@@ -1,7 +1,6 @@
 package grpc_service_binary
 
 import (
-	pb "GophKeeper/pkg/proto/binary"
 	"context"
 	"fmt"
 	"testing"
@@ -16,6 +15,7 @@ import (
 	"GophKeeper/internal/model/binary"
 	mock "GophKeeper/internal/server/app_services/app_service_binary/mocks"
 	"GophKeeper/pkg/errs"
+	pb "GophKeeper/pkg/proto/binary"
 )
 
 func TestBinaryServiceRPC_Create(t *testing.T) {

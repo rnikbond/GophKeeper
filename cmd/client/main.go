@@ -1,13 +1,11 @@
 package main
 
 import (
-	"GophKeeper/internal/client/client_grpc/services/binary_service"
-	"GophKeeper/internal/client/client_grpc/services/card_service"
-	"GophKeeper/internal/client/client_grpc/services/cred_service"
 	"crypto/rsa"
 	"crypto/x509"
 	"encoding/pem"
 	"fmt"
+
 	"github.com/fatih/color"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
@@ -16,6 +14,9 @@ import (
 	"GophKeeper/internal/client"
 	clientGrpc "GophKeeper/internal/client/client_grpc"
 	"GophKeeper/internal/client/client_grpc/services/auth_service"
+	"GophKeeper/internal/client/client_grpc/services/binary_service"
+	"GophKeeper/internal/client/client_grpc/services/card_service"
+	"GophKeeper/internal/client/client_grpc/services/cred_service"
 	"GophKeeper/internal/client/client_grpc/services/text_service"
 	"GophKeeper/pkg/logzap"
 )
@@ -77,15 +78,6 @@ func newClient(conn *grpc.ClientConn, cfg *client.Config) *clientGrpc.ClientGRPC
 	} else {
 		color.Yellow("Encoding data: disabled")
 	}
-
-	//reader := bufio.NewReader(os.Stdin)
-	//fmt.Print("Enter text: ")
-	//text, _ := reader.ReadString('\n')
-	//
-	//enc, _ := secret.Encrypt(pubKey, []byte(text))
-	//dec, _ := secret.Decrypt(privKey, enc)
-	//fmt.Println("Encrypt: ", string(enc))
-	//fmt.Println("Decrypt: ", string(dec))
 
 	authServ := auth_service.NewService(conn, auth_service.WithSalt(cfg.Salt))
 	textServ := text_service.NewService(conn, text_service.WithPublicKey(pubKey), text_service.WithPrivateKey(privKey))

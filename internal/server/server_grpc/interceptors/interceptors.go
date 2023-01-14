@@ -4,7 +4,6 @@ import (
 	"context"
 
 	middleware "github.com/grpc-ecosystem/go-grpc-middleware"
-
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"

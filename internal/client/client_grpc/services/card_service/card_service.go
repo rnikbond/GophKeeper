@@ -1,15 +1,16 @@
 package card_service
 
 import (
-	"GophKeeper/internal/model/card"
-	"GophKeeper/pkg/errs"
-	pb "GophKeeper/pkg/proto/card"
-	"GophKeeper/pkg/secret"
 	"bufio"
 	"context"
 	"crypto/rsa"
 	"errors"
 	"fmt"
+	"os"
+	"strconv"
+	"strings"
+	"time"
+
 	"github.com/EClaesson/go-luhn"
 	"github.com/fatih/color"
 	"go.uber.org/zap"
@@ -17,10 +18,11 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
-	"os"
-	"strconv"
-	"strings"
-	"time"
+
+	"GophKeeper/internal/model/card"
+	"GophKeeper/pkg/errs"
+	pb "GophKeeper/pkg/proto/card"
+	"GophKeeper/pkg/secret"
 )
 
 var PeriodLayout = "01.2006"

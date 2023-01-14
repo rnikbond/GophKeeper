@@ -1,22 +1,22 @@
 package server_grpc
 
 import (
-	"GophKeeper/internal/server/server_grpc/services/grpc_service_auth"
-	"GophKeeper/internal/server/server_grpc/services/grpc_service_binary"
-	"GophKeeper/internal/server/server_grpc/services/grpc_service_card"
-	"GophKeeper/internal/server/server_grpc/services/grpc_service_cred"
-	"GophKeeper/internal/server/server_grpc/services/grpc_service_text"
-	pbBinary "GophKeeper/pkg/proto/binary"
-	pbCard "GophKeeper/pkg/proto/card"
-	pbCred "GophKeeper/pkg/proto/credential"
-	pbText "GophKeeper/pkg/proto/text"
 	"net"
 	"time"
 
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 
+	"GophKeeper/internal/server/server_grpc/services/grpc_service_auth"
+	"GophKeeper/internal/server/server_grpc/services/grpc_service_binary"
+	"GophKeeper/internal/server/server_grpc/services/grpc_service_card"
+	"GophKeeper/internal/server/server_grpc/services/grpc_service_cred"
+	"GophKeeper/internal/server/server_grpc/services/grpc_service_text"
 	pbAuth "GophKeeper/pkg/proto/auth"
+	pbBinary "GophKeeper/pkg/proto/binary"
+	pbCard "GophKeeper/pkg/proto/card"
+	pbCred "GophKeeper/pkg/proto/credential"
+	pbText "GophKeeper/pkg/proto/text"
 )
 
 // ServerOption - определяет операцию сервиса авторизации.

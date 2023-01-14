@@ -1,33 +1,33 @@
 package main
 
 import (
+	"fmt"
+	"os"
+	"os/signal"
+	"syscall"
+
+	_ "github.com/golang-migrate/migrate/v4/source/file"
+	_ "github.com/lib/pq"
+	"go.uber.org/zap"
+
+	"GophKeeper/internal/server"
 	"GophKeeper/internal/server/app_services/app_service_auth"
 	"GophKeeper/internal/server/app_services/app_service_binary"
 	"GophKeeper/internal/server/app_services/app_service_card"
 	"GophKeeper/internal/server/app_services/app_service_credential"
 	"GophKeeper/internal/server/app_services/app_service_text"
+	"GophKeeper/internal/server/server_grpc"
+	"GophKeeper/internal/server/server_grpc/interceptors"
 	"GophKeeper/internal/server/server_grpc/services/grpc_service_auth"
 	"GophKeeper/internal/server/server_grpc/services/grpc_service_binary"
 	"GophKeeper/internal/server/server_grpc/services/grpc_service_card"
 	"GophKeeper/internal/server/server_grpc/services/grpc_service_cred"
 	"GophKeeper/internal/server/server_grpc/services/grpc_service_text"
+	"GophKeeper/internal/storage/auth_store"
 	"GophKeeper/internal/storage/binary_store"
 	"GophKeeper/internal/storage/card_store"
 	"GophKeeper/internal/storage/credential_store"
 	"GophKeeper/internal/storage/text_store"
-	"fmt"
-	_ "github.com/golang-migrate/migrate/v4/source/file"
-	_ "github.com/lib/pq"
-	"os"
-	"os/signal"
-	"syscall"
-
-	"go.uber.org/zap"
-
-	"GophKeeper/internal/server"
-	"GophKeeper/internal/server/server_grpc"
-	"GophKeeper/internal/server/server_grpc/interceptors"
-	"GophKeeper/internal/storage/auth_store"
 	"GophKeeper/pkg/logzap"
 )
 

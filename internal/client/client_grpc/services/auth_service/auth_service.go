@@ -1,17 +1,19 @@
 package auth_service
 
 import (
-	"GophKeeper/pkg/errs"
-	pbAuth "GophKeeper/pkg/proto/auth"
-	"GophKeeper/pkg/secret"
 	"bufio"
 	"context"
 	"fmt"
+	"os"
+
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"os"
+
+	"GophKeeper/pkg/errs"
+	pbAuth "GophKeeper/pkg/proto/auth"
+	"GophKeeper/pkg/secret"
 )
 
 type AuthOptions func(c *AuthService)

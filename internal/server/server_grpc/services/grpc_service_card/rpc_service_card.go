@@ -1,7 +1,6 @@
 package grpc_service_card
 
 import (
-	"GophKeeper/internal/client/client_grpc/services/card_service"
 	"context"
 	"errors"
 
@@ -9,6 +8,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
+	"GophKeeper/internal/client/client_grpc/services/card_service"
 	"GophKeeper/internal/model/card"
 	"GophKeeper/internal/server/app_services/app_service_card"
 	"GophKeeper/pkg/errs"

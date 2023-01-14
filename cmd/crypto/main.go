@@ -1,13 +1,15 @@
 package main
 
 import (
-	"GophKeeper/pkg/logzap"
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/x509"
 	"encoding/pem"
-	"go.uber.org/zap"
 	"io/ioutil"
+
+	"go.uber.org/zap"
+
+	"GophKeeper/pkg/logzap"
 )
 
 func GenerateRsaKeyPair() (*rsa.PrivateKey, *rsa.PublicKey) {

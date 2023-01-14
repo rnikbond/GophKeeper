@@ -1,23 +1,25 @@
 package text_service
 
 import (
-	"GophKeeper/pkg/errs"
-	pb "GophKeeper/pkg/proto/text"
-	"GophKeeper/pkg/secret"
 	"bufio"
 	"context"
 	"crypto/rsa"
 	"errors"
 	"fmt"
+	"io/ioutil"
+	"os"
+	"strings"
+
 	"github.com/fatih/color"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
-	"io/ioutil"
-	"os"
-	"strings"
+
+	"GophKeeper/pkg/errs"
+	pb "GophKeeper/pkg/proto/text"
+	"GophKeeper/pkg/secret"
 )
 
 type TextOptions func(c *TextService)
