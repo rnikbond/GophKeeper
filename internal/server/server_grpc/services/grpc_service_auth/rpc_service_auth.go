@@ -3,6 +3,7 @@ package grpc_service_auth
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	"go.uber.org/zap"
 	"google.golang.org/grpc/codes"
@@ -39,6 +40,8 @@ func (serv *AuthServiceRPC) Register(ctx context.Context, in *pb.AuthRequest) (*
 		Email:    in.Email,
 		Password: in.Password,
 	}
+
+	fmt.Println(cred)
 
 	tokenStr, err := serv.auth.Register(cred)
 	if err != nil {
@@ -99,7 +102,7 @@ func (serv *AuthServiceRPC) ChangePassword(ctx context.Context, in *pb.ChangePas
 		return nil, status.Error(codes.Internal, errs.ErrInternal.Error())
 	}
 
-	if err := serv.auth.ChangePassword(email, in.Password); err != nil {
+	if err := serv.auth.ChangePassword(email, string(in.Password)); err != nil {
 
 		if errors.Is(err, app_service_auth.ErrShortPassword) {
 			return nil, status.Error(codes.InvalidArgument, err.Error())

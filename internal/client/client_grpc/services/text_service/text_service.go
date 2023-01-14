@@ -3,8 +3,10 @@ package text_service
 import (
 	"GophKeeper/pkg/errs"
 	pb "GophKeeper/pkg/proto/text"
+	"GophKeeper/pkg/secret"
 	"bufio"
 	"context"
+	"crypto/rsa"
 	"errors"
 	"fmt"
 	"github.com/fatih/color"
@@ -16,18 +18,41 @@ import (
 	"os"
 )
 
+type TextOptions func(c *TextService)
+
 type TextService struct {
-	rpc    pb.TextServiceClient
-	logger *zap.Logger
+	rpc        pb.TextServiceClient
+	logger     *zap.Logger
+	publicKey  *rsa.PublicKey
+	privateKey *rsa.PrivateKey
 
 	Token string
 }
 
 // NewService - Создание экземпляра сервиса для текстовых данных.
-func NewService(conn *grpc.ClientConn) *TextService {
-	return &TextService{
+func NewService(conn *grpc.ClientConn, opts ...TextOptions) *TextService {
+
+	serv := &TextService{
 		rpc:    pb.NewTextServiceClient(conn),
 		logger: zap.L(),
+	}
+
+	for _, opt := range opts {
+		opt(serv)
+	}
+
+	return serv
+}
+
+func WithPublicKey(key *rsa.PublicKey) TextOptions {
+	return func(serv *TextService) {
+		serv.publicKey = key
+	}
+}
+
+func WithPrivateKey(key *rsa.PrivateKey) TextOptions {
+	return func(serv *TextService) {
+		serv.privateKey = key
 	}
 }
 
@@ -119,13 +144,24 @@ func (serv TextService) ShowMenu() error {
 
 func (serv TextService) Create() error {
 
-	data := &pb.CreateRequest{}
+	reader := bufio.NewReader(os.Stdin)
 
-	fmt.Print("Метаинформация : ")
-	fmt.Fscan(os.Stdin, &data.MetaInfo)
+	fmt.Print("Метаинформация: ")
+	meta, _ := reader.ReadString('\n')
 
 	fmt.Print("Текст: ")
-	fmt.Fscan(os.Stdin, &data.Text)
+	text, _ := reader.ReadString('\n')
+
+	encodeData, errEncode := secret.Encrypt(serv.publicKey, []byte(text))
+	if errEncode != nil {
+		serv.logger.Error("failed crypt data", zap.Error(errEncode))
+		return errs.ErrInternal
+	}
+
+	data := &pb.CreateRequest{
+		MetaInfo: meta,
+		Text:     encodeData,
+	}
 
 	md := metadata.New(map[string]string{"token": serv.Token})
 	ctx := metadata.NewOutgoingContext(context.Background(), md)
@@ -150,9 +186,10 @@ func (serv TextService) Create() error {
 func (serv TextService) Get() (string, error) {
 
 	data := &pb.GetRequest{}
+	reader := bufio.NewReader(os.Stdin)
 
-	fmt.Print("Метаинформация : ")
-	fmt.Fscan(os.Stdin, &data.MetaInfo)
+	fmt.Print("Метаинформация: ")
+	data.MetaInfo, _ = reader.ReadString('\n')
 
 	md := metadata.New(map[string]string{"token": serv.Token})
 	ctx := metadata.NewOutgoingContext(context.Background(), md)
@@ -172,15 +209,22 @@ func (serv TextService) Get() (string, error) {
 		return ``, fmt.Errorf("%s %w", err.Error(), errs.ErrInternal)
 	}
 
-	return resp.Text, nil
+	dataDecrypt, errDecode := secret.Decrypt(serv.privateKey, resp.Text)
+	if errDecode != nil {
+		serv.logger.Error("failed decrypt data", zap.Error(errDecode))
+		return ``, errs.ErrInternal
+	}
+
+	return string(dataDecrypt), nil
 }
 
 func (serv TextService) Delete() error {
 
 	data := &pb.DeleteRequest{}
+	reader := bufio.NewReader(os.Stdin)
 
-	fmt.Print("Метаинформация : ")
-	fmt.Fscan(os.Stdin, &data.MetaInfo)
+	fmt.Print("Метаинформация: ")
+	data.MetaInfo, _ = reader.ReadString('\n')
 
 	md := metadata.New(map[string]string{"token": serv.Token})
 	ctx := metadata.NewOutgoingContext(context.Background(), md)
@@ -205,13 +249,24 @@ func (serv TextService) Delete() error {
 
 func (serv TextService) Change() error {
 
-	data := &pb.ChangeRequest{}
+	reader := bufio.NewReader(os.Stdin)
 
-	fmt.Print("Метаинформация : ")
-	fmt.Fscan(os.Stdin, &data.MetaInfo)
+	fmt.Print("Метаинформация: ")
+	meta, _ := reader.ReadString('\n')
 
 	fmt.Print("Текст: ")
-	fmt.Fscan(os.Stdin, &data.Text)
+	text, _ := reader.ReadString('\n')
+
+	encodeData, errEncode := secret.Encrypt(serv.publicKey, []byte(text))
+	if errEncode != nil {
+		serv.logger.Error("failed crypt data", zap.Error(errEncode))
+		return errs.ErrInternal
+	}
+
+	data := &pb.ChangeRequest{
+		MetaInfo: meta,
+		Text:     encodeData,
+	}
 
 	md := metadata.New(map[string]string{"token": serv.Token})
 	ctx := metadata.NewOutgoingContext(context.Background(), md)

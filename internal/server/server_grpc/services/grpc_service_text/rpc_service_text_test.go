@@ -36,7 +36,7 @@ func TestTextServiceRPC_Create(t *testing.T) {
 			name: "Success",
 			in: &pb.CreateRequest{
 				MetaInfo: "book1",
-				Text:     "testText",
+				Text:     []byte("testText"),
 			},
 			errApp:  nil,
 			wantErr: false,
@@ -45,7 +45,7 @@ func TestTextServiceRPC_Create(t *testing.T) {
 			name: "Already exist",
 			in: &pb.CreateRequest{
 				MetaInfo: "book1",
-				Text:     "testText",
+				Text:     []byte("testText"),
 			},
 			errApp:   errs.ErrAlreadyExist,
 			wantErr:  true,
@@ -55,7 +55,7 @@ func TestTextServiceRPC_Create(t *testing.T) {
 			name: "Anomaly app service",
 			in: &pb.CreateRequest{
 				MetaInfo: "book1",
-				Text:     "testText",
+				Text:     []byte("testText"),
 			},
 			errApp:   fmt.Errorf("unknown error"),
 			wantErr:  true,
@@ -68,7 +68,7 @@ func TestTextServiceRPC_Create(t *testing.T) {
 
 			data := text.DataTextFull{
 				MetaInfo: tt.in.MetaInfo,
-				Text:     tt.in.Text,
+				Text:     string(tt.in.Text),
 			}
 
 			textApp.EXPECT().Create(data).Return(tt.errApp)
@@ -105,7 +105,7 @@ func TestTextServiceRPC_Change(t *testing.T) {
 			name: "Success",
 			in: &pb.ChangeRequest{
 				MetaInfo: "book1",
-				Text:     "testText",
+				Text:     []byte("testText"),
 			},
 			errApp:  nil,
 			wantErr: false,
@@ -114,7 +114,7 @@ func TestTextServiceRPC_Change(t *testing.T) {
 			name: "Not found",
 			in: &pb.ChangeRequest{
 				MetaInfo: "book1",
-				Text:     "testText",
+				Text:     []byte("testText"),
 			},
 			errApp:   errs.ErrNotFound,
 			wantErr:  true,
@@ -124,7 +124,7 @@ func TestTextServiceRPC_Change(t *testing.T) {
 			name: "Anomaly app service",
 			in: &pb.ChangeRequest{
 				MetaInfo: "book1",
-				Text:     "testText",
+				Text:     []byte("testText"),
 			},
 			errApp:   fmt.Errorf("unknown error"),
 			wantErr:  true,
@@ -137,7 +137,7 @@ func TestTextServiceRPC_Change(t *testing.T) {
 
 			data := text.DataTextFull{
 				MetaInfo: tt.in.MetaInfo,
-				Text:     tt.in.Text,
+				Text:     string(tt.in.Text),
 			}
 
 			textApp.EXPECT().Change(data).Return(tt.errApp)
@@ -243,7 +243,7 @@ func TestTextServiceRPC_Get(t *testing.T) {
 			},
 			out: &pb.GetResponse{
 				MetaInfo: "book1",
-				Text:     "testText",
+				Text:     []byte("testText"),
 			},
 			errApp:  nil,
 			wantErr: false,

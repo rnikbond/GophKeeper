@@ -125,7 +125,7 @@ func (c *ClientGRPC) showStartMenu() bool {
 					fmt.Println("Некорректный Email или пароль слишком короткий")
 				} else {
 					fmt.Println("Внутренняя ошибка сервиса")
-					c.logger.Fatal("failed sing in", zap.Error(err))
+					//c.logger.Fatal("failed sing up", zap.Error(err))
 				}
 			}
 		}

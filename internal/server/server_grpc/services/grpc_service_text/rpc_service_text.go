@@ -3,7 +3,6 @@ package grpc_service_text
 import (
 	"context"
 	"errors"
-
 	"go.uber.org/zap"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -36,7 +35,7 @@ func (serv *TextServiceRPC) Create(ctx context.Context, in *text_store.CreateReq
 
 	data := text.DataTextFull{
 		MetaInfo: in.MetaInfo,
-		Text:     in.Text,
+		Text:     string(in.Text),
 	}
 
 	err := serv.textApp.Create(data)
@@ -60,7 +59,7 @@ func (serv *TextServiceRPC) Change(ctx context.Context, in *text_store.ChangeReq
 
 	data := text.DataTextFull{
 		MetaInfo: in.MetaInfo,
-		Text:     in.Text,
+		Text:     string(in.Text),
 	}
 
 	err := serv.textApp.Change(data)
@@ -124,7 +123,7 @@ func (serv *TextServiceRPC) Get(ctx context.Context, in *text_store.GetRequest) 
 
 	out := &text_store.GetResponse{
 		MetaInfo: data.MetaInfo,
-		Text:     data.Text,
+		Text:     []byte(data.Text),
 	}
 
 	return out, nil

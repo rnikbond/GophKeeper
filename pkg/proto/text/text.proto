@@ -15,13 +15,12 @@ message Empty {}
 
 message CreateRequest {
   string metaInfo = 1;
-  string text     = 2;
-
+  bytes  text     = 2;
 }
 
 message ChangeRequest {
   string metaInfo = 1;
-  string text     = 2;
+  bytes  text     = 2;
 }
 
 message DeleteRequest {
@@ -34,7 +33,7 @@ message GetRequest {
 
 message GetResponse {
   string metaInfo = 1;
-  string text     = 2;
+  bytes  text     = 2;
 }
 
 /*
