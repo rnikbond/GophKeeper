@@ -375,8 +375,6 @@ func (serv *CardService) SetToken(token string) {
 
 func checkCardData(in card.DataCardFull) error {
 
-	fmt.Println(in.Period)
-	fmt.Println("len", len("in.Period"))
 	if _, errTime := time.Parse(PeriodLayout, in.Period); errTime != nil {
 		return ErrInvalidPeriod
 	}
