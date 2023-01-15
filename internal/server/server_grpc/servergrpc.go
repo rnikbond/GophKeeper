@@ -41,9 +41,15 @@ func NewServer(addr string, interceptor grpc.ServerOption, opts ...ServerOption)
 		return nil, err
 	}
 
+	maxSize := 1024 * 1024 * 10
+	optGrpc := []grpc.ServerOption{
+		interceptor,
+		grpc.MaxRecvMsgSize(maxSize),
+		grpc.MaxSendMsgSize(maxSize),
+	}
+
 	s := &ServerGRPC{
-		//Server:   grpc.NewServer(interceptors.NewValidateInterceptor(secretKey)),
-		Server:   grpc.NewServer(interceptor),
+		Server:   grpc.NewServer(optGrpc...),
 		Listener: listen,
 		logger:   zap.L(),
 	}

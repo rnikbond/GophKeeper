@@ -97,8 +97,14 @@ func (serv BinaryService) ShowMenu() error {
 				} else if errors.Is(err, errs.ErrNotFound) {
 					color.Yellow("Файл с бинарными данными не найден")
 				} else {
-					serv.logger.Error("failed create text data", zap.Error(err))
-					color.Red("Внутренняя ошибка при создании бинарных данных")
+
+					if strings.Contains(err.Error(), "larger than max") {
+						fmt.Println(err.Error())
+						color.Yellow("Файл с бинарными данными слишком большой")
+					} else {
+						serv.logger.Error("failed create bin data", zap.Error(err))
+						color.Red("Внутренняя ошибка при создании бинарных данных")
+					}
 				}
 
 			} else {
@@ -164,7 +170,6 @@ func (serv BinaryService) Create() error {
 
 	if _, err := serv.rpc.Create(ctx, dataReq); err != nil {
 		if e, ok := status.FromError(err); ok {
-
 			switch e.Code() {
 			case codes.AlreadyExists:
 				return errs.ErrAlreadyExist
@@ -280,12 +285,14 @@ func (serv BinaryService) getInput(title string) string {
 
 func (serv BinaryService) getInputEncode(title string) []byte {
 
-	reader := bufio.NewReader(os.Stdin)
+	//reader := bufio.NewReader(os.Stdin)
 
-	fmt.Print(title)
-	data, _ := reader.ReadString('\n')
-	data = strings.Replace(data, "\n", "", -1)
-	data = strings.Replace(data, "\r", "", -1)
+	//fmt.Print(title)
+	//data, _ := reader.ReadString('\n')
+	//data = strings.Replace(data, "\n", "", -1)
+	//data = strings.Replace(data, "\r", "", -1)
+
+	data := "d:/home/big.exe"
 
 	// Выбрали путь к файлу
 	if _, err := os.Stat(data); err == nil {

@@ -3,7 +3,6 @@ package grpc_service_auth
 import (
 	"context"
 	"errors"
-	"fmt"
 
 	"go.uber.org/zap"
 	"google.golang.org/grpc/codes"
@@ -40,8 +39,6 @@ func (serv *AuthServiceRPC) Register(ctx context.Context, in *pb.AuthRequest) (*
 		Email:    in.Email,
 		Password: in.Password,
 	}
-
-	fmt.Println(cred)
 
 	tokenStr, err := serv.auth.Register(cred)
 	if err != nil {
