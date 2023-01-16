@@ -35,7 +35,7 @@ type CardService struct {
 	publicKey  *rsa.PublicKey
 	privateKey *rsa.PrivateKey
 
-	Token string
+	token string
 }
 
 // NewService - Создание экземпляра сервиса для текстовых данных.
@@ -66,7 +66,7 @@ func WithPrivateKey(key *rsa.PrivateKey) CardOptions {
 }
 
 func (serv CardService) ShowMenu() error {
-	if len(serv.Token) == 0 {
+	if len(serv.token) == 0 {
 		return fmt.Errorf("token is empty")
 	}
 
@@ -215,7 +215,7 @@ func (serv CardService) Create() error {
 		FullName: serv.encode([]byte(fullName)),
 	}
 
-	md := metadata.New(map[string]string{"token": serv.Token})
+	md := metadata.New(map[string]string{"token": serv.token})
 	ctx := metadata.NewOutgoingContext(context.Background(), md)
 
 	if _, err := serv.rpc.Create(ctx, dataReq); err != nil {
@@ -241,7 +241,7 @@ func (serv CardService) Get() (card.DataCardFull, error) {
 	data := &pb.GetRequest{}
 	data.MetaInfo = serv.getInput("Метаинформация: ")
 
-	md := metadata.New(map[string]string{"token": serv.Token})
+	md := metadata.New(map[string]string{"token": serv.token})
 	ctx := metadata.NewOutgoingContext(context.Background(), md)
 
 	resp, err := serv.rpc.Get(ctx, data)
@@ -296,7 +296,7 @@ func (serv CardService) Delete() error {
 	data := &pb.DeleteRequest{}
 	data.MetaInfo = serv.getInput("Метаинформация: ")
 
-	md := metadata.New(map[string]string{"token": serv.Token})
+	md := metadata.New(map[string]string{"token": serv.token})
 	ctx := metadata.NewOutgoingContext(context.Background(), md)
 
 	_, err := serv.rpc.Delete(ctx, data)
@@ -344,7 +344,7 @@ func (serv CardService) Change() error {
 		FullName: serv.encode([]byte(fullName)),
 	}
 
-	md := metadata.New(map[string]string{"token": serv.Token})
+	md := metadata.New(map[string]string{"token": serv.token})
 	ctx := metadata.NewOutgoingContext(context.Background(), md)
 
 	_, err := serv.rpc.Change(ctx, dataReq)
@@ -387,7 +387,7 @@ func (serv CardService) Name() string {
 }
 
 func (serv *CardService) SetToken(token string) {
-	serv.Token = token
+	serv.token = token
 }
 
 func checkCardData(in card.DataCardFull) error {

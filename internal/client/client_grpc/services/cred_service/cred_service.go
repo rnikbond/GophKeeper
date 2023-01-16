@@ -29,8 +29,7 @@ type CredService struct {
 	publicKey  *rsa.PublicKey
 	privateKey *rsa.PrivateKey
 
-	// TODO :: Не экспортирумый сделать
-	Token string
+	token string
 }
 
 // NewService - Создание экземпляра сервиса для текстовых данных.
@@ -61,7 +60,7 @@ func WithPrivateKey(key *rsa.PrivateKey) CredOptions {
 }
 
 func (serv CredService) ShowMenu() error {
-	if len(serv.Token) == 0 {
+	if len(serv.token) == 0 {
 		return fmt.Errorf("token is empty")
 	}
 
@@ -167,7 +166,7 @@ func (serv CredService) Create() error {
 		Password: password,
 	}
 
-	md := metadata.New(map[string]string{"token": serv.Token})
+	md := metadata.New(map[string]string{"token": serv.token})
 	ctx := metadata.NewOutgoingContext(context.Background(), md)
 
 	if _, err := serv.rpc.Create(ctx, dataReq); err != nil {
@@ -191,7 +190,7 @@ func (serv CredService) Get() (string, string, error) {
 	data := &pb.GetRequest{}
 	data.MetaInfo = serv.getInput("Метаинформация: ")
 
-	md := metadata.New(map[string]string{"token": serv.Token})
+	md := metadata.New(map[string]string{"token": serv.token})
 	ctx := metadata.NewOutgoingContext(context.Background(), md)
 
 	resp, err := serv.rpc.Get(ctx, data)
@@ -229,7 +228,7 @@ func (serv CredService) Delete() error {
 	data := &pb.DeleteRequest{}
 	data.MetaInfo = serv.getInput("Метаинформация: ")
 
-	md := metadata.New(map[string]string{"token": serv.Token})
+	md := metadata.New(map[string]string{"token": serv.token})
 	ctx := metadata.NewOutgoingContext(context.Background(), md)
 
 	_, err := serv.rpc.Delete(ctx, data)
@@ -262,7 +261,7 @@ func (serv CredService) Change() error {
 		Password: password,
 	}
 
-	md := metadata.New(map[string]string{"token": serv.Token})
+	md := metadata.New(map[string]string{"token": serv.token})
 	ctx := metadata.NewOutgoingContext(context.Background(), md)
 
 	_, err := serv.rpc.Change(ctx, dataReq)
@@ -312,5 +311,5 @@ func (serv CredService) Name() string {
 }
 
 func (serv *CredService) SetToken(token string) {
-	serv.Token = token
+	serv.token = token
 }

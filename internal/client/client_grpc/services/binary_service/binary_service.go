@@ -30,7 +30,7 @@ type BinaryService struct {
 	publicKey  *rsa.PublicKey
 	privateKey *rsa.PrivateKey
 
-	Token string
+	token string
 }
 
 // NewService - Создание экземпляра сервиса для текстовых данных.
@@ -61,7 +61,7 @@ func WithPrivateKey(key *rsa.PrivateKey) BinaryOptions {
 }
 
 func (serv BinaryService) ShowMenu() error {
-	if len(serv.Token) == 0 {
+	if len(serv.token) == 0 {
 		return fmt.Errorf("token is empty")
 	}
 
@@ -171,7 +171,7 @@ func (serv BinaryService) Create() error {
 		Data:     data,
 	}
 
-	md := metadata.New(map[string]string{"token": serv.Token})
+	md := metadata.New(map[string]string{"token": serv.token})
 	ctx := metadata.NewOutgoingContext(context.Background(), md)
 
 	if _, err := serv.rpc.Create(ctx, dataReq); err != nil {
@@ -194,7 +194,7 @@ func (serv BinaryService) Get() (string, error) {
 	data := &pb.GetRequest{}
 	data.MetaInfo = serv.getInput("Метаинформация: ")
 
-	md := metadata.New(map[string]string{"token": serv.Token})
+	md := metadata.New(map[string]string{"token": serv.token})
 	ctx := metadata.NewOutgoingContext(context.Background(), md)
 
 	resp, err := serv.rpc.Get(ctx, data)
@@ -226,7 +226,7 @@ func (serv BinaryService) Delete() error {
 	data := &pb.DeleteRequest{}
 	data.MetaInfo = serv.getInput("Метаинформация: ")
 
-	md := metadata.New(map[string]string{"token": serv.Token})
+	md := metadata.New(map[string]string{"token": serv.token})
 	ctx := metadata.NewOutgoingContext(context.Background(), md)
 
 	_, err := serv.rpc.Delete(ctx, data)
@@ -257,7 +257,7 @@ func (serv BinaryService) Change() error {
 		Data:     data,
 	}
 
-	md := metadata.New(map[string]string{"token": serv.Token})
+	md := metadata.New(map[string]string{"token": serv.token})
 	ctx := metadata.NewOutgoingContext(context.Background(), md)
 
 	_, err := serv.rpc.Change(ctx, dataReq)
@@ -322,5 +322,5 @@ func (serv BinaryService) Name() string {
 }
 
 func (serv *BinaryService) SetToken(token string) {
-	serv.Token = token
+	serv.token = token
 }

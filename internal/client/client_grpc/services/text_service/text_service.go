@@ -30,7 +30,7 @@ type TextService struct {
 	publicKey  *rsa.PublicKey
 	privateKey *rsa.PrivateKey
 
-	Token string
+	token string
 }
 
 // NewService - Создание экземпляра сервиса для текстовых данных.
@@ -61,7 +61,7 @@ func WithPrivateKey(key *rsa.PrivateKey) TextOptions {
 }
 
 func (serv TextService) ShowMenu() error {
-	if len(serv.Token) == 0 {
+	if len(serv.token) == 0 {
 		return fmt.Errorf("token is empty")
 	}
 
@@ -164,7 +164,7 @@ func (serv TextService) Create() error {
 		Text:     data,
 	}
 
-	md := metadata.New(map[string]string{"token": serv.Token})
+	md := metadata.New(map[string]string{"token": serv.token})
 	ctx := metadata.NewOutgoingContext(context.Background(), md)
 
 	_, err := serv.rpc.Create(ctx, dataReq)
@@ -189,7 +189,7 @@ func (serv TextService) Get() (string, error) {
 	data := &pb.GetRequest{}
 	data.MetaInfo = serv.getInput("Метаинформация: ")
 
-	md := metadata.New(map[string]string{"token": serv.Token})
+	md := metadata.New(map[string]string{"token": serv.token})
 	ctx := metadata.NewOutgoingContext(context.Background(), md)
 
 	resp, err := serv.rpc.Get(ctx, data)
@@ -221,7 +221,7 @@ func (serv TextService) Delete() error {
 	data := &pb.DeleteRequest{}
 	data.MetaInfo = serv.getInput("Метаинформация: ")
 
-	md := metadata.New(map[string]string{"token": serv.Token})
+	md := metadata.New(map[string]string{"token": serv.token})
 	ctx := metadata.NewOutgoingContext(context.Background(), md)
 
 	_, err := serv.rpc.Delete(ctx, data)
@@ -252,7 +252,7 @@ func (serv TextService) Change() error {
 		Text:     data,
 	}
 
-	md := metadata.New(map[string]string{"token": serv.Token})
+	md := metadata.New(map[string]string{"token": serv.token})
 	ctx := metadata.NewOutgoingContext(context.Background(), md)
 
 	_, err := serv.rpc.Change(ctx, dataReq)
@@ -315,5 +315,5 @@ func (serv TextService) Name() string {
 }
 
 func (serv *TextService) SetToken(token string) {
-	serv.Token = token
+	serv.token = token
 }
