@@ -13,10 +13,6 @@ import (
 	"GophKeeper/internal/client/client_grpc/services"
 	"GophKeeper/internal/client/client_grpc/services/auth_service"
 	"GophKeeper/pkg/errs"
-	binary2 "GophKeeper/pkg/proto/binary"
-	cardStore "GophKeeper/pkg/proto/card"
-	"GophKeeper/pkg/proto/credential"
-	textStore "GophKeeper/pkg/proto/text"
 )
 
 type ClientOptions func(c *ClientGRPC)
@@ -27,11 +23,6 @@ type ClientGRPC struct {
 
 	auth     *auth_service.AuthService
 	services []services.IService
-
-	rpcCredClient   credential.CredentialServiceClient
-	rpcBinaryClient binary2.BinaryServiceClient
-	rpcTextClient   textStore.TextServiceClient
-	rpcCardClient   cardStore.CardServiceClient
 }
 
 func NewClient(auth *auth_service.AuthService, opts ...ClientOptions) *ClientGRPC {
