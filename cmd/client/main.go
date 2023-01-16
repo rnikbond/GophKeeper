@@ -1,6 +1,7 @@
 package main
 
 import (
+	"GophKeeper/internal/client/app_services/app_service_auth"
 	"crypto/rsa"
 	"crypto/x509"
 	"encoding/pem"
@@ -12,10 +13,10 @@ import (
 
 	"GophKeeper/internal/client"
 	clientGrpc "GophKeeper/internal/client/client_grpc"
-	"GophKeeper/internal/client/client_grpc/services/auth_service"
 	"GophKeeper/internal/client/client_grpc/services/binary_service"
 	"GophKeeper/internal/client/client_grpc/services/card_service"
 	"GophKeeper/internal/client/client_grpc/services/cred_service"
+	"GophKeeper/internal/client/client_grpc/services/rpc_auth_service"
 	"GophKeeper/internal/client/client_grpc/services/text_service"
 	"GophKeeper/pkg/logzap"
 )
@@ -78,7 +79,10 @@ func newClient(conn *grpc.ClientConn, cfg *client.Config) *clientGrpc.ClientGRPC
 		color.Yellow("Encoding data: disabled")
 	}
 
-	authServ := auth_service.NewService(conn, auth_service.WithSalt(cfg.Salt))
+	authApp := app_service_auth.NewService(app_service_auth.WithSalt(cfg.Salt))
+
+	authServ := rpc_auth_service.NewService(conn, authApp)
+
 	textServ := text_service.NewService(conn, text_service.WithPublicKey(pubKey), text_service.WithPrivateKey(privKey))
 	binServ := binary_service.NewService(conn, binary_service.WithPublicKey(pubKey), binary_service.WithPrivateKey(privKey))
 	credServ := cred_service.NewService(conn, cred_service.WithPublicKey(pubKey), cred_service.WithPrivateKey(privKey))

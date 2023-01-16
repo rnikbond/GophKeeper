@@ -11,7 +11,7 @@ import (
 	"google.golang.org/grpc"
 
 	"GophKeeper/internal/client/client_grpc/services"
-	"GophKeeper/internal/client/client_grpc/services/auth_service"
+	"GophKeeper/internal/client/client_grpc/services/rpc_auth_service"
 	"GophKeeper/pkg/errs"
 )
 
@@ -21,11 +21,11 @@ type ClientGRPC struct {
 	conn   *grpc.ClientConn
 	logger *zap.Logger
 
-	auth     *auth_service.AuthService
+	auth     *rpc_auth_service.AuthService
 	services []services.IService
 }
 
-func NewClient(auth *auth_service.AuthService, opts ...ClientOptions) *ClientGRPC {
+func NewClient(auth *rpc_auth_service.AuthService, opts ...ClientOptions) *ClientGRPC {
 
 	c := &ClientGRPC{
 		auth:   auth,

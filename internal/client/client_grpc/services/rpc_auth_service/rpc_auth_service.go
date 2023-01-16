@@ -1,73 +1,48 @@
-package auth_service
+package rpc_auth_service
 
 import (
-	"bufio"
+	"GophKeeper/internal/client/model/auth_model"
 	"context"
 	"fmt"
-	"golang.org/x/term"
-	"os"
-	"syscall"
-
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
 	"GophKeeper/pkg/errs"
-	pbAuth "GophKeeper/pkg/proto/auth"
-	"GophKeeper/pkg/secret"
+	pb "GophKeeper/pkg/proto/auth"
 )
 
-type AuthOptions func(c *AuthService)
+type AuthAppService interface {
+	SignIn() auth_model.Credential
+	SignUp() auth_model.Credential
+}
 
 type AuthService struct {
-	rpc    pbAuth.AuthServiceClient
+	rpc    pb.AuthServiceClient
+	app    AuthAppService
 	logger *zap.Logger
 
 	Token string
-	salt  string
 }
 
 // NewService - Создание экземпляра сервиса авторизации.
-func NewService(conn *grpc.ClientConn, opts ...AuthOptions) *AuthService {
-	serv := &AuthService{
-		rpc:    pbAuth.NewAuthServiceClient(conn),
+func NewService(conn *grpc.ClientConn, app AuthAppService) *AuthService {
+	return &AuthService{
+		rpc:    pb.NewAuthServiceClient(conn),
+		app:    app,
 		logger: zap.L(),
-	}
-
-	for _, opt := range opts {
-		opt(serv)
-	}
-
-	return serv
-}
-
-func WithSalt(salt string) AuthOptions {
-	return func(serv *AuthService) {
-		serv.salt = salt
 	}
 }
 
 // SignIn - Авторизация пользователя.
 func (c *AuthService) SignIn() error {
 
-	auth := &pbAuth.AuthRequest{}
-	reader := bufio.NewReader(os.Stdin)
-
-	fmt.Print("Email: ")
-	auth.Email, _ = reader.ReadString('\n')
-
-	fmt.Print("Пароль: ")
-	pwd, err := term.ReadPassword(int(syscall.Stdin))
-	if err != nil {
-		return err
+	cred := c.app.SignIn()
+	auth := &pb.AuthRequest{
+		Email:    cred.Email,
+		Password: cred.Password,
 	}
-	auth.Password = string(pwd)
-
-	//auth.Email = "test@mail.ru"
-	//auth.Password = "test"
-
-	auth.Password = secret.GeneratePasswordHash(auth.Password, c.salt)
 
 	resp, err := c.rpc.Login(context.Background(), auth)
 	if err != nil {
@@ -90,23 +65,11 @@ func (c *AuthService) SignIn() error {
 // SignUp - Регистрация пользователя.
 func (c *AuthService) SignUp() error {
 
-	auth := &pbAuth.AuthRequest{}
-	reader := bufio.NewReader(os.Stdin)
-
-	fmt.Print("Email: ")
-	auth.Email, _ = reader.ReadString('\n')
-
-	fmt.Print("Пароль: ")
-	pwd, err := term.ReadPassword(int(syscall.Stdin))
-	if err != nil {
-		return err
+	cred := c.app.SignUp()
+	auth := &pb.AuthRequest{
+		Email:    cred.Email,
+		Password: cred.Password,
 	}
-	auth.Password = string(pwd)
-
-	//auth.Email = "test@mail.ru"
-	//auth.Password = "test"
-
-	auth.Password = secret.GeneratePasswordHash(auth.Password, c.salt)
 
 	resp, err := c.rpc.Register(context.Background(), auth)
 	if err != nil {
