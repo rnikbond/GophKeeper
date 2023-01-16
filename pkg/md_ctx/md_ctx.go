@@ -14,7 +14,7 @@ func ValueFromContext(ctx context.Context, key string) (string, bool) {
 	}
 
 	values := md.Get(key)
-	if len(values) != 1 {
+	if len(values) == 0 {
 		return ``, false
 	}
 
