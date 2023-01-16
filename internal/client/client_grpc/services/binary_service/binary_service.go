@@ -92,12 +92,14 @@ func (serv BinaryService) ShowMenu() error {
 			return nil
 		case 1:
 			if err := serv.Create(); err != nil {
-				if errors.Is(err, errs.ErrAlreadyExist) {
+				switch {
+				case errors.Is(err, errs.ErrAlreadyExist):
 					color.Yellow("Такие данные уже существуют")
-				} else if errors.Is(err, errs.ErrNotFound) {
-					color.Yellow("Файл с бинарными данными не найден")
-				} else {
 
+				case errors.Is(err, errs.ErrNotFound):
+					color.Yellow("Файл с бинарными данными не найден")
+
+				default:
 					if strings.Contains(err.Error(), "larger than max") {
 						fmt.Println(err.Error())
 						color.Yellow("Файл с бинарными данными слишком большой")
@@ -106,7 +108,6 @@ func (serv BinaryService) ShowMenu() error {
 						color.Red("Внутренняя ошибка при создании бинарных данных")
 					}
 				}
-
 			} else {
 				color.Green("Данные успешно сохранены")
 			}
@@ -115,12 +116,13 @@ func (serv BinaryService) ShowMenu() error {
 
 			data, err := serv.Get()
 			if err != nil {
-
-				if errors.Is(err, errs.ErrNotFound) {
+				switch {
+				case errors.Is(err, errs.ErrNotFound):
 					color.Red("Такие данные не найдены")
-				} else {
-					serv.logger.Error("failed delete text data", zap.Error(err))
-					color.Red("Внутренняя ошибка при поиске данные")
+
+				default:
+					serv.logger.Error("failed find bin data", zap.Error(err))
+					color.Red("Внутренняя ошибка при поиске данных")
 				}
 			} else {
 				color.Cyan("Данные: %s", data)
@@ -129,9 +131,11 @@ func (serv BinaryService) ShowMenu() error {
 		case 3:
 
 			if err := serv.Delete(); err != nil {
-				if errors.Is(err, errs.ErrNotFound) {
+				switch {
+				case errors.Is(err, errs.ErrNotFound):
 					color.Red("Такие данные не найдены")
-				} else {
+
+				default:
 					serv.logger.Error("failed delete bin data", zap.Error(err))
 					color.Red("Внутренняя ошибка при удалении данных")
 				}
@@ -142,9 +146,11 @@ func (serv BinaryService) ShowMenu() error {
 		case 4:
 
 			if err := serv.Change(); err != nil {
-				if errors.Is(err, errs.ErrNotFound) {
+				switch {
+				case errors.Is(err, errs.ErrNotFound):
 					color.Red("Не найдены данные для изменения")
-				} else {
+
+				default:
 					serv.logger.Error("failed change bin data", zap.Error(err))
 					color.Red("Внутренняя ошибка при изменении данных")
 				}

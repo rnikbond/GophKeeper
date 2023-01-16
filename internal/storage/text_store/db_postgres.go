@@ -1,15 +1,18 @@
 package text_store
 
 import (
-	"GophKeeper/internal/model/text"
-	"GophKeeper/pkg/errs"
 	"context"
 	"database/sql"
 	"errors"
 	"fmt"
+
+	"github.com/jackc/pgerrcode"
 	"github.com/jmoiron/sqlx"
 	"github.com/lib/pq"
 	"go.uber.org/zap"
+
+	"GophKeeper/internal/model/text"
+	"GophKeeper/pkg/errs"
 )
 
 var (
@@ -44,7 +47,7 @@ func (store *PostgresStorage) Create(data text.DataTextFull) error {
 	if _, err := store.db.ExecContext(context.Background(), queryInsert, data.MetaInfo, data.Text); err != nil {
 
 		pqErr := err.(*pq.Error)
-		if pqErr.Code == "23505" {
+		if pqErr.Code == pgerrcode.UniqueViolation {
 			return errs.ErrAlreadyExist
 		}
 

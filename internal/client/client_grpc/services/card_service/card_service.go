@@ -95,77 +95,94 @@ func (serv CardService) ShowMenu() error {
 		switch choice {
 		case 0:
 			return nil
-		case 1:
-			if err := serv.Create(); err != nil {
-				if errors.Is(err, errs.ErrAlreadyExist) {
-					color.Yellow("Такие данные уже существуют")
-				} else if errors.Is(err, ErrInvalidNumber) {
-					color.Yellow("Некорректный номер карты")
-				} else if errors.Is(err, ErrInvalidPeriod) {
-					color.Yellow("Некорректный срок действия карты")
-				} else if errors.Is(err, ErrInvalidCVV) {
-					color.Yellow("Некорректный CVV")
-				} else if errors.Is(err, ErrInvalidFullName) {
-					color.Yellow("Некорректные данные держателя карты")
-				} else {
-					serv.logger.Error("failed create credential data", zap.Error(err))
-					color.Red("Внутренняя ошибка при создании данных авторизации")
-				}
 
-			} else {
+		case 1:
+			err := serv.Create()
+
+			switch {
+			case err == nil:
 				color.Green("Данные успешно сохранены")
+
+			case errors.Is(err, errs.ErrAlreadyExist):
+				color.Yellow("Такие данные уже существуют")
+
+			case errors.Is(err, ErrInvalidNumber):
+				color.Yellow("Некорректный номер карты")
+
+			case errors.Is(err, ErrInvalidPeriod):
+				color.Yellow("Некорректный срок действия карты")
+
+			case errors.Is(err, ErrInvalidCVV):
+				color.Yellow("Некорректный CVV")
+
+			case errors.Is(err, ErrInvalidFullName):
+				color.Yellow("Некорректные данные держателя карты")
+
+			default:
+				serv.logger.Error("failed create card data", zap.Error(err))
+				color.Red("Внутренняя ошибка при создании данных")
 			}
 
 		case 2:
-
 			data, err := serv.Get()
-			if err != nil {
 
-				if errors.Is(err, errs.ErrNotFound) {
-					color.Red("Такие данные не найдены")
-				} else {
-					serv.logger.Error("failed delete text data", zap.Error(err))
-					color.Red("Внутренняя ошибка при поиске данные")
-				}
-			} else {
+			switch {
+			case err == nil:
 				color.Cyan("Номер карты  : %s", data.Number)
 				color.Cyan("Срок действия: %s", data.Period)
 				color.Cyan("CVV          : %s", data.CVV)
 				color.Cyan("Держатель    : %s", data.FullName)
+
+			case errors.Is(err, errs.ErrNotFound):
+				color.Red("Такие данные не найдены")
+
+			default:
+				serv.logger.Error("failed find card data", zap.Error(err))
+				color.Red("Внутренняя ошибка при поиске данные")
 			}
 
 		case 3:
 
-			if err := serv.Delete(); err != nil {
-				if errors.Is(err, errs.ErrNotFound) {
-					color.Red("Такие данные не найдены")
-				} else {
-					serv.logger.Error("failed delete bin data", zap.Error(err))
-					color.Red("Внутренняя ошибка при удалении данных")
-				}
-			} else {
+			err := serv.Delete()
+
+			switch {
+			case err == nil:
 				color.Green("Данные успешно удалены")
+
+			case errors.Is(err, errs.ErrNotFound):
+				color.Red("Такие данные не найдены")
+
+			default:
+				serv.logger.Error("failed delete card data", zap.Error(err))
+				color.Red("Внутренняя ошибка при удалении данных")
 			}
 
 		case 4:
 
-			if err := serv.Change(); err != nil {
-				if errors.Is(err, errs.ErrNotFound) {
-					color.Red("Не найдены данные для изменения")
-				} else if errors.Is(err, ErrInvalidNumber) {
-					color.Yellow("Некорректный номер карты")
-				} else if errors.Is(err, ErrInvalidPeriod) {
-					color.Yellow("Некорректный срок действия карты")
-				} else if errors.Is(err, ErrInvalidCVV) {
-					color.Yellow("Некорректный CVV")
-				} else if errors.Is(err, ErrInvalidFullName) {
-					color.Yellow("Некорректные данные держателя карты")
-				} else {
-					serv.logger.Error("failed change bin data", zap.Error(err))
-					color.Red("Внутренняя ошибка при изменении данных")
-				}
-			} else {
+			err := serv.Change()
+
+			switch {
+			case err == nil:
 				color.Green("Данные успешно изменены")
+
+			case errors.Is(err, errs.ErrAlreadyExist):
+				color.Yellow("Такие данные уже существуют")
+
+			case errors.Is(err, ErrInvalidNumber):
+				color.Yellow("Некорректный номер карты")
+
+			case errors.Is(err, ErrInvalidPeriod):
+				color.Yellow("Некорректный срок действия карты")
+
+			case errors.Is(err, ErrInvalidCVV):
+				color.Yellow("Некорректный CVV")
+
+			case errors.Is(err, ErrInvalidFullName):
+				color.Yellow("Некорректные данные держателя карты")
+
+			default:
+				serv.logger.Error("failed change card data", zap.Error(err))
+				color.Red("Внутренняя ошибка при изменении данных")
 			}
 		}
 	}

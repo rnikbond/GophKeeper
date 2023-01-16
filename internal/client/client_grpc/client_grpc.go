@@ -106,11 +106,14 @@ func (c *ClientGRPC) showStartMenu() bool {
 
 				redColor.Print("\tОшибка авторизации: ")
 
-				if errors.Is(err, errs.ErrNotFound) {
+				switch {
+				case errors.Is(err, errs.ErrNotFound):
 					fmt.Println("Пользователь не найден")
-				} else if errors.Is(err, errs.ErrInvalidArgument) {
+
+				case errors.Is(err, errs.ErrInvalidArgument):
 					fmt.Println("Неверный логин или пароль")
-				} else {
+
+				default:
 					fmt.Println("Внутренняя ошибка сервиса")
 					c.logger.Fatal("failed sing in", zap.Error(err))
 				}
@@ -121,13 +124,16 @@ func (c *ClientGRPC) showStartMenu() bool {
 
 				redColor.Print("\tОшибка регистрации: ")
 
-				if errors.Is(err, errs.ErrAlreadyExist) {
+				switch {
+				case errors.Is(err, errs.ErrAlreadyExist):
 					fmt.Println("Такой Email же зарегистрирован")
-				} else if errors.Is(err, errs.ErrInvalidArgument) {
+
+				case errors.Is(err, errs.ErrInvalidArgument):
 					fmt.Println("Некорректный Email или пароль слишком короткий")
-				} else {
+
+				default:
 					fmt.Println("Внутренняя ошибка сервиса")
-					//c.logger.Fatal("failed sing up", zap.Error(err))
+					c.logger.Fatal("failed sing in", zap.Error(err))
 				}
 			}
 		}

@@ -1,15 +1,18 @@
 package card_store
 
 import (
-	"GophKeeper/internal/model/card"
-	"GophKeeper/pkg/errs"
 	"context"
 	"database/sql"
 	"errors"
 	"fmt"
+
+	"github.com/jackc/pgerrcode"
 	"github.com/jmoiron/sqlx"
 	"github.com/lib/pq"
 	"go.uber.org/zap"
+
+	"GophKeeper/internal/model/card"
+	"GophKeeper/pkg/errs"
 )
 
 var (
@@ -50,7 +53,7 @@ func (store *PostgresStorage) Create(data card.DataCardFull) error {
 		data.FullName); err != nil {
 
 		pqErr := err.(*pq.Error)
-		if pqErr.Code == "23505" {
+		if pqErr.Code == pgerrcode.UniqueViolation {
 			return errs.ErrAlreadyExist
 		}
 

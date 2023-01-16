@@ -90,65 +90,66 @@ func (serv CredService) ShowMenu() error {
 		switch choice {
 		case 0:
 			return nil
-		case 1:
-			if err := serv.Create(); err != nil {
-				if errors.Is(err, errs.ErrAlreadyExist) {
-					color.Yellow("Такие данные уже существуют")
-				} else {
-					serv.logger.Error("failed create credential data", zap.Error(err))
-					color.Red("Внутренняя ошибка при создании данных авторизации")
-				}
 
-			} else {
+		case 1:
+			err := serv.Create()
+
+			switch {
+			case err == nil:
 				color.Green("Данные успешно сохранены")
+
+			case errors.Is(err, errs.ErrAlreadyExist):
+				color.Yellow("Такие данные уже существуют")
+
+			default:
+				serv.logger.Error("failed create credential data", zap.Error(err))
+				color.Red("Внутренняя ошибка при создании данных")
 			}
 
 		case 2:
-
 			login, pwd, err := serv.Get()
-			if err != nil {
 
-				if errors.Is(err, errs.ErrNotFound) {
-					color.Red("Такие данные не найдены")
-				} else {
-					serv.logger.Error("failed delete text data", zap.Error(err))
-					color.Red("Внутренняя ошибка при поиске данные")
-				}
-			} else {
+			switch {
+			case err == nil:
 				color.Cyan("Логин : %s", login)
 				color.Cyan("Пароль: %s", pwd)
+
+			case errors.Is(err, errs.ErrNotFound):
+				color.Red("Такие данные не найдены")
+
+			default:
+				serv.logger.Error("failed find cred data", zap.Error(err))
+				color.Red("Внутренняя ошибка при поиске данные")
 			}
 
 		case 3:
+			err := serv.Delete()
 
-			if err := serv.Delete(); err != nil {
-				if errors.Is(err, errs.ErrNotFound) {
-					color.Red("Такие данные не найдены")
-				} else {
-					serv.logger.Error("failed delete bin data", zap.Error(err))
-					color.Red("Внутренняя ошибка при удалении данных")
-				}
-			} else {
+			switch {
+			case err == nil:
 				color.Green("Данные успешно удалены")
+
+			case errors.Is(err, errs.ErrNotFound):
+				color.Red("Такие данные не найдены")
+
+			default:
+				serv.logger.Error("failed delete cred data", zap.Error(err))
+				color.Red("Внутренняя ошибка при удалении данных")
 			}
 
 		case 4:
+			err := serv.Change()
 
-			if err := serv.Change(); err != nil {
-
-				//switch {
-				//case errors.Is(err, errs.ErrNotFound):
-				//
-				//}
-
-				if errors.Is(err, errs.ErrNotFound) {
-					color.Red("Не найдены данные для изменения")
-				} else {
-					serv.logger.Error("failed change bin data", zap.Error(err))
-					color.Red("Внутренняя ошибка при изменении данных")
-				}
-			} else {
+			switch {
+			case err == nil:
 				color.Green("Данные успешно изменены")
+
+			case errors.Is(err, errs.ErrNotFound):
+				color.Red("Не найдены данные для изменения")
+
+			default:
+				serv.logger.Error("failed change bin data", zap.Error(err))
+				color.Red("Внутренняя ошибка при изменении данных")
 			}
 		}
 	}

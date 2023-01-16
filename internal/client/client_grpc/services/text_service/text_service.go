@@ -90,58 +90,65 @@ func (serv TextService) ShowMenu() error {
 		switch choice {
 		case 0:
 			return nil
-		case 1:
-			if err := serv.Create(); err != nil {
-				if errors.Is(err, errs.ErrAlreadyExist) {
-					color.Yellow("Такие данные уже существуют")
-				} else {
-					serv.logger.Error("failed create text data", zap.Error(err))
-					color.Red("Внутренняя ошибка при создании текстовых данных")
-				}
 
-			} else {
+		case 1:
+			err := serv.Create()
+
+			switch {
+			case err == nil:
 				color.Green("Данные успешно сохранены")
+
+			case errors.Is(err, errs.ErrAlreadyExist):
+				color.Yellow("Такие данные уже существуют")
+
+			default:
+				serv.logger.Error("failed create text data", zap.Error(err))
+				color.Red("Внутренняя ошибка при создании данных")
 			}
 
 		case 2:
-
 			text, err := serv.Get()
-			if err != nil {
 
-				if errors.Is(err, errs.ErrNotFound) {
-					color.Red("Такие данные не найдены")
-				} else {
-					serv.logger.Error("failed delete text data", zap.Error(err))
-					color.Red("Внутренняя ошибка при поиске данные")
-				}
-			} else {
+			switch {
+			case err == nil:
 				color.Cyan("Данные: %s", text)
+
+			case errors.Is(err, errs.ErrNotFound):
+				color.Red("Такие данные не найдены")
+
+			default:
+				serv.logger.Error("failed find text data", zap.Error(err))
+				color.Red("Внутренняя ошибка при поиске данные")
 			}
 
 		case 3:
+			err := serv.Delete()
 
-			if err := serv.Delete(); err != nil {
-				if errors.Is(err, errs.ErrNotFound) {
-					color.Red("Такие данные не найдены")
-				} else {
-					serv.logger.Error("failed delete text data", zap.Error(err))
-					color.Red("Внутренняя ошибка при удалении данных")
-				}
-			} else {
+			switch {
+			case err == nil:
 				color.Green("Данные успешно удалены")
+
+			case errors.Is(err, errs.ErrNotFound):
+				color.Red("Такие данные не найдены")
+
+			default:
+				serv.logger.Error("failed delete text data", zap.Error(err))
+				color.Red("Внутренняя ошибка при удалении данных")
 			}
 
 		case 4:
+			err := serv.Change()
 
-			if err := serv.Change(); err != nil {
-				if errors.Is(err, errs.ErrNotFound) {
-					color.Red("Не найдены данные для изменения")
-				} else {
-					serv.logger.Error("failed change text data", zap.Error(err))
-					color.Red("Внутренняя ошибка при изменении данных")
-				}
-			} else {
+			switch {
+			case err == nil:
 				color.Green("Данные успешно изменены")
+
+			case errors.Is(err, errs.ErrNotFound):
+				color.Red("Не найдены данные для изменения")
+
+			default:
+				serv.logger.Error("failed change text data", zap.Error(err))
+				color.Red("Внутренняя ошибка при изменении данных")
 			}
 		}
 	}
