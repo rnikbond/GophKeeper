@@ -4,7 +4,9 @@ import (
 	"bufio"
 	"context"
 	"fmt"
+	"golang.org/x/term"
 	"os"
+	"syscall"
 
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
@@ -56,7 +58,11 @@ func (c *AuthService) SignIn() error {
 	auth.Email, _ = reader.ReadString('\n')
 
 	fmt.Print("Пароль: ")
-	auth.Password, _ = reader.ReadString('\n')
+	pwd, err := term.ReadPassword(int(syscall.Stdin))
+	if err != nil {
+		return err
+	}
+	auth.Password = string(pwd)
 
 	//auth.Email = "test@mail.ru"
 	//auth.Password = "test"
@@ -91,7 +97,11 @@ func (c *AuthService) SignUp() error {
 	auth.Email, _ = reader.ReadString('\n')
 
 	fmt.Print("Пароль: ")
-	auth.Password, _ = reader.ReadString('\n')
+	pwd, err := term.ReadPassword(int(syscall.Stdin))
+	if err != nil {
+		return err
+	}
+	auth.Password = string(pwd)
 
 	//auth.Email = "test@mail.ru"
 	//auth.Password = "test"

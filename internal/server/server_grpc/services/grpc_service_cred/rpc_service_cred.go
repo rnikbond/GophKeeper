@@ -1,3 +1,4 @@
+//go:generate mockgen -source rpc_service_cred.go -destination mocks/rpc_service_cred_mock.go -package grpc_service_cred
 package grpc_service_cred
 
 import (
@@ -9,20 +10,26 @@ import (
 	"google.golang.org/grpc/status"
 
 	"GophKeeper/internal/model/cred"
-	"GophKeeper/internal/server/app_services/app_service_credential"
 	"GophKeeper/pkg/errs"
 	"GophKeeper/pkg/proto/credential"
 )
 
+type CredentialApp interface {
+	Create(in cred.CredentialFull) error
+	Get(in cred.CredentialGet) (cred.CredentialFull, error)
+	Delete(in cred.CredentialGet) error
+	Change(in cred.CredentialFull) error
+}
+
 type CredServiceRPC struct {
 	credential.CredentialServiceServer
 
-	credApp app_service_credential.CredentialApp
+	credApp CredentialApp
 	logger  *zap.Logger
 }
 
 // NewCredServiceRPC - Создание эклемпляра gRPC сервиса дял хранения данных в виде логина и пароля.
-func NewCredServiceRPC(credApp app_service_credential.CredentialApp) *CredServiceRPC {
+func NewCredServiceRPC(credApp CredentialApp) *CredServiceRPC {
 	serv := &CredServiceRPC{
 		credApp: credApp,
 		logger:  zap.L(),

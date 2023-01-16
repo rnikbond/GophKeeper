@@ -1,4 +1,3 @@
-//go:generate mockgen -source app_service_card.go -destination mocks/app_service_card_mock.go -package app_services
 package app_service_card
 
 import (

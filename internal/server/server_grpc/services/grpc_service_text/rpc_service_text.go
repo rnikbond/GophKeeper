@@ -1,3 +1,4 @@
+//go:generate mockgen -source rpc_service_text.go -destination mocks/rpc_service_text_mock.go -package grpc_service_text
 package grpc_service_text
 
 import (
@@ -8,20 +9,26 @@ import (
 	"google.golang.org/grpc/status"
 
 	"GophKeeper/internal/model/text"
-	"GophKeeper/internal/server/app_services/app_service_text"
 	"GophKeeper/pkg/errs"
 	"GophKeeper/pkg/proto/text"
 )
 
+type TextApp interface {
+	Create(in text.DataTextFull) error
+	Get(in text.DataTextGet) (text.DataTextFull, error)
+	Delete(in text.DataTextGet) error
+	Change(in text.DataTextFull) error
+}
+
 type TextServiceRPC struct {
 	text_store.TextServiceServer
 
-	textApp app_service_text.TextApp
+	textApp TextApp
 	logger  *zap.Logger
 }
 
 // NewTextServiceRPC - Создание эклемпляра gRPC сервиса для хранения текстовыъ данных.
-func NewTextServiceRPC(textApp app_service_text.TextApp) *TextServiceRPC {
+func NewTextServiceRPC(textApp TextApp) *TextServiceRPC {
 	serv := &TextServiceRPC{
 		textApp: textApp,
 		logger:  zap.L(),

@@ -1,4 +1,3 @@
-//go:generate mockgen -source app_service_credential.go -destination mocks/app_service_credential_mock.go -package app_services
 package app_service_credential
 
 import (
@@ -7,13 +6,6 @@ import (
 	"GophKeeper/internal/model/cred"
 	"GophKeeper/internal/storage/credential_store"
 )
-
-type CredentialApp interface {
-	Create(in cred.CredentialFull) error
-	Get(in cred.CredentialGet) (cred.CredentialFull, error)
-	Delete(in cred.CredentialGet) error
-	Change(in cred.CredentialFull) error
-}
 
 type CredentialAppService struct {
 	store  credential_store.CredStorage

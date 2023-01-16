@@ -29,6 +29,7 @@ type CredService struct {
 	publicKey  *rsa.PublicKey
 	privateKey *rsa.PrivateKey
 
+	// TODO :: Не экспортирумый сделать
 	Token string
 }
 
@@ -134,6 +135,12 @@ func (serv CredService) ShowMenu() error {
 		case 4:
 
 			if err := serv.Change(); err != nil {
+
+				//switch {
+				//case errors.Is(err, errs.ErrNotFound):
+				//
+				//}
+
 				if errors.Is(err, errs.ErrNotFound) {
 					color.Red("Не найдены данные для изменения")
 				} else {

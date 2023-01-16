@@ -1,4 +1,3 @@
-//go:generate mockgen -source app_service_text.go -destination mocks/app_service_text_mock.go -package app_services
 package app_service_text
 
 import (
@@ -7,13 +6,6 @@ import (
 	"GophKeeper/internal/model/text"
 	"GophKeeper/internal/storage/text_store"
 )
-
-type TextApp interface {
-	Create(in text.DataTextFull) error
-	Get(in text.DataTextGet) (text.DataTextFull, error)
-	Delete(in text.DataTextGet) error
-	Change(in text.DataTextFull) error
-}
 
 type TextAppService struct {
 	store  text_store.TextStorage

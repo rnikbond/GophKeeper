@@ -13,7 +13,7 @@ import (
 
 	"GophKeeper/internal/client/client_grpc/services/card_service"
 	"GophKeeper/internal/model/card"
-	mock "GophKeeper/internal/server/app_services/app_service_card/mocks"
+	mock "GophKeeper/internal/server/server_grpc/services/grpc_service_card/mocks"
 	"GophKeeper/pkg/errs"
 	pb "GophKeeper/pkg/proto/card"
 )

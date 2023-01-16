@@ -1,3 +1,4 @@
+//go:generate mockgen -source rpc_service_auth.go -destination mocks/rpc_service_auth_mock.go -package grpc_service_auth
 package grpc_service_auth
 
 import (
@@ -15,15 +16,21 @@ import (
 	pb "GophKeeper/pkg/proto/auth"
 )
 
+type AuthApp interface {
+	Login(in auth.Credential) (string, error)
+	Register(in auth.Credential) (string, error)
+	ChangePassword(email, password string) error
+}
+
 type AuthServiceRPC struct {
 	pb.AuthServiceServer
 
-	auth   app_service_auth.AuthApp
+	auth   AuthApp
 	logger *zap.Logger
 }
 
 // NewAuthServiceRPC - Создание эклемпляра gRPC сервиса авторизации и регистрации
-func NewAuthServiceRPC(auth app_service_auth.AuthApp) *AuthServiceRPC {
+func NewAuthServiceRPC(auth AuthApp) *AuthServiceRPC {
 	serv := &AuthServiceRPC{
 		auth:   auth,
 		logger: zap.L(),

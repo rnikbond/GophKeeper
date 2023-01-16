@@ -1,4 +1,3 @@
-//go:generate mockgen -source app_service_auth.go -destination mocks/app_service_auth_mock.go -package app_services
 package app_service_auth
 
 import (

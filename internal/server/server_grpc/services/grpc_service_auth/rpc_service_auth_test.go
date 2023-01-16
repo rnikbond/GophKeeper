@@ -14,7 +14,7 @@ import (
 
 	"GophKeeper/internal/model/auth"
 	"GophKeeper/internal/server/app_services/app_service_auth"
-	mock "GophKeeper/internal/server/app_services/app_service_auth/mocks"
+	mock "GophKeeper/internal/server/server_grpc/services/grpc_service_auth/mocks"
 	"GophKeeper/pkg/errs"
 	pb "GophKeeper/pkg/proto/auth"
 	"GophKeeper/pkg/token"

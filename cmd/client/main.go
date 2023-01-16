@@ -5,7 +5,6 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"fmt"
-
 	"github.com/fatih/color"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"

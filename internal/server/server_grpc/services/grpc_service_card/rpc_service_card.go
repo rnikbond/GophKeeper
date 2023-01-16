@@ -1,3 +1,4 @@
+//go:generate mockgen -source rpc_service_card.go -destination mocks/rpc_service_card_mock.go -package grpc_service_card
 package grpc_service_card
 
 import (
@@ -14,6 +15,13 @@ import (
 	"GophKeeper/pkg/errs"
 	"GophKeeper/pkg/proto/card"
 )
+
+type CardApp interface {
+	Create(data card.DataCardFull) error
+	Get(in card.DataCardGet) (card.DataCardFull, error)
+	Delete(in card.DataCardGet) error
+	Change(in card.DataCardFull) error
+}
 
 type CardServiceRPC struct {
 	card_store.CardServiceServer

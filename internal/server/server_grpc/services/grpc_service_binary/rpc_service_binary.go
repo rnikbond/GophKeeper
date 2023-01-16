@@ -1,3 +1,4 @@
+//go:generate mockgen -source rpc_service_binary.go -destination mocks/rpc_service_binary_mock.go -package grpc_service_binary
 package grpc_service_binary
 
 import (
@@ -9,20 +10,26 @@ import (
 	"google.golang.org/grpc/status"
 
 	"GophKeeper/internal/model/binary"
-	"GophKeeper/internal/server/app_services/app_service_binary"
 	"GophKeeper/pkg/errs"
 	pb "GophKeeper/pkg/proto/binary"
 )
 
+type BinaryApp interface {
+	Create(in binary.DataFull) error
+	Get(in binary.DataGet) (binary.DataFull, error)
+	Delete(in binary.DataGet) error
+	Change(in binary.DataFull) error
+}
+
 type BinaryServiceRPC struct {
 	pb.BinaryServiceServer
 
-	credApp app_service_binary.BinaryApp
+	credApp BinaryApp
 	logger  *zap.Logger
 }
 
 // NewBinaryServiceRPC - Создание эклемпляра gRPC сервиса для хранения бинарных данных.
-func NewBinaryServiceRPC(credApp app_service_binary.BinaryApp) *BinaryServiceRPC {
+func NewBinaryServiceRPC(credApp BinaryApp) *BinaryServiceRPC {
 	serv := &BinaryServiceRPC{
 		credApp: credApp,
 		logger:  zap.L(),

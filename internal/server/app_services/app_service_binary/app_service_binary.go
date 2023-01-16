@@ -1,4 +1,3 @@
-//go:generate mockgen -source app_service_binary.go -destination mocks/app_service_binary_mock.go -package app_services
 package app_service_binary
 
 import (
@@ -7,13 +6,6 @@ import (
 	"GophKeeper/internal/model/binary"
 	"GophKeeper/internal/storage/binary_store"
 )
-
-type BinaryApp interface {
-	Create(in binary.DataFull) error
-	Get(in binary.DataGet) (binary.DataFull, error)
-	Delete(in binary.DataGet) error
-	Change(in binary.DataFull) error
-}
 
 type BinaryAppService struct {
 	store  binary_store.BinaryStorage
