@@ -2,7 +2,7 @@
 package grpc_service_card
 
 import (
-	"GophKeeper/internal/client/grpc_services/card_service"
+	"GophKeeper/internal/client/grpc_services/grpc_service_card"
 	"context"
 	"errors"
 
@@ -58,10 +58,10 @@ func (serv *CardServiceRPC) Create(ctx context.Context, in *card_store.CreateReq
 			return &card_store.Empty{}, status.Errorf(codes.AlreadyExists, err.Error())
 		}
 
-		if errors.Is(err, card_service.ErrInvalidPeriod) ||
-			errors.Is(err, card_service.ErrInvalidNumber) ||
-			errors.Is(err, card_service.ErrInvalidCVV) ||
-			errors.Is(err, card_service.ErrInvalidFullName) {
+		if errors.Is(err, grpc_service_card.ErrInvalidPeriod) ||
+			errors.Is(err, grpc_service_card.ErrInvalidNumber) ||
+			errors.Is(err, grpc_service_card.ErrInvalidCVV) ||
+			errors.Is(err, grpc_service_card.ErrInvalidFullName) {
 			return &card_store.Empty{}, status.Errorf(codes.InvalidArgument, err.Error())
 		}
 
@@ -92,10 +92,10 @@ func (serv *CardServiceRPC) Change(ctx context.Context, in *card_store.ChangeReq
 			return &card_store.Empty{}, status.Errorf(codes.NotFound, err.Error())
 		}
 
-		if errors.Is(err, card_service.ErrInvalidPeriod) ||
-			errors.Is(err, card_service.ErrInvalidNumber) ||
-			errors.Is(err, card_service.ErrInvalidCVV) ||
-			errors.Is(err, card_service.ErrInvalidFullName) {
+		if errors.Is(err, grpc_service_card.ErrInvalidPeriod) ||
+			errors.Is(err, grpc_service_card.ErrInvalidNumber) ||
+			errors.Is(err, grpc_service_card.ErrInvalidCVV) ||
+			errors.Is(err, grpc_service_card.ErrInvalidFullName) {
 			return &card_store.Empty{}, status.Errorf(codes.InvalidArgument, err.Error())
 		}
 

@@ -1,4 +1,4 @@
-package card_service
+package grpc_service_card
 
 import (
 	"GophKeeper/internal/model/card"

@@ -3,10 +3,12 @@ package main
 import (
 	"GophKeeper/internal/client/app_services/app_service_auth"
 	"GophKeeper/internal/client/app_services/app_service_binary"
+	"GophKeeper/internal/client/app_services/app_service_card"
 	"GophKeeper/internal/client/app_services/app_service_cred"
 	"GophKeeper/internal/client/app_services/app_service_text"
 	"GophKeeper/internal/client/grpc_services/grpc_service_auth"
 	"GophKeeper/internal/client/grpc_services/grpc_service_binary"
+	"GophKeeper/internal/client/grpc_services/grpc_service_card"
 	"GophKeeper/internal/client/grpc_services/grpc_service_cred"
 	"GophKeeper/internal/client/grpc_services/grpc_service_text"
 	"crypto/rsa"
@@ -80,24 +82,19 @@ func newClient(conn *grpc.ClientConn, cfg *client.Config) *client.Client {
 	rpcText := grpc_service_text.NewService(conn)
 	rpcBin := grpc_service_binary.NewService(conn)
 	rpcCred := grpc_service_cred.NewService(conn)
+	rpcCard := grpc_service_card.NewService(conn)
 
 	authApp := app_service_auth.NewService(rpcAuth, app_service_auth.WithSalt(cfg.Salt))
 	textApp := app_service_text.NewService(rpcText, app_service_text.WithPublicKey(pubKey), app_service_text.WithPrivateKey(privKey))
 	binApp := app_service_binary.NewService(rpcBin, app_service_binary.WithPublicKey(pubKey), app_service_binary.WithPrivateKey(privKey))
 	credApp := app_service_cred.NewService(rpcCred, app_service_cred.WithPublicKey(pubKey), app_service_cred.WithPrivateKey(privKey))
+	cardApp := app_service_card.NewService(rpcCard, app_service_card.WithPublicKey(pubKey), app_service_card.WithPrivateKey(privKey))
 
 	return client.NewClient(authApp,
 		client.WithService(textApp),
 		client.WithService(binApp),
-		client.WithService(credApp))
-
-	//credServ := grpc_service_cred.NewService(conn, grpc_service_cred.WithPublicKey(pubKey), grpc_service_cred.WithPrivateKey(privKey))
-	//cardServ := card_service.NewService(conn, card_service.WithPublicKey(pubKey), card_service.WithPrivateKey(privKey))
-
-	//return clientGrpc.NewClient(
-	//	authServ,
-	//	clientGrpc.WithService(credServ),
-	//	clientGrpc.WithService(cardServ))
+		client.WithService(credApp),
+		client.WithService(cardApp))
 }
 
 func publicKey(key []byte) *rsa.PublicKey {
