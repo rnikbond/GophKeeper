@@ -1,4 +1,4 @@
-package text_service
+package grpc_service_text
 
 import (
 	"bufio"

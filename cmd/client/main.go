@@ -2,6 +2,7 @@ package main
 
 import (
 	"GophKeeper/internal/client/app_services/app_service_auth"
+	"GophKeeper/internal/client/grpc_services/grpc_service_auth"
 	"crypto/rsa"
 	"crypto/x509"
 	"encoding/pem"
@@ -12,17 +13,7 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 
 	"GophKeeper/internal/client"
-	clientGrpc "GophKeeper/internal/client/client_grpc"
-	"GophKeeper/internal/client/client_grpc/services/binary_service"
-	"GophKeeper/internal/client/client_grpc/services/card_service"
-	"GophKeeper/internal/client/client_grpc/services/cred_service"
-	"GophKeeper/internal/client/client_grpc/services/rpc_auth_service"
-	"GophKeeper/internal/client/client_grpc/services/text_service"
 	"GophKeeper/pkg/logzap"
-)
-
-var (
-	_ = (*clientGrpc.ClientGRPC)(nil)
 )
 
 var (
@@ -68,7 +59,7 @@ func newConfig() *client.Config {
 	return cfg
 }
 
-func newClient(conn *grpc.ClientConn, cfg *client.Config) *clientGrpc.ClientGRPC {
+func newClient(conn *grpc.ClientConn, cfg *client.Config) *client.Client {
 
 	pubKey := publicKey(cfg.PublicKey)
 	privKey := privateKey(cfg.PrivateKey)
@@ -79,21 +70,23 @@ func newClient(conn *grpc.ClientConn, cfg *client.Config) *clientGrpc.ClientGRPC
 		color.Yellow("Encoding data: disabled")
 	}
 
-	authApp := app_service_auth.NewService(app_service_auth.WithSalt(cfg.Salt))
+	rpcAuth := grpc_service_auth.NewService(conn)
 
-	authServ := rpc_auth_service.NewService(conn, authApp)
+	authApp := app_service_auth.NewService(rpcAuth, app_service_auth.WithSalt(cfg.Salt))
 
-	textServ := text_service.NewService(conn, text_service.WithPublicKey(pubKey), text_service.WithPrivateKey(privKey))
-	binServ := binary_service.NewService(conn, binary_service.WithPublicKey(pubKey), binary_service.WithPrivateKey(privKey))
-	credServ := cred_service.NewService(conn, cred_service.WithPublicKey(pubKey), cred_service.WithPrivateKey(privKey))
-	cardServ := card_service.NewService(conn, card_service.WithPublicKey(pubKey), card_service.WithPrivateKey(privKey))
+	return client.NewClient(authApp)
 
-	return clientGrpc.NewClient(
-		authServ,
-		clientGrpc.WithService(textServ),
-		clientGrpc.WithService(binServ),
-		clientGrpc.WithService(credServ),
-		clientGrpc.WithService(cardServ))
+	//textServ := grpc_service_text.NewService(conn, grpc_service_text.WithPublicKey(pubKey), grpc_service_text.WithPrivateKey(privKey))
+	//binServ := binary_service.NewService(conn, binary_service.WithPublicKey(pubKey), binary_service.WithPrivateKey(privKey))
+	//credServ := cred_service.NewService(conn, cred_service.WithPublicKey(pubKey), cred_service.WithPrivateKey(privKey))
+	//cardServ := card_service.NewService(conn, card_service.WithPublicKey(pubKey), card_service.WithPrivateKey(privKey))
+
+	//return clientGrpc.NewClient(
+	//	authServ,
+	//	clientGrpc.WithService(textServ),
+	//	clientGrpc.WithService(binServ),
+	//	clientGrpc.WithService(credServ),
+	//	clientGrpc.WithService(cardServ))
 }
 
 func publicKey(key []byte) *rsa.PublicKey {

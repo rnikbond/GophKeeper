@@ -19,4 +19,5 @@ var (
 	ErrAlreadyExist    = NewErr("already exist")
 	ErrInvalidArgument = NewErr("invalid argument")
 	ErrInternal        = NewErr("internal error")
+	ErrCancel          = NewErr("operation canceled")
 )
