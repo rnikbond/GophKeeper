@@ -1,10 +1,11 @@
 package card_store
 
 import (
-	"github.com/stretchr/testify/require"
 	"testing"
 
-	"GophKeeper/internal/model/card"
+	"github.com/stretchr/testify/require"
+
+	"GophKeeper/internal/server/model/card"
 	"GophKeeper/pkg/errs"
 )
 

@@ -5,7 +5,7 @@
 package grpc_service_binary
 
 import (
-	binary "GophKeeper/internal/model/binary"
+	"GophKeeper/internal/server/model/binary"
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"

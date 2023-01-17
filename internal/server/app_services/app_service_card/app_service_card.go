@@ -3,7 +3,7 @@ package app_service_card
 import (
 	"go.uber.org/zap"
 
-	"GophKeeper/internal/model/card"
+	"GophKeeper/internal/server/model/card"
 	"GophKeeper/internal/storage/card_store"
 )
 

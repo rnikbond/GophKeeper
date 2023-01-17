@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"GophKeeper/internal/model/binary"
+	"GophKeeper/internal/server/model/binary"
 	"GophKeeper/internal/storage/binary_store"
 	"GophKeeper/pkg/errs"
 )

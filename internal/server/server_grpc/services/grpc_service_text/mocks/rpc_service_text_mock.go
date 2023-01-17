@@ -5,7 +5,7 @@
 package grpc_service_text
 
 import (
-	text "GophKeeper/internal/model/text"
+	"GophKeeper/internal/server/model/text"
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"

@@ -3,7 +3,7 @@ package app_service_credential
 import (
 	"go.uber.org/zap"
 
-	"GophKeeper/internal/model/cred"
+	"GophKeeper/internal/server/model/cred"
 	"GophKeeper/internal/storage/credential_store"
 )
 

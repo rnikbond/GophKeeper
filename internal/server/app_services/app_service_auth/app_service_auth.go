@@ -6,7 +6,7 @@ import (
 
 	"go.uber.org/zap"
 
-	authModel "GophKeeper/internal/model/auth"
+	authModel "GophKeeper/internal/server/model/auth"
 	"GophKeeper/internal/storage/auth_store"
 	"GophKeeper/pkg/errs"
 	"GophKeeper/pkg/token"

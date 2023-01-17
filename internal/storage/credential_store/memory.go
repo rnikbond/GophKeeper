@@ -3,7 +3,7 @@ package credential_store
 import (
 	"sync"
 
-	"GophKeeper/internal/model/cred"
+	"GophKeeper/internal/server/model/cred"
 	"GophKeeper/pkg/errs"
 )
 

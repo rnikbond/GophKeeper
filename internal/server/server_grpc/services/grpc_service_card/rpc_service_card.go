@@ -9,8 +9,8 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	"GophKeeper/internal/model/card"
 	"GophKeeper/internal/server/app_services/app_service_card"
+	"GophKeeper/internal/server/model/card"
 	"GophKeeper/pkg/errs"
 	"GophKeeper/pkg/proto/card"
 )

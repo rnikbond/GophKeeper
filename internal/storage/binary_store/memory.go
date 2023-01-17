@@ -3,7 +3,7 @@ package binary_store
 import (
 	"sync"
 
-	"GophKeeper/internal/model/binary"
+	"GophKeeper/internal/server/model/binary"
 	"GophKeeper/pkg/errs"
 )
 

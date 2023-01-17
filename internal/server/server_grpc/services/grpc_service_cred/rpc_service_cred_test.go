@@ -11,7 +11,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	"GophKeeper/internal/model/cred"
+	"GophKeeper/internal/server/model/cred"
 	mock "GophKeeper/internal/server/server_grpc/services/grpc_service_cred/mocks"
 	"GophKeeper/pkg/errs"
 	pb "GophKeeper/pkg/proto/credential"

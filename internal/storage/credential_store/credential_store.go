@@ -1,7 +1,9 @@
 //go:generate mockgen -source credential_store.go -destination mocks/credential_store_mock.go -package credential_store
 package credential_store
 
-import "GophKeeper/internal/model/cred"
+import (
+	"GophKeeper/internal/server/model/cred"
+)
 
 type CredStorage interface {
 	Create(data cred.CredentialFull) error

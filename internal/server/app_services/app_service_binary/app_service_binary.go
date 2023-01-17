@@ -3,7 +3,7 @@ package app_service_binary
 import (
 	"go.uber.org/zap"
 
-	"GophKeeper/internal/model/binary"
+	"GophKeeper/internal/server/model/binary"
 	"GophKeeper/internal/storage/binary_store"
 )
 

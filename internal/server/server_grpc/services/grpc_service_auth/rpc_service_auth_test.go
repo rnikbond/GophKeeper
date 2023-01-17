@@ -12,8 +12,8 @@ import (
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 
-	"GophKeeper/internal/model/auth"
 	"GophKeeper/internal/server/app_services/app_service_auth"
+	"GophKeeper/internal/server/model/auth"
 	mock "GophKeeper/internal/server/server_grpc/services/grpc_service_auth/mocks"
 	"GophKeeper/pkg/errs"
 	pb "GophKeeper/pkg/proto/auth"

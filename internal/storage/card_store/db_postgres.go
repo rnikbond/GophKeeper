@@ -11,7 +11,7 @@ import (
 	"github.com/lib/pq"
 	"go.uber.org/zap"
 
-	"GophKeeper/internal/model/card"
+	"GophKeeper/internal/server/model/card"
 	"GophKeeper/pkg/errs"
 )
 

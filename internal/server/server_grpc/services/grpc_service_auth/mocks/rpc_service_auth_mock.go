@@ -5,7 +5,7 @@
 package grpc_service_auth
 
 import (
-	auth "GophKeeper/internal/model/auth"
+	"GophKeeper/internal/server/model/auth"
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"

@@ -3,7 +3,7 @@ package app_service_text
 import (
 	"go.uber.org/zap"
 
-	"GophKeeper/internal/model/text"
+	"GophKeeper/internal/server/model/text"
 	"GophKeeper/internal/storage/text_store"
 )
 

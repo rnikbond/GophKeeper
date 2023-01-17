@@ -3,7 +3,7 @@ package card_store
 import (
 	"sync"
 
-	"GophKeeper/internal/model/card"
+	"GophKeeper/internal/server/model/card"
 	"GophKeeper/pkg/errs"
 )
 

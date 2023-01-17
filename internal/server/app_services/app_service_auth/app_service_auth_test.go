@@ -6,7 +6,7 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 
-	"GophKeeper/internal/model/auth"
+	"GophKeeper/internal/server/model/auth"
 	"GophKeeper/internal/storage/auth_store"
 	storeMock "GophKeeper/internal/storage/auth_store/mocks"
 	"GophKeeper/pkg/errs"

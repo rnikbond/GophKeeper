@@ -3,7 +3,7 @@ package auth_store
 import (
 	"sync"
 
-	"GophKeeper/internal/model/auth"
+	"GophKeeper/internal/server/model/auth"
 	"GophKeeper/pkg/errs"
 )
 

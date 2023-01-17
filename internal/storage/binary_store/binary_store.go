@@ -2,7 +2,7 @@
 package binary_store
 
 import (
-	"GophKeeper/internal/model/binary"
+	"GophKeeper/internal/server/model/binary"
 )
 
 type BinaryStorage interface {

@@ -9,7 +9,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	"GophKeeper/internal/model/binary"
+	"GophKeeper/internal/server/model/binary"
 	"GophKeeper/pkg/errs"
 	pb "GophKeeper/pkg/proto/binary"
 )

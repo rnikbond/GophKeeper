@@ -3,7 +3,7 @@ package text_store
 import (
 	"sync"
 
-	"GophKeeper/internal/model/text"
+	"GophKeeper/internal/server/model/text"
 	"GophKeeper/pkg/errs"
 )
 

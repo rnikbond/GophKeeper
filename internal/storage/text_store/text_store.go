@@ -1,7 +1,9 @@
 //go:generate mockgen -source text_store.go -destination mocks/text_store_mock.go -package credential_store
 package text_store
 
-import "GophKeeper/internal/model/text"
+import (
+	"GophKeeper/internal/server/model/text"
+)
 
 type TextStorage interface {
 	Create(data text.DataTextFull) error

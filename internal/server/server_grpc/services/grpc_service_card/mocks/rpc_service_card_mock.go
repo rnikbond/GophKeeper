@@ -5,7 +5,7 @@
 package grpc_service_card
 
 import (
-	card "GophKeeper/internal/model/card"
+	"GophKeeper/internal/server/model/card"
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"

@@ -6,7 +6,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	"go.uber.org/zap"
 
-	"GophKeeper/internal/model/auth"
+	"GophKeeper/internal/server/model/auth"
 	"GophKeeper/pkg/errs"
 )
 
