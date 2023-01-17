@@ -1,5 +1,5 @@
-DROP TABLE users;
-DROP TABLE cred_data;
-DROP TABLE bin_data;
-DROP TABLE text_data;
-DROP TABLE card_data;
+DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS cred_data;
+DROP TABLE IF EXISTS bin_data;
+DROP TABLE IF EXISTS text_data;
+DROP TABLE IF EXISTS card_data;
