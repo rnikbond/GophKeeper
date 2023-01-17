@@ -1,7 +1,7 @@
-package app_service_binary
+package app_service_cred
 
 import (
-	"GophKeeper/internal/client/model/binary_model"
+	"GophKeeper/internal/client/model/cred_model"
 	"GophKeeper/pkg/errs"
 	"GophKeeper/pkg/secret"
 	"bufio"
@@ -10,21 +10,20 @@ import (
 	"fmt"
 	"github.com/fatih/color"
 	"go.uber.org/zap"
-	"io/ioutil"
 	"os"
 	"strings"
 )
 
 type Sender interface {
-	Create(text binary_model.Binary, token string) error
-	Get(meta string, token string) (binary_model.Binary, error)
+	Create(data cred_model.Credential, token string) error
+	Get(meta string, token string) (cred_model.Credential, error)
 	Delete(meta string, token string) error
-	Change(text binary_model.Binary, token string) error
+	Change(data cred_model.Credential, token string) error
 }
 
-type BinaryOptions func(c *BinaryService)
+type CredOptions func(c *CredService)
 
-type BinaryService struct {
+type CredService struct {
 	Sender
 
 	publicKey  *rsa.PublicKey
@@ -35,8 +34,8 @@ type BinaryService struct {
 }
 
 // NewService - Создание экземпляра сервиса для текстовых данных.
-func NewService(s Sender, opts ...BinaryOptions) *BinaryService {
-	serv := &BinaryService{
+func NewService(s Sender, opts ...CredOptions) *CredService {
+	serv := &CredService{
 		logger: zap.L(),
 		Sender: s,
 	}
@@ -48,20 +47,19 @@ func NewService(s Sender, opts ...BinaryOptions) *BinaryService {
 	return serv
 }
 
-func WithPublicKey(key *rsa.PublicKey) BinaryOptions {
-	return func(serv *BinaryService) {
+func WithPublicKey(key *rsa.PublicKey) CredOptions {
+	return func(serv *CredService) {
 		serv.publicKey = key
 	}
 }
 
-func WithPrivateKey(key *rsa.PrivateKey) BinaryOptions {
-	return func(serv *BinaryService) {
+func WithPrivateKey(key *rsa.PrivateKey) CredOptions {
+	return func(serv *CredService) {
 		serv.privateKey = key
 	}
 }
 
-func (serv BinaryService) ShowMenu() {
-
+func (serv CredService) ShowMenu() {
 	stdin := bufio.NewReader(os.Stdin)
 
 	for {
@@ -103,20 +101,25 @@ func (serv BinaryService) ShowMenu() {
 	}
 }
 
-func (serv BinaryService) Create() {
-
-	data := binary_model.Binary{}
+func (serv CredService) Create() {
+	data := cred_model.Credential{}
 
 	data.MetaInfo = serv.getInput("Метаинформация: ")
-	data.Data = serv.getInputEncode("Данные: ")
+	data.Login = serv.getInputEncode("Логин: ")
+	data.Password = serv.getInputEncode("Пароль: ")
 
 	if len(data.MetaInfo) == 0 {
 		color.Red("Метаинформация не может быть пустой")
 		return
 	}
 
-	if len(data.Data) == 0 {
-		color.Red("Данные не могут быть пустыми")
+	if len(data.Login) == 0 {
+		color.Red("Логин не может быть пустым")
+		return
+	}
+
+	if len(data.Password) == 0 {
+		color.Red("Пароль не может быть пустым")
 		return
 	}
 
@@ -126,8 +129,7 @@ func (serv BinaryService) Create() {
 	}
 }
 
-func (serv BinaryService) Get() {
-
+func (serv CredService) Get() {
 	meta := serv.getInput("Метаинформация: ")
 
 	if len(meta) == 0 {
@@ -135,23 +137,30 @@ func (serv BinaryService) Get() {
 		return
 	}
 
-	text, err := serv.Sender.Get(meta, serv.token)
+	data, err := serv.Sender.Get(meta, serv.token)
 	if ok := serv.parseError(err); !ok {
 		return
 	}
 
-	dataDec, errDec := secret.Decrypt(serv.privateKey, text.Data)
+	loginDec, errDec := secret.Decrypt(serv.privateKey, data.Login)
 	if errDec != nil {
 		serv.logger.Error("failed decrypt data", zap.Error(errDec))
 		color.Red("Упс... Что-то пошло не так")
 		return
 	}
 
-	color.Cyan("Данные: %s", string(dataDec))
+	passwordDec, errDec := secret.Decrypt(serv.privateKey, data.Password)
+	if errDec != nil {
+		serv.logger.Error("failed decrypt data", zap.Error(errDec))
+		color.Red("Упс... Что-то пошло не так")
+		return
+	}
+
+	color.Cyan("Логин : %s", string(loginDec))
+	color.Cyan("Пароль: %s", string(passwordDec))
 }
 
-func (serv BinaryService) Delete() {
-
+func (serv CredService) Delete() {
 	meta := serv.getInput("Метаинформация: ")
 
 	if len(meta) == 0 {
@@ -165,20 +174,25 @@ func (serv BinaryService) Delete() {
 	}
 }
 
-func (serv BinaryService) Change() {
-
-	data := binary_model.Binary{}
+func (serv CredService) Change() {
+	data := cred_model.Credential{}
 
 	data.MetaInfo = serv.getInput("Метаинформация: ")
-	data.Data = serv.getInputEncode("Текст: ")
+	data.Login = serv.getInputEncode("Логин: ")
+	data.Password = serv.getInputEncode("Пароль: ")
 
 	if len(data.MetaInfo) == 0 {
 		color.Red("Метаинформация не может быть пустой")
 		return
 	}
 
-	if len(data.Data) == 0 {
-		color.Red("Данные не могут быть пустыми")
+	if len(data.Login) == 0 {
+		color.Red("Логин не может быть пустым")
+		return
+	}
+
+	if len(data.Password) == 0 {
+		color.Red("Пароль не может быть пустым")
 		return
 	}
 
@@ -188,8 +202,7 @@ func (serv BinaryService) Change() {
 	}
 }
 
-func (serv BinaryService) parseError(err error) bool {
-
+func (serv CredService) parseError(err error) bool {
 	if err == nil {
 		return true
 	}
@@ -215,8 +228,7 @@ func (serv BinaryService) parseError(err error) bool {
 	return false
 }
 
-func (serv BinaryService) getInput(title string) string {
-
+func (serv CredService) getInput(title string) string {
 	reader := bufio.NewReader(os.Stdin)
 
 	fmt.Print(title)
@@ -227,8 +239,7 @@ func (serv BinaryService) getInput(title string) string {
 	return data
 }
 
-func (serv BinaryService) getInputEncode(title string) []byte {
-
+func (serv CredService) getInputEncode(title string) []byte {
 	reader := bufio.NewReader(os.Stdin)
 
 	fmt.Print(title)
@@ -236,27 +247,14 @@ func (serv BinaryService) getInputEncode(title string) []byte {
 	data = strings.Replace(data, "\n", "", -1)
 	data = strings.Replace(data, "\r", "", -1)
 
-	// Выбрали путь к файлу
-	if _, err := os.Stat(data); err == nil {
-		fileData, errRead := ioutil.ReadFile(data)
-		if errRead != nil {
-			return nil
-		}
-
-		color.Cyan("Выбран файл")
-		data = string(fileData)
-	} else {
-		color.Cyan("Вы ввели данные вручную")
-	}
-
 	encodeData, _ := secret.Encrypt(serv.publicKey, []byte(data))
 	return encodeData
 }
 
-func (serv *BinaryService) SetToken(token string) {
+func (serv *CredService) SetToken(token string) {
 	serv.token = token
 }
 
-func (serv BinaryService) Name() string {
-	return "Бинарные данные"
+func (serv CredService) Name() string {
+	return "Логины и пароли"
 }

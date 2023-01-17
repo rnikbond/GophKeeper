@@ -20,4 +20,5 @@ var (
 	ErrInvalidArgument = NewErr("invalid argument")
 	ErrInternal        = NewErr("internal error")
 	ErrCancel          = NewErr("operation canceled")
+	ErrLargeData       = NewErr("large data")
 )

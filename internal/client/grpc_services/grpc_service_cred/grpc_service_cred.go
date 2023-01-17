@@ -1,66 +1,62 @@
-package grpc_service_text
+package grpc_service_cred
 
 import (
-	"GophKeeper/internal/client/model/text_model"
+	"GophKeeper/internal/client/model/cred_model"
 	"context"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
-	"strings"
 
 	"GophKeeper/pkg/errs"
-	pb "GophKeeper/pkg/proto/text"
+	pb "GophKeeper/pkg/proto/credential"
 )
 
-type TextService struct {
-	rpc    pb.TextServiceClient
+type CredService struct {
+	rpc    pb.CredentialServiceClient
 	logger *zap.Logger
 }
 
 // NewService - Создание экземпляра сервиса для текстовых данных.
-func NewService(conn *grpc.ClientConn) *TextService {
-	return &TextService{
-		rpc:    pb.NewTextServiceClient(conn),
+func NewService(conn *grpc.ClientConn) *CredService {
+	return &CredService{
+		rpc:    pb.NewCredentialServiceClient(conn),
 		logger: zap.L(),
 	}
 }
 
-func (serv TextService) Create(data text_model.Text, token string) error {
+func (serv CredService) Create(data cred_model.Credential, token string) error {
+
 	dataReq := &pb.CreateRequest{
 		MetaInfo: data.MetaInfo,
-		Text:     data.Data,
+		Email:    data.Login,
+		Password: data.Password,
 	}
 
 	md := metadata.New(map[string]string{"token": token})
 	ctx := metadata.NewOutgoingContext(context.Background(), md)
 
-	_, err := serv.rpc.Create(ctx, dataReq)
-	if err == nil {
-		return nil
-	}
+	if _, err := serv.rpc.Create(ctx, dataReq); err != nil {
+		if e, ok := status.FromError(err); ok {
+			switch e.Code() {
+			case codes.AlreadyExists:
+				return errs.ErrAlreadyExist
 
-	if e, ok := status.FromError(err); ok {
-		switch e.Code() {
-		case codes.AlreadyExists:
-			return errs.ErrAlreadyExist
-
-		default:
-			if strings.Contains(err.Error(), "larger than max") {
-				return errs.ErrLargeData
+			default:
+				serv.logger.Error("unknown gRPC error in cred service Create()",
+					zap.Uint32("gRPC code", uint32(e.Code())),
+					zap.String("gRPC text", e.String()))
 			}
-
-			serv.logger.Error("unknown gRPC error in text service Create()",
-				zap.Uint32("gRPC code", uint32(e.Code())),
-				zap.String("gRPC text", e.String()))
 		}
+
+		return errs.ErrInternal
 	}
 
-	return errs.ErrInternal
+	return nil
 }
 
-func (serv TextService) Get(meta, token string) (text_model.Text, error) {
+func (serv CredService) Get(meta string, token string) (cred_model.Credential, error) {
 	data := &pb.GetRequest{
 		MetaInfo: meta,
 	}
@@ -74,24 +70,26 @@ func (serv TextService) Get(meta, token string) (text_model.Text, error) {
 
 			switch e.Code() {
 			case codes.NotFound:
-				return text_model.Text{}, errs.ErrNotFound
+				return cred_model.Credential{}, errs.ErrNotFound
 
 			default:
-				serv.logger.Error("unknown gRPC error in text service Get()",
+				serv.logger.Error("unknown gRPC error in cred service Get()",
 					zap.Uint32("gRPC code", uint32(e.Code())),
 					zap.String("gRPC text", e.String()))
 			}
 		}
-		return text_model.Text{}, errs.ErrInternal
+
+		return cred_model.Credential{}, errs.ErrInternal
 	}
 
-	return text_model.Text{
+	return cred_model.Credential{
 		MetaInfo: meta,
-		Data:     resp.Text,
+		Login:    resp.Email,
+		Password: resp.Password,
 	}, nil
 }
 
-func (serv TextService) Delete(meta, token string) error {
+func (serv CredService) Delete(meta string, token string) error {
 	data := &pb.DeleteRequest{
 		MetaInfo: meta,
 	}
@@ -99,13 +97,15 @@ func (serv TextService) Delete(meta, token string) error {
 	md := metadata.New(map[string]string{"token": token})
 	ctx := metadata.NewOutgoingContext(context.Background(), md)
 
-	if _, err := serv.rpc.Delete(ctx, data); err != nil {
+	_, err := serv.rpc.Delete(ctx, data)
+	if err != nil {
 		if e, ok := status.FromError(err); ok {
 			switch e.Code() {
 			case codes.NotFound:
 				return errs.ErrNotFound
+
 			default:
-				serv.logger.Error("unknown gRPC error in text service Delete()",
+				serv.logger.Error("unknown gRPC error in cred service Delete()",
 					zap.Uint32("gRPC code", uint32(e.Code())),
 					zap.String("gRPC text", e.String()))
 			}
@@ -116,28 +116,25 @@ func (serv TextService) Delete(meta, token string) error {
 	return nil
 }
 
-func (serv TextService) Change(data text_model.Text, token string) error {
+func (serv CredService) Change(data cred_model.Credential, token string) error {
+
 	dataReq := &pb.ChangeRequest{
 		MetaInfo: data.MetaInfo,
-		Text:     data.Data,
+		Email:    data.Login,
+		Password: data.Password,
 	}
 
 	md := metadata.New(map[string]string{"token": token})
 	ctx := metadata.NewOutgoingContext(context.Background(), md)
 
-	_, err := serv.rpc.Change(ctx, dataReq)
-	if err != nil {
+	if _, err := serv.rpc.Change(ctx, dataReq); err != nil {
 		if e, ok := status.FromError(err); ok {
 			switch e.Code() {
 			case codes.NotFound:
 				return errs.ErrNotFound
 
 			default:
-				if strings.Contains(err.Error(), "larger than max") {
-					return errs.ErrLargeData
-				}
-
-				serv.logger.Error("unknown gRPC error in text service Change()",
+				serv.logger.Error("unknown gRPC error in cred service Change()",
 					zap.Uint32("gRPC code", uint32(e.Code())),
 					zap.String("gRPC text", e.String()))
 			}

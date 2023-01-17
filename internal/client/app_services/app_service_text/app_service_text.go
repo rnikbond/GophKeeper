@@ -204,6 +204,9 @@ func (serv TextService) parseError(err error) bool {
 	case errors.Is(err, errs.ErrNotFound):
 		fmt.Println("Такая метаинформация не найдена")
 
+	case errors.Is(err, errs.ErrLargeData):
+		fmt.Println("Размер данных слишком большой")
+
 	default:
 		fmt.Println("Внутренняя ошибка сервиса")
 		serv.logger.Error("unknown error", zap.Error(err))

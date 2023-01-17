@@ -1,66 +1,68 @@
-package grpc_service_text
+package grpc_service_binary
 
 import (
-	"GophKeeper/internal/client/model/text_model"
+	"GophKeeper/internal/client/model/binary_model"
 	"context"
+	"strings"
+
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
-	"strings"
 
 	"GophKeeper/pkg/errs"
-	pb "GophKeeper/pkg/proto/text"
+	pb "GophKeeper/pkg/proto/binary"
 )
 
-type TextService struct {
-	rpc    pb.TextServiceClient
+type BinaryOptions func(c *BinaryService)
+
+type BinaryService struct {
+	rpc    pb.BinaryServiceClient
 	logger *zap.Logger
 }
 
 // NewService - Создание экземпляра сервиса для текстовых данных.
-func NewService(conn *grpc.ClientConn) *TextService {
-	return &TextService{
-		rpc:    pb.NewTextServiceClient(conn),
+func NewService(conn *grpc.ClientConn) *BinaryService {
+	return &BinaryService{
+		rpc:    pb.NewBinaryServiceClient(conn),
 		logger: zap.L(),
 	}
+
 }
 
-func (serv TextService) Create(data text_model.Text, token string) error {
+func (serv BinaryService) Create(data binary_model.Binary, token string) error {
 	dataReq := &pb.CreateRequest{
 		MetaInfo: data.MetaInfo,
-		Text:     data.Data,
+		Data:     data.Data,
 	}
 
 	md := metadata.New(map[string]string{"token": token})
 	ctx := metadata.NewOutgoingContext(context.Background(), md)
 
-	_, err := serv.rpc.Create(ctx, dataReq)
-	if err == nil {
-		return nil
-	}
+	if _, err := serv.rpc.Create(ctx, dataReq); err != nil {
+		if e, ok := status.FromError(err); ok {
+			switch e.Code() {
+			case codes.AlreadyExists:
+				return errs.ErrAlreadyExist
 
-	if e, ok := status.FromError(err); ok {
-		switch e.Code() {
-		case codes.AlreadyExists:
-			return errs.ErrAlreadyExist
+			default:
+				if strings.Contains(err.Error(), "larger than max") {
+					return errs.ErrLargeData
+				}
 
-		default:
-			if strings.Contains(err.Error(), "larger than max") {
-				return errs.ErrLargeData
+				serv.logger.Error("unknown gRPC error in binary service Create()",
+					zap.Uint32("gRPC code", uint32(e.Code())),
+					zap.String("gRPC text", e.String()))
 			}
-
-			serv.logger.Error("unknown gRPC error in text service Create()",
-				zap.Uint32("gRPC code", uint32(e.Code())),
-				zap.String("gRPC text", e.String()))
 		}
+		return errs.ErrInternal
 	}
 
-	return errs.ErrInternal
+	return nil
 }
 
-func (serv TextService) Get(meta, token string) (text_model.Text, error) {
+func (serv BinaryService) Get(meta, token string) (binary_model.Binary, error) {
 	data := &pb.GetRequest{
 		MetaInfo: meta,
 	}
@@ -74,24 +76,24 @@ func (serv TextService) Get(meta, token string) (text_model.Text, error) {
 
 			switch e.Code() {
 			case codes.NotFound:
-				return text_model.Text{}, errs.ErrNotFound
+				return binary_model.Binary{}, errs.ErrNotFound
 
 			default:
-				serv.logger.Error("unknown gRPC error in text service Get()",
+				serv.logger.Error("unknown gRPC error in binary service Get()",
 					zap.Uint32("gRPC code", uint32(e.Code())),
 					zap.String("gRPC text", e.String()))
 			}
 		}
-		return text_model.Text{}, errs.ErrInternal
+		return binary_model.Binary{}, errs.ErrInternal
 	}
 
-	return text_model.Text{
+	return binary_model.Binary{
 		MetaInfo: meta,
-		Data:     resp.Text,
+		Data:     resp.Data,
 	}, nil
 }
 
-func (serv TextService) Delete(meta, token string) error {
+func (serv BinaryService) Delete(meta, token string) error {
 	data := &pb.DeleteRequest{
 		MetaInfo: meta,
 	}
@@ -101,11 +103,13 @@ func (serv TextService) Delete(meta, token string) error {
 
 	if _, err := serv.rpc.Delete(ctx, data); err != nil {
 		if e, ok := status.FromError(err); ok {
+
 			switch e.Code() {
 			case codes.NotFound:
 				return errs.ErrNotFound
+
 			default:
-				serv.logger.Error("unknown gRPC error in text service Delete()",
+				serv.logger.Error("unknown gRPC error in binary service Delete()",
 					zap.Uint32("gRPC code", uint32(e.Code())),
 					zap.String("gRPC text", e.String()))
 			}
@@ -116,10 +120,10 @@ func (serv TextService) Delete(meta, token string) error {
 	return nil
 }
 
-func (serv TextService) Change(data text_model.Text, token string) error {
+func (serv BinaryService) Change(data binary_model.Binary, token string) error {
 	dataReq := &pb.ChangeRequest{
 		MetaInfo: data.MetaInfo,
-		Text:     data.Data,
+		Data:     data.Data,
 	}
 
 	md := metadata.New(map[string]string{"token": token})
@@ -137,7 +141,7 @@ func (serv TextService) Change(data text_model.Text, token string) error {
 					return errs.ErrLargeData
 				}
 
-				serv.logger.Error("unknown gRPC error in text service Change()",
+				serv.logger.Error("unknown gRPC error in binary service Change()",
 					zap.Uint32("gRPC code", uint32(e.Code())),
 					zap.String("gRPC text", e.String()))
 			}
