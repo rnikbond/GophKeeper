@@ -1,3 +1,4 @@
+//go:generate mockgen -source grpc_service_text.go -destination mocks/grpc_service_text_mock.go -package grpc_service_text
 package grpc_service_text
 
 import (

@@ -1,3 +1,4 @@
+//go:generate mockgen -source grpc_service_cred.go -destination mocks/grpc_service_cred_mock.go -package grpc_service_cred
 package grpc_service_cred
 
 import (

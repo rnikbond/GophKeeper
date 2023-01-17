@@ -5,7 +5,7 @@
 package binary_store
 
 import (
-	"GophKeeper/internal/server/model/binary"
+	binary "GophKeeper/internal/server/model/binary"
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"

@@ -1,3 +1,4 @@
+//go:generate mockgen -source grpc_service_binary.go -destination mocks/grpc_service_binary_mock.go -package grpc_service_binary
 package grpc_service_binary
 
 import (

@@ -5,7 +5,7 @@
 package credential_store
 
 import (
-	"GophKeeper/internal/server/model/cred"
+	cred "GophKeeper/internal/server/model/cred"
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"

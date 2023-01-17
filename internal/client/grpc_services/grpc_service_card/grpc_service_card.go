@@ -1,3 +1,4 @@
+//go:generate mockgen -source grpc_service_card.go -destination mocks/grpc_service_card_mock.go -package grpc_service_card
 package grpc_service_card
 
 import (

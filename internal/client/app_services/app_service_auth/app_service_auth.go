@@ -93,26 +93,14 @@ func (serv AuthService) Token() (string, error) {
 // SignIn - Авторизация пользователя.
 func (serv AuthService) signIn() (string, error) {
 
-	//cred := serv.readCredential()
-
-	cred := auth_model.Credential{
-		Email:    "email@com",
-		Password: "email123",
-	}
-
+	cred := serv.readCredential()
 	return serv.Sender.SignIn(cred)
 }
 
 // SignUp - Регистрация пользователя.
 func (serv AuthService) signUp() (string, error) {
 
-	//cred := serv.readCredential()
-
-	cred := auth_model.Credential{
-		Email:    "email@com",
-		Password: "email123",
-	}
-
+	cred := serv.readCredential()
 	return serv.Sender.SignUp(cred)
 }
 
