@@ -1,14 +1,16 @@
 package client
 
 import (
-	"GophKeeper/internal/client/app_services/app_service_auth"
-	"GophKeeper/pkg/errs"
 	"bufio"
 	"errors"
 	"fmt"
+	"os"
+
 	"github.com/fatih/color"
 	"go.uber.org/zap"
-	"os"
+
+	"GophKeeper/internal/client/app_services/app_service_auth"
+	"GophKeeper/pkg/errs"
 )
 
 type Options func(c *Client)

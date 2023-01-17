@@ -1,14 +1,15 @@
 package grpc_service_card
 
 import (
-	"GophKeeper/internal/client/model/card_model"
 	"context"
+
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 
+	"GophKeeper/internal/client/model/card_model"
 	"GophKeeper/pkg/errs"
 	pb "GophKeeper/pkg/proto/card"
 )

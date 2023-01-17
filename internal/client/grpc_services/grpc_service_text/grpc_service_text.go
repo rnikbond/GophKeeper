@@ -1,15 +1,16 @@
 package grpc_service_text
 
 import (
-	"GophKeeper/internal/client/model/text_model"
 	"context"
+	"strings"
+
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
-	"strings"
 
+	"GophKeeper/internal/client/model/text_model"
 	"GophKeeper/pkg/errs"
 	pb "GophKeeper/pkg/proto/text"
 )

@@ -1,6 +1,17 @@
 package main
 
 import (
+	"crypto/rsa"
+	"crypto/x509"
+	"encoding/pem"
+	"fmt"
+
+	"github.com/fatih/color"
+	"go.uber.org/zap"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
+
+	"GophKeeper/internal/client"
 	"GophKeeper/internal/client/app_services/app_service_auth"
 	"GophKeeper/internal/client/app_services/app_service_binary"
 	"GophKeeper/internal/client/app_services/app_service_card"
@@ -11,16 +22,6 @@ import (
 	"GophKeeper/internal/client/grpc_services/grpc_service_card"
 	"GophKeeper/internal/client/grpc_services/grpc_service_cred"
 	"GophKeeper/internal/client/grpc_services/grpc_service_text"
-	"crypto/rsa"
-	"crypto/x509"
-	"encoding/pem"
-	"fmt"
-	"github.com/fatih/color"
-	"go.uber.org/zap"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
-
-	"GophKeeper/internal/client"
 	"GophKeeper/pkg/logzap"
 )
 

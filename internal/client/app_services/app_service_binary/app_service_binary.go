@@ -1,18 +1,20 @@
 package app_service_binary
 
 import (
-	"GophKeeper/internal/client/model/binary_model"
-	"GophKeeper/pkg/errs"
-	"GophKeeper/pkg/secret"
 	"bufio"
 	"crypto/rsa"
 	"errors"
 	"fmt"
-	"github.com/fatih/color"
-	"go.uber.org/zap"
 	"io/ioutil"
 	"os"
 	"strings"
+
+	"github.com/fatih/color"
+	"go.uber.org/zap"
+
+	"GophKeeper/internal/client/model/binary_model"
+	"GophKeeper/pkg/errs"
+	"GophKeeper/pkg/secret"
 )
 
 type Sender interface {

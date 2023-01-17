@@ -1,7 +1,6 @@
 package grpc_service_binary
 
 import (
-	"GophKeeper/internal/client/model/binary_model"
 	"context"
 	"strings"
 
@@ -11,6 +10,7 @@ import (
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 
+	"GophKeeper/internal/client/model/binary_model"
 	"GophKeeper/pkg/errs"
 	pb "GophKeeper/pkg/proto/binary"
 )

@@ -1,17 +1,19 @@
 package app_service_cred
 
 import (
-	"GophKeeper/internal/client/model/cred_model"
-	"GophKeeper/pkg/errs"
-	"GophKeeper/pkg/secret"
 	"bufio"
 	"crypto/rsa"
 	"errors"
 	"fmt"
-	"github.com/fatih/color"
-	"go.uber.org/zap"
 	"os"
 	"strings"
+
+	"github.com/fatih/color"
+	"go.uber.org/zap"
+
+	"GophKeeper/internal/client/model/cred_model"
+	"GophKeeper/pkg/errs"
+	"GophKeeper/pkg/secret"
 )
 
 type Sender interface {

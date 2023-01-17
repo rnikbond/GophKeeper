@@ -1,14 +1,15 @@
 package grpc_service_cred
 
 import (
-	"GophKeeper/internal/client/model/cred_model"
 	"context"
+
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 
+	"GophKeeper/internal/client/model/cred_model"
 	"GophKeeper/pkg/errs"
 	pb "GophKeeper/pkg/proto/credential"
 )

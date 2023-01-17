@@ -1,20 +1,22 @@
 package app_service_card
 
 import (
-	"GophKeeper/internal/client/model/card_model"
-	"GophKeeper/pkg/errs"
-	"GophKeeper/pkg/secret"
 	"bufio"
 	"crypto/rsa"
 	"errors"
 	"fmt"
-	"github.com/EClaesson/go-luhn"
-	"github.com/fatih/color"
-	"go.uber.org/zap"
 	"os"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/EClaesson/go-luhn"
+	"github.com/fatih/color"
+	"go.uber.org/zap"
+
+	"GophKeeper/internal/client/model/card_model"
+	"GophKeeper/pkg/errs"
+	"GophKeeper/pkg/secret"
 )
 
 var PeriodLayout = "01.2006"

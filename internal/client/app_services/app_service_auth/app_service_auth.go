@@ -1,17 +1,18 @@
 package app_service_auth
 
 import (
-	"GophKeeper/pkg/errs"
 	"bufio"
 	"errors"
 	"fmt"
-	"github.com/fatih/color"
-	"go.uber.org/zap"
-	"golang.org/x/term"
 	"os"
 	"syscall"
 
+	"github.com/fatih/color"
+	"go.uber.org/zap"
+	"golang.org/x/term"
+
 	"GophKeeper/internal/client/model/auth_model"
+	"GophKeeper/pkg/errs"
 	"GophKeeper/pkg/secret"
 )
 

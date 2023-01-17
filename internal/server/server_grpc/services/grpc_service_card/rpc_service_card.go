@@ -2,7 +2,6 @@
 package grpc_service_card
 
 import (
-	"GophKeeper/internal/client/grpc_services/grpc_service_card"
 	"context"
 	"errors"
 
@@ -58,13 +57,6 @@ func (serv *CardServiceRPC) Create(ctx context.Context, in *card_store.CreateReq
 			return &card_store.Empty{}, status.Errorf(codes.AlreadyExists, err.Error())
 		}
 
-		if errors.Is(err, grpc_service_card.ErrInvalidPeriod) ||
-			errors.Is(err, grpc_service_card.ErrInvalidNumber) ||
-			errors.Is(err, grpc_service_card.ErrInvalidCVV) ||
-			errors.Is(err, grpc_service_card.ErrInvalidFullName) {
-			return &card_store.Empty{}, status.Errorf(codes.InvalidArgument, err.Error())
-		}
-
 		serv.logger.Error("failed create card data",
 			zap.Error(err),
 			zap.String("meta", in.MetaInfo))
@@ -90,13 +82,6 @@ func (serv *CardServiceRPC) Change(ctx context.Context, in *card_store.ChangeReq
 	if err != nil {
 		if errors.Is(err, errs.ErrNotFound) {
 			return &card_store.Empty{}, status.Errorf(codes.NotFound, err.Error())
-		}
-
-		if errors.Is(err, grpc_service_card.ErrInvalidPeriod) ||
-			errors.Is(err, grpc_service_card.ErrInvalidNumber) ||
-			errors.Is(err, grpc_service_card.ErrInvalidCVV) ||
-			errors.Is(err, grpc_service_card.ErrInvalidFullName) {
-			return &card_store.Empty{}, status.Errorf(codes.InvalidArgument, err.Error())
 		}
 
 		serv.logger.Error("failed change card data",
