@@ -92,14 +92,26 @@ func (serv AuthService) Token() (string, error) {
 // SignIn - Авторизация пользователя.
 func (serv AuthService) signIn() (string, error) {
 
-	cred := serv.readCredential()
+	//cred := serv.readCredential()
+
+	cred := auth_model.Credential{
+		Email:    "email@com",
+		Password: "email123",
+	}
+
 	return serv.Sender.SignIn(cred)
 }
 
 // SignUp - Регистрация пользователя.
 func (serv AuthService) signUp() (string, error) {
 
-	cred := serv.readCredential()
+	//cred := serv.readCredential()
+
+	cred := auth_model.Credential{
+		Email:    "email@com",
+		Password: "email123",
+	}
+
 	return serv.Sender.SignUp(cred)
 }
 
@@ -140,7 +152,7 @@ func (serv AuthService) parseErr(err error) bool {
 
 	default:
 		fmt.Println("Внутренняя ошибка сервиса")
-		serv.logger.Error("unknown gRPC error", zap.Error(err))
+		serv.logger.Error("unknown error", zap.Error(err))
 	}
 
 	return false

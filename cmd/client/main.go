@@ -2,7 +2,9 @@ package main
 
 import (
 	"GophKeeper/internal/client/app_services/app_service_auth"
+	"GophKeeper/internal/client/app_services/app_service_text"
 	"GophKeeper/internal/client/grpc_services/grpc_service_auth"
+	"GophKeeper/internal/client/grpc_services/grpc_service_text"
 	"crypto/rsa"
 	"crypto/x509"
 	"encoding/pem"
@@ -71,10 +73,13 @@ func newClient(conn *grpc.ClientConn, cfg *client.Config) *client.Client {
 	}
 
 	rpcAuth := grpc_service_auth.NewService(conn)
+	rpcText := grpc_service_text.NewService(conn)
 
 	authApp := app_service_auth.NewService(rpcAuth, app_service_auth.WithSalt(cfg.Salt))
+	textApp := app_service_text.NewService(rpcText, app_service_text.WithPublicKey(pubKey), app_service_text.WithPrivateKey(privKey))
 
-	return client.NewClient(authApp)
+	return client.NewClient(authApp,
+		client.WithService(textApp))
 
 	//textServ := grpc_service_text.NewService(conn, grpc_service_text.WithPublicKey(pubKey), grpc_service_text.WithPrivateKey(privKey))
 	//binServ := binary_service.NewService(conn, binary_service.WithPublicKey(pubKey), binary_service.WithPrivateKey(privKey))

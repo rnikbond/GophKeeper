@@ -15,7 +15,7 @@ type Options func(c *Client)
 
 type IService interface {
 	Name() string
-	ShowMenu() error
+	ShowMenu()
 	SetToken(token string)
 }
 
@@ -107,9 +107,7 @@ func (c *Client) showServicesMenu() {
 		}
 
 		if choice >= 1 && choice <= len(c.services) {
-			if err := c.services[choice-1].ShowMenu(); err != nil {
-				c.logger.Error(fmt.Sprintf("failed run menu service %s", c.services[choice-1].Name()), zap.Error(err))
-			}
+			c.services[choice-1].ShowMenu()
 		}
 	}
 }
